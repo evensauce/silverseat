@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+
+        <div class="flex justify-end items-center mb-6">
+            <span class="mr-3 text-sm font-medium text-gray-900">Customer View</span>
+            <label for="view-toggle" class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="view-toggle" class="sr-only peer toggle-checkbox">
+                <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 toggle-label relative transition duration-200 ease-in-out"></div>
+            </label>
+            <span class="ml-3 text-sm font-medium text-gray-900">Admin View</span>
+        </div>
+
+        <div id="admin-view" class="hidden space-y-8">
+            <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Admin Panel</h1>
+
+            <div class="p-6 border rounded-lg shadow-lg bg-white">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
+                <form id="movie-form" class="space-y-4">
+                    <input type="hidden" id="edit-index"> <div>
+                        <label for="title" class="form-label">Title:</label>
+                        <input type="text" id="title" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="poster" class="form-label">Poster Image URL:</label>
+                        <input type="url" id="poster" class="form-input" placeholder="https://example.com/image.jpg" required>
+                    </div>
+                    <div>
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea id="description" class="form-input" rows="3" required></textarea>
+                    </div>
+                    <div>
+                        <label for="genre" class="form-label">Genre:</label>
+                        <input type="text" id="genre" class="form-input" placeholder="e.g., Action, Comedy, Sci-Fi" required>
+                    </div>
+                    <div>
+                        <label for="duration" class="form-label">Duration (minutes):</label>
+                        <input type="number" id="duration" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="showtimes" class="form-label">Showtimes (comma-separated):</label>
+                        <input type="text" id="showtimes" class="form-input" placeholder="e.g., 10:00 AM, 1:00 PM, 4:00 PM" required>
+                    </div>
+                    <div class="flex gap-4 pt-2">
+                        <button type="submit" id="submit-button" class="btn btn-primary">Add Movie</button>
+                        <button type="button" id="cancel-edit-button" class="btn btn-secondary hidden">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Manage Movies</h2>
+                <div id="admin-movie-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <p id="no-movies-admin" class="text-gray-500 col-span-full">No movies added yet.</p>
+                </div>
+            </div>
+
+             <div>
+                <h2 class="text-2xl font-semibold mt-8 mb-4 text-gray-700">Live Customer View Preview</h2>
+                <div id="admin-preview-customer-view" class="border rounded-lg p-6 bg-gray-50 shadow-inner">
+                     <div id="customer-movie-list-preview" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                         <p id="no-movies-preview" class="text-gray-500 col-span-full">No movies to preview.</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="customer-view">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Now Showing</h1>
+            <div id="customer-movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <p id="no-movies-customer" class="text-gray-500 col-span-full">No movies currently showing.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="edit-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-semibold mb-4">Edit Movie</h2>
+            <form id="edit-movie-form" class="space-y-4">
+                 <input type="hidden" id="modal-edit-index">
+                 <div>
+                     <label for="modal-title" class="form-label">Title:</label>
+                     <input type="text" id="modal-title" class="form-input" required>
+                 </div>
+                 <div>
+                     <label for="modal-poster" class="form-label">Poster Image URL:</label>
+                     <input type="url" id="modal-poster" class="form-input" required>
+                 </div>
+                 <div>
+                     <label for="modal-description" class="form-label">Description:</label>
+                     <textarea id="modal-description" class="form-input" rows="3" required></textarea>
+                 </div>
+                 <div>
+                     <label for="modal-genre" class="form-label">Genre:</label>
+                     <input type="text" id="modal-genre" class="form-input" required>
+                 </div>
+                 <div>
+                     <label for="modal-duration" class="form-label">Duration (minutes):</label>
+                     <input type="number" id="modal-duration" class="form-input" required>
+                 </div>
+                 <div>
+                     <label for="modal-showtimes" class="form-label">Showtimes (comma-separated):</label>
+                     <input type="text" id="modal-showtimes" class="form-input" required>
+                 </div>
+                 <div class="flex justify-end gap-4 pt-4">
+                     <button type="button" id="close-modal-button" class="btn btn-secondary">Cancel</button>
+                     <button type="submit" class="btn btn-primary">Save Changes</button>
+                 </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
