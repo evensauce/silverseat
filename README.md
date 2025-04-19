@@ -4,7 +4,8 @@
 SilverSeats is a Cinema Event Management System (EMS) developed as part of the **KH4005CMD Computer Science Activity-Led Learning Project 1** at **The Knowledge Hub Universities (TKH)**, under the supervision of **Dr. Mohamed Salem**.  
 This project was submitted in **April 2025** for the **KH4006CEM** module.
 
----
+--- Version 2:
+Primary update: Added showtimes, in the admin side and in the customer side.
 
 ## 🎬 Overview
 

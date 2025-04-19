@@ -82,42 +82,46 @@
             </div>
         </div>
 
-    </div>
+    </div> <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 id="modal-movie-title" class="text-2xl font-semibold text-gray-800">Movie Title</h2>
+                <button id="modal-close-button" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
 
-    <div id="edit-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h2 class="text-xl font-semibold mb-4">Edit Movie</h2>
-            <form id="edit-movie-form" class="space-y-4">
-                 <input type="hidden" id="modal-edit-index">
-                 <div>
-                     <label for="modal-title" class="form-label">Title:</label>
-                     <input type="text" id="modal-title" class="form-input" required>
-                 </div>
-                 <div>
-                     <label for="modal-poster" class="form-label">Poster Image URL:</label>
-                     <input type="url" id="modal-poster" class="form-input" required>
-                 </div>
-                 <div>
-                     <label for="modal-description" class="form-label">Description:</label>
-                     <textarea id="modal-description" class="form-input" rows="3" required></textarea>
-                 </div>
-                 <div>
-                     <label for="modal-genre" class="form-label">Genre:</label>
-                     <input type="text" id="modal-genre" class="form-input" required>
-                 </div>
-                 <div>
-                     <label for="modal-duration" class="form-label">Duration (minutes):</label>
-                     <input type="number" id="modal-duration" class="form-input" required>
-                 </div>
-                 <div>
-                     <label for="modal-showtimes" class="form-label">Showtimes (comma-separated):</label>
-                     <input type="text" id="modal-showtimes" class="form-input" required>
-                 </div>
-                 <div class="flex justify-end gap-4 pt-4">
-                     <button type="button" id="close-modal-button" class="btn btn-secondary">Cancel</button>
-                     <button type="submit" class="btn btn-primary">Save Changes</button>
-                 </div>
-            </form>
+            <div class="p-6 overflow-y-auto flex-grow space-y-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-shrink-0 w-full md:w-1/3">
+                         <img id="modal-movie-poster" src="https://placehold.co/400x600/cccccc/ffffff?text=Poster" alt="Movie Poster" class="rounded-md w-full h-auto object-cover">
+                    </div>
+                    <div class="flex-grow space-y-3">
+                        <p class="text-sm text-gray-600">
+                            <strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> &bull;
+                            <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min
+                        </p>
+                        <p id="modal-movie-description" class="text-gray-700 text-base">Description goes here...</p>
+
+                        <div class="pt-2">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">Select Showtime:</h3>
+                            <fieldset id="modal-showtimes-list" class="flex flex-wrap gap-2">
+                                <p class="text-gray-500 text-sm">No showtimes available.</p>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seat-map-container" class="hidden pt-4 border-t border-gray-200 mt-4">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-700">Select Seats:</h3>
+                    <div class="screen">SCREEN</div>
+                    <div id="seat-grid" class="seat-grid mb-4">
+                        </div>
+                    <p id="selected-seats-info" class="text-sm text-gray-600">Selected Seats: None</p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button id="confirm-selection-button" class="btn btn-primary" disabled>Confirm Selection</button>
+            </div>
         </div>
     </div>
 

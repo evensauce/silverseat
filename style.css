@@ -23,10 +23,6 @@ body {
     transition: transform 0.2s ease-in-out;
     border: 1px solid #e5e7eb; /* Light gray border */
 }
-/* Ensure modal stays on top */
-#edit-modal {
-    z-index: 50;
-}
 /* Add some transition for view switching */
 #admin-view, #customer-view {
     transition: opacity 0.3s ease-in-out;
@@ -38,6 +34,8 @@ body {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* Subtle shadow */
     overflow: hidden; /* Ensure image corners are rounded */
     transition: transform 0.2s ease-in-out;
+    display: flex; /* Use flexbox for card structure */
+    flex-direction: column; /* Stack elements vertically */
 }
 .movie-card:hover {
      transform: translateY(-5px); /* Slight lift on hover */
@@ -106,4 +104,96 @@ body {
 .btn-icon {
      padding: 0.5rem; /* Smaller padding for icon buttons */
      margin-left: 0.5rem;
+}
+
+/* --- Modal Styles --- */
+#movie-details-modal {
+    z-index: 100; /* Ensure modal is on top */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+#movie-details-modal.hidden {
+     opacity: 0;
+     visibility: hidden;
+}
+/* Style for radio button labels */
+.showtime-label {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: inline-block;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.showtime-label:hover {
+    background-color: #e5e7eb;
+}
+/* Style for selected radio button label */
+input[type="radio"]:checked + .showtime-label {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+/* Hide actual radio button */
+input[type="radio"].showtime-radio {
+    display: none;
+}
+
+/* --- Seat Map Styles --- */
+.screen {
+    width: 80%;
+    height: 15px;
+    background-color: #4a5568; /* Dark gray */
+    margin: 15px auto 25px;
+    border-radius: 3px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    color: white;
+    text-align: center;
+    font-size: 0.7rem;
+    line-height: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+.seat-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center rows */
+}
+.seat-row {
+     display: flex;
+     justify-content: center; /* Center seats in a row */
+     margin-bottom: 5px;
+}
+.seat {
+    width: 28px;
+    height: 28px;
+    margin: 3px;
+    background-color: #cbd5e1; /* Light Gray - Available */
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4a5568; /* Dark gray icon */
+    font-size: 0.8rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.seat:hover {
+    background-color: #94a3b8; /* Slightly darker gray on hover */
+}
+.seat.selected {
+    background-color: #3b82f6; /* Blue - Selected */
+    color: white;
+    transform: scale(1.1); /* Slightly larger when selected */
+}
+.seat.unavailable { /* Example for unavailable seats */
+    background-color: #64748b; /* Mid Gray - Unavailable */
+    cursor: not-allowed;
+    color: #e2e8f0;
+}
+.seat-spacer { /* For aisles */
+     width: 28px;
+     height: 28px;
+     margin: 3px;
 }
