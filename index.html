@@ -9,27 +9,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100">
+
+    <div id="splash-screen">
+        <div class="splash-logo">CW</div> </div>
+
     <div id="app-header" class="view-hidden">
         <div class="container mx-auto flex justify-between items-center">
-            <span class="text-lg font-semibold text-gray-700">Silver Seat</span>
+            <span class="text-lg font-semibold text-gray-700">Cinema World</span>
             <div class="flex items-center gap-4">
                 <span id="logged-in-user-info" class="text-sm text-gray-600"></span>
-                <button id="logout-button" class="btn btn-secondary btn-sm !py-1 !px-3">Logout</button> </div>
+                <button id="logout-button" class="btn btn-secondary btn-sm !py-1 !px-3">Logout</button>
+            </div>
         </div>
     </div>
 
-    <div id="auth-view">
+    <div id="auth-view" class="view-hidden">
         <div class="auth-container">
             <form id="customer-login-form" class="space-y-6">
                 <h2 class="text-2xl font-bold text-center text-gray-800">Customer Login</h2>
-                <p id="customer-login-error" class="text-red-500 text-sm text-center hidden"></p> <div>
-                    <label for="customer-email" class="form-label">Email:</label>
-                    <input type="email" id="customer-email" class="form-input" required>
-                </div>
-                <div>
-                    <label for="customer-password" class="form-label">Password:</label>
-                    <input type="password" id="customer-password" class="form-input" required>
-                </div>
+                <p id="customer-login-error" class="text-red-500 text-sm text-center hidden"></p>
+                <div><label for="customer-email" class="form-label">Email:</label><input type="email" id="customer-email" class="form-input" required></div>
+                <div><label for="customer-password" class="form-label">Password:</label><input type="password" id="customer-password" class="form-input" required></div>
                 <button type="submit" class="btn btn-primary w-full">Login</button>
                 <div class="text-center text-sm text-gray-600 space-x-4">
                     <button type="button" id="show-register-button" class="btn-link">Register New Account</button>
@@ -37,39 +37,22 @@
                     <button type="button" id="show-admin-login-button" class="btn-link">Admin Login</button>
                 </div>
             </form>
-
             <form id="customer-register-form" class="space-y-6 hidden">
                 <h2 class="text-2xl font-bold text-center text-gray-800">Register Account</h2>
-                 <p id="register-error" class="text-red-500 text-sm text-center hidden"></p> <div>
-                    <label for="register-email" class="form-label">Email:</label>
-                    <input type="email" id="register-email" class="form-input" required>
-                </div>
-                <div>
-                    <label for="register-password" class="form-label">Password:</label>
-                    <input type="password" id="register-password" class="form-input" required>
-                </div>
-                 <div>
-                    <label for="register-confirm-password" class="form-label">Confirm Password:</label>
-                    <input type="password" id="register-confirm-password" class="form-input" required>
-                </div>
+                 <p id="register-error" class="text-red-500 text-sm text-center hidden"></p>
+                <div><label for="register-email" class="form-label">Email:</label><input type="email" id="register-email" class="form-input" required></div>
+                <div><label for="register-password" class="form-label">Password:</label><input type="password" id="register-password" class="form-input" required></div>
+                 <div><label for="register-confirm-password" class="form-label">Confirm Password:</label><input type="password" id="register-confirm-password" class="form-input" required></div>
                 <button type="submit" class="btn btn-primary w-full">Register</button>
-                <div class="text-center">
-                    <button type="button" class="btn-link back-to-customer-login">Back to Login</button>
-                </div>
+                <div class="text-center"><button type="button" class="btn-link back-to-customer-login">Back to Login</button></div>
             </form>
-
             <form id="admin-login-form" class="space-y-6 hidden">
                 <h2 class="text-2xl font-bold text-center text-gray-800">Admin Login</h2>
-                 <p id="admin-login-error" class="text-red-500 text-sm text-center hidden"></p> <div>
-                    <label for="admin-email" class="form-label">Email:</label>
-                    <input type="email" id="admin-email" class="form-input" required value="admin@example.com"> </div>
-                <div>
-                    <label for="admin-password" class="form-label">Password:</label>
-                    <input type="password" id="admin-password" class="form-input" required value="password"> </div>
+                 <p id="admin-login-error" class="text-red-500 text-sm text-center hidden"></p>
+                <div><label for="admin-email" class="form-label">Email:</label><input type="email" id="admin-email" class="form-input" required value="admin@example.com"></div>
+                <div><label for="admin-password" class="form-label">Password:</label><input type="password" id="admin-password" class="form-input" required value="password"></div>
                 <button type="submit" class="btn btn-primary w-full">Admin Login</button>
-                 <div class="text-center">
-                    <button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button>
-                </div>
+                 <div class="text-center"><button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button></div>
             </form>
         </div>
     </div>
@@ -78,54 +61,55 @@
 
         <div id="admin-view" class="view-hidden space-y-8">
             <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Admin Panel</h1>
-             <div class="p-6 border rounded-lg shadow-lg bg-white">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
-                <form id="movie-form" class="space-y-4">
-                    <input type="hidden" id="edit-index">
-                    <div>
-                        <label for="title" class="form-label">Title:</label>
-                        <input type="text" id="title" class="form-input" required>
-                    </div>
-                    <div>
-                        <label for="poster" class="form-label">Poster Image URL:</label>
-                        <input type="url" id="poster" class="form-input" placeholder="https://example.com/image.jpg" required>
-                    </div>
-                    <div>
-                        <label for="description" class="form-label">Description:</label>
-                        <textarea id="description" class="form-input" rows="3" required></textarea>
-                    </div>
-                    <div>
-                        <label for="genre" class="form-label">Genre:</label>
-                        <input type="text" id="genre" class="form-input" placeholder="e.g., Action, Comedy, Sci-Fi" required>
-                    </div>
-                    <div>
-                        <label for="duration" class="form-label">Duration (minutes):</label>
-                        <input type="number" id="duration" class="form-input" required>
-                    </div>
-                    <div>
-                        <label for="showtimes" class="form-label">Showtimes (comma-separated):</label>
-                        <input type="text" id="showtimes" class="form-input" placeholder="e.g., 10:00 AM, 1:00 PM, 4:00 PM" required>
-                    </div>
-                    <div class="flex gap-4 pt-2">
-                        <button type="submit" id="submit-button" class="btn btn-primary">Add Movie</button>
-                        <button type="button" id="cancel-edit-button" class="btn btn-secondary hidden">Cancel Edit</button>
-                    </div>
-                </form>
+            <div id="admin-nav" class="mb-4 border-b border-gray-300">
+                 <button data-target="admin-manage-movies" class="admin-nav-button active">Manage Movies</button>
+                 <button data-target="admin-analytics" class="admin-nav-button">Analytics</button>
             </div>
-
-            <div>
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Manage Movies</h2>
-                <div id="admin-movie-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <p id="no-movies-admin" class="text-gray-500 col-span-full hidden">No movies added yet.</p>
+            <div id="admin-manage-movies" class="admin-section">
+                <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
+                    <form id="movie-form" class="space-y-4">
+                        <input type="hidden" id="edit-index">
+                        <div><label for="title" class="form-label">Title:</label><input type="text" id="title" class="form-input" required></div>
+                        <div><label for="poster" class="form-label">Poster Image URL:</label><input type="url" id="poster" class="form-input" placeholder="https://example.com/image.jpg" required></div>
+                        <div><label for="description" class="form-label">Description:</label><textarea id="description" class="form-input" rows="3" required></textarea></div>
+                        <div><label for="genre" class="form-label">Genre:</label><input type="text" id="genre" class="form-input" placeholder="e.g., Action, Comedy, Sci-Fi" required></div>
+                        <div><label for="duration" class="form-label">Duration (minutes):</label><input type="number" id="duration" class="form-input" required></div>
+                        <div><label for="showtimes" class="form-label">Showtimes (comma-separated):</label><input type="text" id="showtimes" class="form-input" placeholder="e.g., 10:00 AM, 1:00 PM, 4:00 PM" required></div>
+                        <div class="flex gap-4 pt-2">
+                            <button type="submit" id="submit-button" class="btn btn-primary">Add Movie</button>
+                            <button type="button" id="cancel-edit-button" class="btn btn-secondary hidden">Cancel Edit</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Manage Movies</h2>
+                    <div id="admin-movie-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <p id="no-movies-admin" class="text-gray-500 col-span-full hidden">No movies added yet.</p>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Live Customer View Preview</h2>
+                    <div id="admin-preview-customer-view" class="border rounded-lg p-6 bg-gray-50 shadow-inner">
+                         <div id="customer-movie-list-preview" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                              <p id="no-movies-preview" class="text-gray-500 col-span-full hidden">No movies to preview.</p>
+                         </div>
+                    </div>
                 </div>
             </div>
-
-             <div>
-                <h2 class="text-2xl font-semibold mt-8 mb-4 text-gray-700">Live Customer View Preview</h2>
-                <div id="admin-preview-customer-view" class="border rounded-lg p-6 bg-gray-50 shadow-inner">
-                     <div id="customer-movie-list-preview" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                          <p id="no-movies-preview" class="text-gray-500 col-span-full hidden">No movies to preview.</p>
-                     </div>
+            <div id="admin-analytics" class="admin-section hidden space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
+                <div class="analytics-card">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
+                    <div id="analytics-avg-ratings" class="space-y-2">
+                        <p class="text-gray-500">No ratings data available.</p>
+                        </div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy (Simulated)</h3>
+                    <div id="analytics-occupancy" class="space-y-4">
+                         <p class="text-gray-500">No movie data available for occupancy analysis.</p>
+                        </div>
                 </div>
             </div>
         </div>
@@ -149,6 +133,8 @@
                          <img id="modal-movie-poster" src="https://placehold.co/400x600/cccccc/ffffff?text=Poster" alt="Movie Poster" class="rounded-md w-full h-auto object-cover">
                     </div>
                     <div class="flex-grow space-y-3">
+                        <div id="modal-avg-rating" class="stars-container text-lg">
+                             </div>
                         <p class="text-sm text-gray-600">
                             <strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> &bull;
                             <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min
@@ -162,6 +148,13 @@
                         </div>
                     </div>
                 </div>
+                 <div id="modal-rating-section" class="pt-4 border-t mt-4 hidden"> {/* Initially hidden, shown only for logged-in customers */}
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Your Rating:</h3>
+                    <div id="modal-stars" class="stars-container interactive flex text-2xl cursor-pointer">
+                        {/* User rating stars will be rendered here */}
+                    </div>
+                    <p id="modal-rating-message" class="text-sm text-gray-500 mt-1"></p>
+                </div>
                 <div id="seat-map-container" class="hidden pt-4 border-t border-gray-200 mt-4">
                     <h3 class="text-lg font-semibold mb-3 text-gray-700">Select Seats:</h3>
                     <div class="screen">SCREEN</div>
@@ -174,6 +167,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="script.js"></script>
 </body>
