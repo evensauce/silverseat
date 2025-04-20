@@ -7,7 +7,7 @@ body {
 #splash-screen {
     position: fixed; inset: 0; background-color: #2563eb; z-index: 200;
     display: flex; align-items: center; justify-content: center;
-    opacity: 1; transition: opacity 0.8s ease-out, visibility 0.8s ease-out; /* Added visibility transition */
+    opacity: 1; transition: opacity 0.9s ease-out, visibility 0.8s ease-out; /* Added visibility transition */
 }
 #splash-screen.is-hidden { /* Use is-hidden for splash too */
     opacity: 0; visibility: hidden; pointer-events: none;
