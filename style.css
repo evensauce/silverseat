@@ -1,5 +1,5 @@
- /* Custom Styles */
- body {
+/* Custom Styles */
+body {
     font-family: 'Inter', sans-serif;
     background-color: #f1f5f9;
 }
@@ -12,8 +12,14 @@
 #splash-screen.is-hidden { /* Use is-hidden for splash too */
     opacity: 0; visibility: hidden; pointer-events: none;
 }
-.splash-logo { color: white; font-size: 3rem; font-weight: bold; animation: pulse 1.5s infinite ease-in-out; }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+/* 2. Splash Screen Emoji Style */
+.splash-logo {
+    color: white;
+    font-size: 5rem; /* Increased size for emoji */
+    animation: pulse 1.5s infinite ease-in-out;
+    line-height: 1; /* Ensure emoji centers well */
+}
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
 /* Transitions for main view switching */
 #admin-view, #customer-view, #auth-view, #app-header {
@@ -82,9 +88,10 @@ input[type="radio"].showtime-radio { display: none; }
 .seat-grid { display: flex; flex-direction: column; align-items: center; }
 .seat-row { display: flex; justify-content: center; margin-bottom: 5px; }
 .seat { width: 28px; height: 28px; margin: 3px; background-color: #cbd5e1; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #4a5568; font-size: 0.8rem; transition: background-color 0.2s ease, transform 0.1s ease; }
-.seat:hover { background-color: #94a3b8; }
+.seat:hover:not(.unavailable):not(.selected) { background-color: #94a3b8; } /* Don't change hover on unavailable/selected */
 .seat.selected { background-color: #3b82f6; color: white; transform: scale(1.1); }
-.seat.unavailable { background-color: #64748b; cursor: not-allowed; color: #e2e8f0; }
+/* 3. Style for unavailable/booked seats */
+.seat.unavailable { background-color: #64748b; cursor: not-allowed; color: #e2e8f0; opacity: 0.7; }
 .seat-spacer { width: 28px; height: 28px; margin: 3px; }
 
 /* Ensure error messages don't collapse when hidden */
