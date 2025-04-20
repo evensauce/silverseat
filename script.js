@@ -71,14 +71,11 @@ let currentModalMovieId = null;
 // --- Utility Functions (REVISED) ---
 function showElement(el) {
     if(el) {
-        // Remove the class that hides
         el.classList.remove('is-hidden');
-        // Explicitly set styles needed to make visible if they were changed by is-hidden
-        el.style.height = ''; // Restore height auto-calculation
+        el.style.height = '';
         el.style.opacity = '1';
         el.style.visibility = 'visible';
-        el.style.pointerEvents = ''; // Restore interaction
-        // Reset potential overrides from is-hidden CSS
+        el.style.pointerEvents = '';
         el.style.margin = '';
         el.style.padding = '';
         el.style.border = '';
@@ -87,9 +84,7 @@ function showElement(el) {
 
 function hideElement(el) {
      if(el) {
-         // Add the class that hides and handles transition
          el.classList.add('is-hidden');
-         // Optionally set styles directly for immediate effect before transition starts
          el.style.opacity = '0';
          el.style.visibility = 'hidden';
          el.style.pointerEvents = 'none';
@@ -99,14 +94,14 @@ function hideElement(el) {
 function displayError(element, message) {
     if (element) {
         element.textContent = message;
-        showElement(element); // Use revised showElement
+        showElement(element);
     }
 }
 
 function hideError(element) {
      if (element) {
         element.textContent = '';
-        hideElement(element); // Use revised hideElement
+        hideElement(element);
     }
 }
 function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
@@ -134,16 +129,15 @@ function handleStarClick(movieId, rating) { if (!authState.isLoggedIn || !authSt
 
 // --- UI Rendering Functions ---
 function renderUI() {
-    closeModal(); // Close modal on any major UI change
-    // Use the NEW hide/show functions
+    closeModal();
     if (authState.isLoggedIn && authState.user) {
         hideElement(authView);
         showElement(appHeader);
         loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${authState.user.type})`;
         if (authState.user.type === 'admin') {
             hideElement(customerView);
-            showElement(adminView); // Show admin container
-            renderAdminContent(); // Render content within admin container
+            showElement(adminView);
+            renderAdminContent();
         } else { // Customer
             hideElement(adminView);
             showElement(customerView);
@@ -154,36 +148,23 @@ function renderUI() {
         hideElement(adminView);
         hideElement(customerView);
         showElement(authView);
-        showCustomerLoginForm(); // Default auth view
+        showCustomerLoginForm();
     }
 }
 
 function renderAdminContent() {
-     resetForm(); // Reset movie form when switching to/within admin view
-     // Handle tab visibility using NEW hide/show functions
+     resetForm();
      document.querySelectorAll('.admin-section').forEach(sec => {
-         if (sec.id === currentAdminTab) {
-             showElement(sec); // Show the active section
-         } else {
-             hideElement(sec); // Hide inactive sections
-         }
+         if (sec.id === currentAdminTab) { showElement(sec); } else { hideElement(sec); }
      });
-
-     // Render content for the active tab
-     if (currentAdminTab === 'admin-manage-movies') {
-         renderMovies(adminMovieListContainer, 'admin');
-         renderMovies(customerPreviewContainer, 'preview');
-     } else if (currentAdminTab === 'admin-analytics') {
-         renderAnalyticsDashboard();
-     }
+     if (currentAdminTab === 'admin-manage-movies') { renderMovies(adminMovieListContainer, 'admin'); renderMovies(customerPreviewContainer, 'preview'); }
+     else if (currentAdminTab === 'admin-analytics') { renderAnalyticsDashboard(); }
 }
 
-function renderCustomerContent() {
-    renderMovies(customerMovieListContainer, 'customer');
-}
+function renderCustomerContent() { renderMovies(customerMovieListContainer, 'customer'); }
 
 // --- Admin Analytics ---
-// (Remains the same)
+// (Remain the same)
 function renderAnalyticsDashboard() { analyticsAvgRatingsContainer.innerHTML = ''; analyticsOccupancyContainer.innerHTML = ''; if (movies.length === 0) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; return; } let hasRatings = false; movies.forEach(movie => { const { average, count } = calculateAverageRating(movie); if (count > 0) hasRatings = true; const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200'; const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700'; const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count); ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); analyticsAvgRatingsContainer.appendChild(ratingDiv); }); if (!hasRatings) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings yet.</p>'; } movies.forEach(movie => { const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0'; const movieTitle = document.createElement('h4'); movieTitle.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitle.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitle); const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach(time => { const simulatedBookedCount = Math.floor(Math.random() * (TOTAL_SEATS_PER_SCREENING + 1)); const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (simulatedBookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0; let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular'; if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; } else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; } const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1'; showtimeDiv.innerHTML = `<span class="text-gray-600">${time}</span><span><span class="text-gray-500 mr-2">(${simulatedBookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span><span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span></span>`; movieOccupancyDiv.appendChild(showtimeDiv); }); } else { movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes.</p>'; } analyticsOccupancyContainer.appendChild(movieOccupancyDiv); }); if (analyticsOccupancyContainer.innerHTML === '') { analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; } }
 
 
