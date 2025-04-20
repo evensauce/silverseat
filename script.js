@@ -1,8 +1,9 @@
 // --- Constants ---
-const MOVIES_STORAGE_KEY = 'cinemaMovies';
-const AUTH_STORAGE_KEY = 'cinemaAuth';
-const CUSTOMERS_STORAGE_KEY = 'cinemaCustomers';
-const USER_RATINGS_STORAGE_KEY = 'cinemaUserRatings';
+const MOVIES_STORAGE_KEY = 'silverSeatMovies'; // 1. Branding Change
+const AUTH_STORAGE_KEY = 'silverSeatAuth'; // 1. Branding Change
+const CUSTOMERS_STORAGE_KEY = 'silverSeatCustomers'; // 1. Branding Change
+const USER_RATINGS_STORAGE_KEY = 'silverSeatUserRatings'; // 1. Branding Change
+const BOOKED_SEATS_STORAGE_KEY_PREFIX = 'silverSeatBookedSeats_'; // 3. Key for booked seats
 const ADMIN_EMAIL = 'admin@example.com';
 const ADMIN_PASSWORD = 'password';
 const TOTAL_SEATS_PER_SCREENING = 5 * 8; // 5 rows x 8 cols
@@ -64,7 +65,7 @@ let customerUsers = [];
 let userRatings = {};
 let authState = { isLoggedIn: false, user: null };
 let editingIndex = null;
-let selectedSeats = [];
+let selectedSeats = []; // Holds seats selected in the *current* interaction
 let currentAdminTab = 'admin-manage-movies';
 let currentModalMovieId = null;
 
@@ -72,9 +73,10 @@ let currentModalMovieId = null;
 function showElement(el) {
     if(el) {
         el.classList.remove('is-hidden');
+        // Remove explicit styles that might conflict with Tailwind or transitions
         el.style.height = '';
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
+        el.style.opacity = ''; // Let CSS handle opacity
+        el.style.visibility = ''; // Let CSS handle visibility
         el.style.pointerEvents = '';
         el.style.margin = '';
         el.style.padding = '';
@@ -85,9 +87,8 @@ function showElement(el) {
 function hideElement(el) {
      if(el) {
          el.classList.add('is-hidden');
-         el.style.opacity = '0';
-         el.style.visibility = 'hidden';
-         el.style.pointerEvents = 'none';
+         // Setting opacity/visibility directly can sometimes interfere with CSS transitions
+         // The .is-hidden class should handle this via CSS rules
      }
 }
 
@@ -214,6 +215,80 @@ function saveAuthToStorage() {
 function clearAuthStorage() {
     authState = { isLoggedIn: false, user: null };
     localStorage.removeItem(AUTH_STORAGE_KEY);
+}
+
+// --- 3. Booked Seat Local Storage Functions ---
+/**
+ * Generates a unique key for storing booked seats for a specific movie and showtime.
+ * @param {string} movieId - The unique ID of the movie.
+ * @param {string} showtime - The specific showtime string (e.g., "10:00 AM").
+ * @returns {string} The localStorage key.
+ */
+function getBookedSeatsKey(movieId, showtime) {
+    if (!movieId || !showtime) {
+        console.error("Cannot generate booked seats key without movieId and showtime.");
+        return null;
+    }
+    // Normalize showtime slightly to avoid issues with extra spaces
+    const normalizedShowtime = showtime.trim().replace(/\s+/g, '_');
+    return `${BOOKED_SEATS_STORAGE_KEY_PREFIX}${movieId}_${normalizedShowtime}`;
+}
+
+/**
+ * Loads the list of booked seat IDs for a specific movie and showtime from localStorage.
+ * @param {string} movieId - The unique ID of the movie.
+ * @param {string} showtime - The specific showtime string.
+ * @returns {string[]} An array of booked seat IDs, or an empty array if none are found or invalid.
+ */
+function loadBookedSeats(movieId, showtime) {
+    const key = getBookedSeatsKey(movieId, showtime);
+    if (!key) return [];
+
+    const storedData = localStorage.getItem(key);
+    if (storedData) {
+        try {
+            const bookedSeats = JSON.parse(storedData);
+            // Ensure it's an array of strings
+            if (Array.isArray(bookedSeats) && bookedSeats.every(s => typeof s === 'string')) {
+                return bookedSeats;
+            }
+        } catch (e) {
+            console.error(`Error parsing booked seats for ${key}:`, e);
+            // Optionally remove the invalid data: localStorage.removeItem(key);
+        }
+    }
+    return []; // Return empty array if no data or data is invalid
+}
+
+/**
+ * Saves the list of booked seat IDs for a specific movie and showtime to localStorage.
+ * Merges the new seats with any existing ones for that slot.
+ * @param {string} movieId - The unique ID of the movie.
+ * @param {string} showtime - The specific showtime string.
+ * @param {string[]} seatsToBook - An array of seat IDs selected in the current booking action.
+ */
+function saveBookedSeats(movieId, showtime, seatsToBook) {
+    const key = getBookedSeatsKey(movieId, showtime);
+    if (!key || !Array.isArray(seatsToBook) || seatsToBook.length === 0) {
+        console.error("Invalid input for saving booked seats.");
+        return;
+    }
+
+    // Load existing seats for this specific movie/showtime
+    const existingBookedSeats = loadBookedSeats(movieId, showtime);
+
+    // Combine existing seats with the newly booked ones, ensuring uniqueness
+    const updatedBookedSeats = [...new Set([...existingBookedSeats, ...seatsToBook])];
+
+    // Save the updated list back to localStorage
+    try {
+        localStorage.setItem(key, JSON.stringify(updatedBookedSeats));
+        console.log(`Saved booked seats for ${key}:`, updatedBookedSeats);
+    } catch (e) {
+        console.error(`Error saving booked seats for ${key}:`, e);
+        // Handle potential storage errors (e.g., quota exceeded)
+        alert("Could not save booking. Local storage might be full.");
+    }
 }
 
 
@@ -357,7 +432,7 @@ function renderCustomerContent() {
 }
 
 // --- Admin Analytics ---
-// (Formatted for Readability)
+// (Formatted for Readability - adjusted for booked seats)
 function renderAnalyticsDashboard() {
     analyticsAvgRatingsContainer.innerHTML = '';
     analyticsOccupancyContainer.innerHTML = '';
@@ -368,7 +443,7 @@ function renderAnalyticsDashboard() {
         return;
     }
 
-    // Render Average Ratings
+    // Render Average Ratings (same as before)
      let hasRatings = false;
      movies.forEach(movie => {
          const { average, count } = calculateAverageRating(movie);
@@ -393,7 +468,7 @@ function renderAnalyticsDashboard() {
          analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings submitted yet.</p>';
      }
 
-    // Render Occupancy (Simulated)
+    // Render Occupancy (Using actual booked seats from localStorage)
      movies.forEach(movie => {
          const movieOccupancyDiv = document.createElement('div');
          movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0';
@@ -409,9 +484,11 @@ function renderAnalyticsDashboard() {
 
          if (showtimes.length > 0) {
              showtimes.forEach(time => {
-                 const simulatedBookedCount = Math.floor(Math.random() * (TOTAL_SEATS_PER_SCREENING + 1));
+                 // 3. Get actual booked count from localStorage
+                 const bookedSeats = loadBookedSeats(movie.movieId, time);
+                 const bookedCount = bookedSeats.length;
                  const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0
-                    ? (simulatedBookedCount / TOTAL_SEATS_PER_SCREENING) * 100
+                    ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100
                     : 0;
 
                  let occupancyLabel = 'Unpopular';
@@ -427,7 +504,7 @@ function renderAnalyticsDashboard() {
                  showtimeDiv.innerHTML = `
                      <span class="text-gray-600">${time}</span>
                      <span>
-                         <span class="text-gray-500 mr-2">(${simulatedBookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span>
+                         <span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span>
                          <span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span>
                      </span>
                  `;
@@ -553,13 +630,31 @@ function showEditForm(index) {
 function deleteMovie(index) {
     if (index < 0 || index >= movies.length) return;
     const movieTitle = movies[index]?.title || 'this movie';
-    if (confirm(`Delete "${movieTitle}"? This also removes ratings.`)) {
-        const movieIdToDelete = movies[index].movieId;
+    const movieIdToDelete = movies[index].movieId; // Get ID before splicing
+
+    if (confirm(`Delete "${movieTitle}"? This also removes ratings and ALL locally stored booking data for this movie.`)) {
         movies.splice(index, 1);
+
+        // Remove ratings associated with the movie
         Object.keys(userRatings).forEach(userId => {
             if (userRatings[userId]?.[movieIdToDelete]) delete userRatings[userId][movieIdToDelete];
         });
-        saveMoviesToStorage(); saveUserRatingsToStorage(); renderAdminContent();
+
+        // 3. Remove booked seats for this movie from localStorage
+        // Iterate through all localStorage keys
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            // Check if the key starts with the prefix and contains the movie ID
+            if (key && key.startsWith(BOOKED_SEATS_STORAGE_KEY_PREFIX) && key.includes(movieIdToDelete)) {
+                localStorage.removeItem(key);
+                console.log(`Removed booking data: ${key}`);
+                i--; // Adjust index because removing item shifts subsequent keys
+            }
+        }
+
+        saveMoviesToStorage();
+        saveUserRatingsToStorage(); // Save updated ratings
+        renderAdminContent();
         if (editingIndex === index) resetForm();
     }
 }
@@ -592,7 +687,7 @@ function createMovieCard(movie, index, viewType) {
     details.className = 'text-sm text-gray-600 mb-1';
     details.innerHTML = `
         <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'}
-        &bull;
+        •
         <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min
     `;
 
@@ -655,7 +750,7 @@ function renderMovies(container, viewType) {
 function openModal(movieId) {
     const movie = movies.find(m => m.movieId === movieId);
     if (!movie) { console.error("Movie not found for modal:", movieId); return; }
-    currentModalMovieId = movieId;
+    currentModalMovieId = movieId; // Store movie ID for later use (booking, rating)
 
     modalMovieTitle.textContent = movie.title || 'Movie Details';
     modalMoviePoster.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image';
@@ -675,7 +770,8 @@ function openModal(movieId) {
             const radio = document.createElement('input');
             radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.movieId}-showtime`;
             radio.value = time; radio.className = 'showtime-radio';
-            radio.onchange = () => handleShowtimeSelection(time);
+             // 3. Attach handler to render seat map when showtime changes
+            radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time); // Pass movieId too
             const label = document.createElement('label');
             label.htmlFor = radioId; label.textContent = time; label.className = 'showtime-label';
             modalShowtimesList.appendChild(radio); modalShowtimesList.appendChild(label);
@@ -699,52 +795,101 @@ function openModal(movieId) {
         hideElement(modalRatingSection);
     }
 
+    // Reset and hide seat map initially
     hideElement(seatMapContainer); seatGrid.innerHTML = ''; selectedSeats = [];
     updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true;
     showElement(movieDetailsModal); document.body.classList.add('overflow-hidden');
 }
 function closeModal() {
     hideElement(movieDetailsModal); document.body.classList.remove('overflow-hidden');
-    currentModalMovieId = null;
+    currentModalMovieId = null; // Clear context
 }
-function handleShowtimeSelection(selectedTime) {
-    renderSeatMap(5, 8); showElement(seatMapContainer); selectedSeats = [];
-    updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true;
+// 3. Updated to receive movieId and showtime
+function handleShowtimeSelection(movieId, selectedTime) {
+    console.log(`Showtime selected: ${selectedTime} for movie ${movieId}`);
+    // Render the seat map specific to this movie and showtime
+    renderSeatMap(movieId, selectedTime, 5, 8);
+    showElement(seatMapContainer);
+    selectedSeats = []; // Clear selection when showtime changes
+    updateSelectedSeatsInfo();
+    confirmSelectionButton.disabled = true; // Disable confirm until seats are selected
 }
-function renderSeatMap(rows, cols) {
-    seatGrid.innerHTML = '';
+
+// 3. Updated to render based on booked seats
+function renderSeatMap(movieId, showtime, rows, cols) {
+    seatGrid.innerHTML = ''; // Clear previous grid
+    if (!movieId || !showtime) {
+        seatGrid.innerHTML = '<p class="text-red-500 text-center">Error: Cannot load seats without movie/showtime.</p>';
+        return;
+    }
+
+    // Load the seats already booked for this specific movie/showtime
+    const bookedSeatIds = loadBookedSeats(movieId, showtime);
+    console.log(`Rendering seat map for ${movieId} at ${showtime}. Booked:`, bookedSeatIds);
+
+
     for (let r = 0; r < rows; r++) {
         const rowDiv = document.createElement('div'); rowDiv.className = 'seat-row';
         const rowLetter = String.fromCharCode(65 + r);
         for (let c = 0; c < cols; c++) {
+            // Add spacers for aisles
             if (c === 2 || c === 6) {
                 const spacer = document.createElement('div'); spacer.className = 'seat-spacer';
                 rowDiv.appendChild(spacer);
             }
+
             const seatId = `${rowLetter}${c + 1}`;
-            const seatDiv = document.createElement('div'); seatDiv.className = 'seat';
-            seatDiv.id = `seat-${seatId}`; seatDiv.dataset.seatId = seatId;
-            seatDiv.innerHTML = `<i class="fas fa-chair"></i>`;
-            seatDiv.onclick = () => toggleSeatSelection(seatId);
+            const seatDiv = document.createElement('div');
+            seatDiv.className = 'seat';
+            seatDiv.id = `seat-${seatId}`;
+            seatDiv.dataset.seatId = seatId;
+            seatDiv.innerHTML = `<i class="fas fa-chair"></i>`; // Use icon for better visual
+
+            // Check if this seat is already booked
+            if (bookedSeatIds.includes(seatId)) {
+                seatDiv.classList.add('unavailable');
+                // Optionally remove the click handler for unavailable seats
+                // seatDiv.onclick = null;
+            } else {
+                // Only add click handler to available seats
+                seatDiv.onclick = () => toggleSeatSelection(seatId);
+            }
+
             rowDiv.appendChild(seatDiv);
         }
         seatGrid.appendChild(rowDiv);
     }
 }
+
+// 3. Updated to prevent selecting unavailable seats
 function toggleSeatSelection(seatId) {
     const seatElement = document.getElementById(`seat-${seatId}`);
-    if (!seatElement || seatElement.classList.contains('unavailable')) return;
+    // Prevent action if the seat is marked as unavailable (already booked)
+    if (!seatElement || seatElement.classList.contains('unavailable')) {
+         console.log(`Seat ${seatId} is unavailable.`);
+         return;
+    }
+
     const index = selectedSeats.indexOf(seatId);
-    if (index > -1) { selectedSeats.splice(index, 1); seatElement.classList.remove('selected'); }
-    else { selectedSeats.push(seatId); seatElement.classList.add('selected'); }
-    updateSelectedSeatsInfo();
+    if (index > -1) { // Seat is currently selected, de-select it
+        selectedSeats.splice(index, 1);
+        seatElement.classList.remove('selected');
+    } else { // Seat is available, select it
+        selectedSeats.push(seatId);
+        seatElement.classList.add('selected');
+    }
+    updateSelectedSeatsInfo(); // Update the display and button state
 }
+
 function updateSelectedSeatsInfo() {
     if (selectedSeats.length === 0) {
-        selectedSeatsInfo.textContent = 'Selected Seats: None'; confirmSelectionButton.disabled = true;
+        selectedSeatsInfo.textContent = 'Selected Seats: None';
+        confirmSelectionButton.disabled = true; // Disable button if no seats selected
     } else {
         selectedSeatsInfo.textContent = `Selected Seats: ${selectedSeats.sort().join(', ')}`;
-        confirmSelectionButton.disabled = false;
+         // Only enable confirm button if seats ARE selected AND a showtime is chosen
+         const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+         confirmSelectionButton.disabled = !selectedShowtimeRadio;
     }
 }
 
@@ -780,12 +925,40 @@ function initializeApp() {
     cancelEditButton.addEventListener('click', resetForm);
     modalCloseButton.addEventListener('click', closeModal);
     movieDetailsModal.addEventListener('click', (e) => { if (e.target === movieDetailsModal) closeModal(); });
+
+     // 3. Updated Confirm Selection Button Logic
     confirmSelectionButton.addEventListener('click', () => {
-         if (selectedSeats.length > 0) {
-             alert(`Seats ${selectedSeats.sort().join(', ')} selected! (Booking simulation complete)`);
-             closeModal();
-         } else { alert("Please select at least one seat."); }
+         // Find the selected showtime radio button
+         const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+
+         if (!currentModalMovieId) {
+             console.error("Error: No movie context for booking.");
+             alert("An error occurred. Please close the modal and try again.");
+             return;
+         }
+         if (!selectedShowtimeRadio) {
+             alert("Please select a showtime.");
+             return;
+         }
+         if (selectedSeats.length === 0) {
+             alert("Please select at least one seat.");
+             return;
+         }
+
+         const selectedShowtime = selectedShowtimeRadio.value;
+         const movieTitle = movies.find(m => m.movieId === currentModalMovieId)?.title || 'Selected Movie';
+
+         // Save the selected seats to localStorage for this specific movie/showtime
+         saveBookedSeats(currentModalMovieId, selectedShowtime, selectedSeats);
+
+         // Provide feedback and close
+         alert(`Booking confirmed!\nMovie: ${movieTitle}\nShowtime: ${selectedShowtime}\nSeats: ${selectedSeats.sort().join(', ')}\n\n(Booking saved locally in this browser)`);
+         closeModal();
+
+         // Optionally, you could re-render the customer movie list if needed,
+         // but the main effect (unavailable seats) is seen on reopening the modal.
     });
+
 
     // Hide splash and render main UI after delay
     setTimeout(() => {
