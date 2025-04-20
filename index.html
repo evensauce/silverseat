@@ -44,14 +44,10 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- 2. Splash Screen Emoji Change -->
-    <div id="splash-screen">
-        <div class="splash-logo">💺</div> <!-- Seat Emoji -->
-    </div>
+    <div id="splash-screen"> <div class="splash-logo">💺</div> </div>
 
     <div id="app-header" class="is-hidden">
         <div class="container mx-auto flex justify-between items-center">
-            <!-- 1. Branding Change -->
             <span class="text-lg font-semibold text-gray-700">SilverSeat</span>
             <div class="flex items-center gap-4">
                 <span id="logged-in-user-info" class="text-sm text-gray-600"></span>
@@ -60,8 +56,8 @@
         </div>
     </div>
 
-    <!-- Auth View, Admin View, Customer View (HTML structure remains the same) -->
-    <div id="auth-view" class="is-hidden">
+    <!-- Auth View (remains the same) -->
+     <div id="auth-view" class="is-hidden">
         <div class="auth-container">
             <form id="customer-login-form" class="space-y-6">
                 <h2 class="text-2xl font-bold text-center text-gray-800">Customer Login</h2>
@@ -92,13 +88,20 @@
         </div>
     </div>
 
-    <div class="container mx-auto p-4 md:p-6 lg:p-8 relative"> <div id="admin-view" class="is-hidden space-y-8">
+    <div class="container mx-auto p-4 md:p-6 lg:p-8 relative">
+        <!-- ==== ADMIN VIEW ==== -->
+        <div id="admin-view" class="is-hidden space-y-8">
             <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Admin Panel</h1>
+            <!-- 2. Admin Nav Update -->
             <div id="admin-nav" class="mb-4 border-b border-gray-300">
                  <button data-target="admin-manage-movies" class="admin-nav-button active">Manage Movies</button>
                  <button data-target="admin-analytics" class="admin-nav-button">Analytics</button>
+                 <button data-target="admin-bookings" class="admin-nav-button">Customer Bookings</button> {/* New Tab */}
             </div>
-            <div id="admin-manage-movies" class="admin-section"> <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
+
+            <!-- Admin Manage Movies Section (remains the same) -->
+            <div id="admin-manage-movies" class="admin-section">
+                 <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
                      <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
                     <form id="movie-form" class="space-y-4">
                         <input type="hidden" id="edit-index">
@@ -126,8 +129,10 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Admin Analytics Section (remains the same) -->
             <div id="admin-analytics" class="admin-section is-hidden space-y-6">
-                <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
+                 <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
                 <div class="analytics-card">
                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
                     <div id="analytics-avg-ratings" class="space-y-2">
@@ -135,21 +140,55 @@
                     </div>
                 </div>
                 <div class="analytics-card">
-                    <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy (Simulated)</h3>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy (Based on Bookings)</h3>
                     <div id="analytics-occupancy" class="space-y-4">
                          <p class="text-gray-500">No movie data available for occupancy analysis.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- 2. Admin Bookings Section -->
+            <div id="admin-bookings-section" class="admin-section is-hidden space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700">All Customer Bookings</h2>
+                <div id="admin-bookings-list" class="space-y-6">
+                    <p class="text-gray-500">Loading bookings...</p>
+                </div>
+            </div>
         </div>
 
+        <!-- ==== CUSTOMER VIEW ==== -->
         <div id="customer-view" class="is-hidden">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Now Showing</h1>
+            <div class="flex justify-between items-center mb-6 border-b pb-2">
+                <h1 class="text-3xl font-bold text-gray-800">Now Showing</h1>
+                <!-- 1. Customer: Button to toggle My Bookings -->
+                <button id="toggle-my-bookings-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+                    <i class="fas fa-ticket-alt mr-2"></i>My Bookings
+                </button>
+            </div>
+
+            <!-- Customer Movie List (Now Showing) -->
             <div id="customer-movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                 <p id="no-movies-customer" class="text-gray-500 col-span-full is-hidden"></p> </div>
+                 <p id="no-movies-customer" class="text-gray-500 col-span-full is-hidden">No movies currently showing.</p>
+            </div>
+
+            <!-- 1. Customer: My Bookings View -->
+            <div id="my-bookings-view" class="is-hidden space-y-4 mt-8">
+                 <div class="flex justify-between items-center mb-6 border-b pb-2">
+                    <h2 class="text-2xl font-bold text-gray-800">My Bookings</h2>
+                     <button id="back-to-movies-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+                         <i class="fas fa-arrow-left mr-2"></i>Back to Movies
+                     </button>
+                 </div>
+                 <div id="my-bookings-list">
+                     <p class="text-gray-500">You have no bookings yet.</p>
+                 </div>
+            </div>
         </div>
 
-    </div> <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
+    </div>
+
+    <!-- Movie Details Modal (remains the same structure) -->
+    <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
          <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
             <div class="flex justify-between items-center p-4 border-b border-gray-200">
                 <h2 id="modal-movie-title" class="text-2xl font-semibold text-gray-800">Movie Title</h2>
@@ -161,8 +200,7 @@
                          <img id="modal-movie-poster" src="https://placehold.co/400x600/cccccc/ffffff?text=Poster" alt="Movie Poster" class="rounded-md w-full h-auto object-cover">
                     </div>
                     <div class="flex-grow space-y-3">
-                        <div id="modal-avg-rating" class="stars-container text-lg">
-                             </div>
+                        <div id="modal-avg-rating" class="stars-container text-lg"></div>
                         <p class="text-sm text-gray-600">
                             <strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> •
                             <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min
@@ -177,11 +215,9 @@
                     </div>
                 </div>
                  <div id="modal-rating-section" class="pt-4 border-t mt-4 is-hidden"> <h3 class="text-lg font-semibold mb-2 text-gray-700">Your Rating:</h3>
-                    <div id="modal-stars" class="stars-container interactive flex text-2xl cursor-pointer">
-                        </div>
+                    <div id="modal-stars" class="stars-container interactive flex text-2xl cursor-pointer"></div>
                     <p id="modal-rating-message" class="text-sm text-gray-500 mt-1"></p>
                 </div>
-                <!-- 3. Seat Map Container remains -->
                 <div id="seat-map-container" class="is-hidden pt-4 border-t border-gray-200 mt-4">
                     <h3 class="text-lg font-semibold mb-3 text-gray-700">Select Seats:</h3>
                     <div class="screen">SCREEN</div>
