@@ -1,49 +1,14 @@
-/* Custom Styles */
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f1f5f9;
-}
-/* Splash Screen */
-#splash-screen {
-    position: fixed; inset: 0; background-color: #2563eb; z-index: 200;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 1; transition: opacity 0.9s ease-out, visibility 0.8s ease-out; /* Added visibility transition */
-}
-#splash-screen.is-hidden { /* Use is-hidden for splash too */
-    opacity: 0; visibility: hidden; pointer-events: none;
-}
-/* 2. Splash Screen Emoji Style */
-.splash-logo {
-    color: white;
-    font-size: 5rem; /* Increased size for emoji */
-    animation: pulse 1.5s infinite ease-in-out;
-    line-height: 1; /* Ensure emoji centers well */
-}
+/* Base Styles (remain mostly the same) */
+body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+#splash-screen { position: fixed; inset: 0; background-color: #2563eb; z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.8s ease-out, visibility 0.8s ease-out; }
+#splash-screen.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-logo { color: white; font-size: 5rem; animation: pulse 1.5s infinite ease-in-out; line-height: 1; }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-/* Transitions for main view switching */
-#admin-view, #customer-view, #auth-view, #app-header {
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-/* Unified hidden class */
-.is-hidden {
-     opacity: 0;
-     visibility: hidden;
-     height: 0; /* Collapse height */
-     overflow: hidden; /* Prevent content spillover */
-     pointer-events: none; /* Prevent interaction */
-     /* Avoid display: none directly if entry transitions are desired */
-     /* Ensure elements with this class don't affect layout significantly */
-     margin: 0 !important; /* Override margins */
-     padding: 0 !important; /* Override padding */
-     border: none !important; /* Override borders */
-}
-
-/* Style movie cards */
+#admin-view, #customer-view, #auth-view, #app-header, #my-bookings-view { transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.is-hidden { opacity: 0; visibility: hidden; height: 0; overflow: hidden; pointer-events: none; margin: 0 !important; padding: 0 !important; border: none !important; }
 .movie-card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
 .movie-card:hover { transform: translateY(-5px); }
 .movie-poster { width: 100%; height: 300px; object-fit: cover; background-color: #e5e7eb; }
-/* Style form elements */
 .form-input { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.75rem 1rem; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
 .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); outline: none; }
 .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
@@ -57,29 +22,19 @@ body {
 .btn-link { background: none; border: none; color: #3b82f6; text-decoration: underline; cursor: pointer; padding: 0; font-weight: 500; }
 .btn-link:hover { color: #2563eb; }
 .btn-icon { padding: 0.5rem; margin-left: 0.5rem; }
-/* Auth form container */
 .auth-container { max-width: 450px; margin: 2rem auto; padding: 2rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-/* Header for logged-in state */
 #app-header { background-color: white; padding: 0.75rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-
-/* Rating Stars */
 .stars-container .fa-star, .stars-container .fa-regular.fa-star { color: #facc15; margin-right: 2px; transition: transform 0.1s ease-in-out; }
 .stars-container.interactive .fa-star:hover, .stars-container.interactive .fa-regular.fa-star:hover { transform: scale(1.2); }
 .stars-container:not(.interactive) { cursor: default; }
-
-/* Admin Tabs */
 .admin-nav-button { padding: 0.5rem 1rem; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-weight: 500; color: #6b7280; transition: color 0.2s ease, border-color 0.2s ease; }
 .admin-nav-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-.admin-section.is-hidden { display: none; } /* Use display none for inactive tabs */
-
-/* Analytics Styles */
+.admin-section.is-hidden { display: none; } /* Keep using display none for inactive admin tabs */
 .analytics-card { background-color: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .occupancy-tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; color: white; }
 .occupancy-popular { background-color: #10b981; } .occupancy-normal { background-color: #f59e0b; } .occupancy-unpopular { background-color: #ef4444; }
-
-/* --- Modal Styles --- */
 #movie-details-modal { z-index: 100; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
-#movie-details-modal.is-hidden { opacity: 0; visibility: hidden; pointer-events: none;} /* Use is-hidden */
+#movie-details-modal.is-hidden { opacity: 0; visibility: hidden; pointer-events: none;}
 .showtime-label { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
 .showtime-label:hover { background-color: #e5e7eb; }
 input[type="radio"]:checked + .showtime-label { background-color: #3b82f6; color: white; border-color: #3b82f6; }
@@ -88,12 +43,16 @@ input[type="radio"].showtime-radio { display: none; }
 .seat-grid { display: flex; flex-direction: column; align-items: center; }
 .seat-row { display: flex; justify-content: center; margin-bottom: 5px; }
 .seat { width: 28px; height: 28px; margin: 3px; background-color: #cbd5e1; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #4a5568; font-size: 0.8rem; transition: background-color 0.2s ease, transform 0.1s ease; }
-.seat:hover:not(.unavailable):not(.selected) { background-color: #94a3b8; } /* Don't change hover on unavailable/selected */
+.seat:hover:not(.unavailable):not(.selected) { background-color: #94a3b8; }
 .seat.selected { background-color: #3b82f6; color: white; transform: scale(1.1); }
-/* 3. Style for unavailable/booked seats */
 .seat.unavailable { background-color: #64748b; cursor: not-allowed; color: #e2e8f0; opacity: 0.7; }
 .seat-spacer { width: 28px; height: 28px; margin: 3px; }
+#customer-login-error, #register-error, #admin-login-error { min-height: 1.25em; }
+#customer-login-error.is-hidden, #register-error.is-hidden, #admin-login-error.is-hidden { min-height: 0; }
 
-/* Ensure error messages don't collapse when hidden */
- #customer-login-error, #register-error, #admin-login-error { min-height: 1.25em; /* approx height of text */ }
- #customer-login-error.is-hidden, #register-error.is-hidden, #admin-login-error.is-hidden { min-height: 0; } /* Allow collapse when truly hidden */
+/* Styles for Booking Lists */
+.booking-list-item { background-color: #fff; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.booking-list-item strong { color: #1f2937; }
+.booking-list-item .seats { font-family: monospace; background-color: #e5e7eb; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; }
+.admin-booking-group h3 { font-size: 1.25rem; font-weight: bold; color: #374151; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; }
+.admin-booking-item { margin-bottom: 0.5rem; padding-left: 0.5rem; border-left: 3px solid #9ca3af; font-size: 0.9rem; }
