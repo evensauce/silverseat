@@ -1,4 +1,4 @@
-/* Base Styles (remain mostly the same) */
+/* Base Styles */
 body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
 #splash-screen { position: fixed; inset: 0; background-color: #2563eb; z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.8s ease-out, visibility 0.8s ease-out; }
 #splash-screen.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -29,7 +29,7 @@ body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
 .stars-container:not(.interactive) { cursor: default; }
 .admin-nav-button { padding: 0.5rem 1rem; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-weight: 500; color: #6b7280; transition: color 0.2s ease, border-color 0.2s ease; }
 .admin-nav-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-.admin-section.is-hidden { display: none; } /* Keep using display none for inactive admin tabs */
+.admin-section.is-hidden { display: none; }
 .analytics-card { background-color: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .occupancy-tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; color: white; }
 .occupancy-popular { background-color: #10b981; } .occupancy-normal { background-color: #f59e0b; } .occupancy-unpopular { background-color: #ef4444; }
@@ -54,5 +54,7 @@ input[type="radio"].showtime-radio { display: none; }
 .booking-list-item { background-color: #fff; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .booking-list-item strong { color: #1f2937; }
 .booking-list-item .seats { font-family: monospace; background-color: #e5e7eb; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; }
-.admin-booking-group h3 { font-size: 1.25rem; font-weight: bold; color: #374151; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; }
+.admin-booking-group h3 { font-size: 1.25rem; font-weight:600; color: #374151; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; }
 .admin-booking-item { margin-bottom: 0.5rem; padding-left: 0.5rem; border-left: 3px solid #9ca3af; font-size: 0.9rem; }
+.admin-booking-item span { display: flex; align-items: center; margin-bottom: 0.15rem; } /* Align icon and text */
+.admin-booking-item i { width: 1.25rem; text-align: center; margin-right: 0.5rem; color: #6b7280; } /* Consistent icon width */

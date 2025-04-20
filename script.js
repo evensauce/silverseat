@@ -1,588 +1,262 @@
-// --- Constants ---
-const MOVIES_STORAGE_KEY = 'silverSeatMovies';
-const AUTH_STORAGE_KEY = 'silverSeatAuth';
-const CUSTOMERS_STORAGE_KEY = 'silverSeatCustomers';
-const USER_RATINGS_STORAGE_KEY = 'silverSeatUserRatings';
-const BOOKED_SEATS_STORAGE_KEY_PREFIX = 'silverSeatBookedSeats_'; // For seat map availability
-const ALL_BOOKINGS_STORAGE_KEY = 'silverSeatAllBookings'; // 3. Key for detailed booking list
-const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'password';
-const TOTAL_SEATS_PER_SCREENING = 5 * 8;
+ // --- Constants ---
+ const MOVIES_STORAGE_KEY = 'silverSeatMovies';
+ const AUTH_STORAGE_KEY = 'silverSeatAuth';
+ const CUSTOMERS_STORAGE_KEY = 'silverSeatCustomers';
+ const USER_RATINGS_STORAGE_KEY = 'silverSeatUserRatings';
+ const BOOKED_SEATS_STORAGE_KEY_PREFIX = 'silverSeatBookedSeats_';
+ const ALL_BOOKINGS_STORAGE_KEY = 'silverSeatAllBookings';
+ const ADMIN_EMAIL = 'admin@example.com';
+ const ADMIN_PASSWORD = 'password';
+ const TOTAL_SEATS_PER_SCREENING = 5 * 8;
 
-// --- DOM Elements ---
-// (Standard elements)
-const splashScreen = document.getElementById('splash-screen');
-const authView = document.getElementById('auth-view');
-const customerLoginForm = document.getElementById('customer-login-form');
-const customerRegisterForm = document.getElementById('customer-register-form');
-const adminLoginForm = document.getElementById('admin-login-form');
-const showRegisterButton = document.getElementById('show-register-button');
-const showAdminLoginButton = document.getElementById('show-admin-login-button');
-const backToCustomerLoginButtons = document.querySelectorAll('.back-to-customer-login');
-const customerLoginError = document.getElementById('customer-login-error');
-const registerError = document.getElementById('register-error');
-const adminLoginError = document.getElementById('admin-login-error');
-const appHeader = document.getElementById('app-header');
-const loggedInUserInfo = document.getElementById('logged-in-user-info');
-const logoutButton = document.getElementById('logout-button');
-// Admin View Elements
-const adminView = document.getElementById('admin-view');
-const adminNavButtons = document.querySelectorAll('.admin-nav-button');
-const adminManageMoviesSection = document.getElementById('admin-manage-movies');
-const adminAnalyticsSection = document.getElementById('admin-analytics');
-const adminBookingsSection = document.getElementById('admin-bookings-section'); // 2. Admin bookings section
-const adminBookingsListContainer = document.getElementById('admin-bookings-list'); // 2. Container for admin bookings list
-const movieForm = document.getElementById('movie-form');
-const formTitle = document.getElementById('form-title');
-const submitButton = document.getElementById('submit-button');
-const cancelEditButton = document.getElementById('cancel-edit-button');
-const adminMovieListContainer = document.getElementById('admin-movie-list');
-const customerPreviewContainer = document.getElementById('customer-movie-list-preview');
-const noMoviesAdminMsg = document.getElementById('no-movies-admin');
-const noMoviesPreviewMsg = document.getElementById('no-movies-preview');
-const analyticsAvgRatingsContainer = document.getElementById('analytics-avg-ratings');
-const analyticsOccupancyContainer = document.getElementById('analytics-occupancy');
-// Customer View Elements
-const customerView = document.getElementById('customer-view');
-const customerMovieListContainer = document.getElementById('customer-movie-list');
-const noMoviesCustomerMsg = document.getElementById('no-movies-customer');
-const toggleMyBookingsBtn = document.getElementById('toggle-my-bookings-btn'); // 1. Customer bookings button
-const myBookingsView = document.getElementById('my-bookings-view'); // 1. Customer bookings view container
-const myBookingsListContainer = document.getElementById('my-bookings-list'); // 1. Container for customer's booking list
-const backToMoviesBtn = document.getElementById('back-to-movies-btn'); // 1. Back to movies button
-// Modal Elements
-const movieDetailsModal = document.getElementById('movie-details-modal');
-const modalCloseButton = document.getElementById('modal-close-button');
-const modalMovieTitle = document.getElementById('modal-movie-title');
-const modalMoviePoster = document.getElementById('modal-movie-poster');
-const modalAvgRatingContainer = document.getElementById('modal-avg-rating');
-const modalMovieGenre = document.getElementById('modal-movie-genre');
-const modalMovieDuration = document.getElementById('modal-movie-duration');
-const modalMovieDescription = document.getElementById('modal-movie-description');
-const modalShowtimesList = document.getElementById('modal-showtimes-list');
-const modalRatingSection = document.getElementById('modal-rating-section');
-const modalStarsContainer = document.getElementById('modal-stars');
-const modalRatingMessage = document.getElementById('modal-rating-message');
-const seatMapContainer = document.getElementById('seat-map-container');
-const seatGrid = document.getElementById('seat-grid');
-const selectedSeatsInfo = document.getElementById('selected-seats-info');
-const confirmSelectionButton = document.getElementById('confirm-selection-button');
+ // --- DOM Elements ---
+ const splashScreen = document.getElementById('splash-screen');
+ const authView = document.getElementById('auth-view');
+ const customerLoginForm = document.getElementById('customer-login-form');
+ const customerRegisterForm = document.getElementById('customer-register-form');
+ const adminLoginForm = document.getElementById('admin-login-form');
+ const showRegisterButton = document.getElementById('show-register-button');
+ const showAdminLoginButton = document.getElementById('show-admin-login-button');
+ const backToCustomerLoginButtons = document.querySelectorAll('.back-to-customer-login');
+ const customerLoginError = document.getElementById('customer-login-error');
+ const registerError = document.getElementById('register-error');
+ const adminLoginError = document.getElementById('admin-login-error');
+ const appHeader = document.getElementById('app-header');
+ const loggedInUserInfo = document.getElementById('logged-in-user-info');
+ const logoutButton = document.getElementById('logout-button');
+ const adminView = document.getElementById('admin-view');
+ const adminNavButtons = document.querySelectorAll('.admin-nav-button');
+ const adminManageMoviesSection = document.getElementById('admin-manage-movies');
+ const adminAnalyticsSection = document.getElementById('admin-analytics');
+ const adminBookingsSection = document.getElementById('admin-bookings-section'); // Verified ID
+ const adminBookingsListContainer = document.getElementById('admin-bookings-list');
+ const movieForm = document.getElementById('movie-form');
+ const formTitle = document.getElementById('form-title');
+ const submitButton = document.getElementById('submit-button');
+ const cancelEditButton = document.getElementById('cancel-edit-button');
+ const adminMovieListContainer = document.getElementById('admin-movie-list');
+ const customerPreviewContainer = document.getElementById('customer-movie-list-preview');
+ const noMoviesAdminMsg = document.getElementById('no-movies-admin');
+ const noMoviesPreviewMsg = document.getElementById('no-movies-preview');
+ const analyticsAvgRatingsContainer = document.getElementById('analytics-avg-ratings');
+ const analyticsOccupancyContainer = document.getElementById('analytics-occupancy');
+ const customerView = document.getElementById('customer-view');
+ const customerMovieListContainer = document.getElementById('customer-movie-list');
+ const noMoviesCustomerMsg = document.getElementById('no-movies-customer');
+ const toggleMyBookingsBtn = document.getElementById('toggle-my-bookings-btn');
+ const myBookingsView = document.getElementById('my-bookings-view');
+ const myBookingsListContainer = document.getElementById('my-bookings-list');
+ const backToMoviesBtn = document.getElementById('back-to-movies-btn');
+ const movieDetailsModal = document.getElementById('movie-details-modal');
+ const modalCloseButton = document.getElementById('modal-close-button');
+ const modalMovieTitle = document.getElementById('modal-movie-title');
+ const modalMoviePoster = document.getElementById('modal-movie-poster');
+ const modalAvgRatingContainer = document.getElementById('modal-avg-rating');
+ const modalMovieGenre = document.getElementById('modal-movie-genre');
+ const modalMovieDuration = document.getElementById('modal-movie-duration');
+ const modalMovieDescription = document.getElementById('modal-movie-description');
+ const modalShowtimesList = document.getElementById('modal-showtimes-list');
+ const modalRatingSection = document.getElementById('modal-rating-section');
+ const modalStarsContainer = document.getElementById('modal-stars');
+ const modalRatingMessage = document.getElementById('modal-rating-message');
+ const seatMapContainer = document.getElementById('seat-map-container');
+ const seatGrid = document.getElementById('seat-grid');
+ const selectedSeatsInfo = document.getElementById('selected-seats-info');
+ const confirmSelectionButton = document.getElementById('confirm-selection-button');
 
+ // --- State ---
+ let movies = [];
+ let customerUsers = [];
+ let userRatings = {};
+ let allBookings = [];
+ let authState = { isLoggedIn: false, user: null };
+ let editingIndex = null;
+ let selectedSeats = [];
+ let currentAdminTab = 'admin-manage-movies'; // Default admin tab
+ let currentModalMovieId = null;
+ let isShowingMyBookings = false;
 
-// --- State ---
-let movies = [];
-let customerUsers = [];
-let userRatings = {};
-let allBookings = []; // 3. Central array for all booking details
-let authState = { isLoggedIn: false, user: null };
-let editingIndex = null;
-let selectedSeats = []; // Holds seats selected in the *current* interaction
-let currentAdminTab = 'admin-manage-movies';
-let currentModalMovieId = null;
-let isShowingMyBookings = false; // 1. State for customer view toggle
+ // --- Utility Functions ---
+ function showElement(el) { if(el) { el.classList.remove('is-hidden'); el.style.height = ''; el.style.opacity = ''; el.style.visibility = ''; el.style.pointerEvents = ''; el.style.margin = ''; el.style.padding = ''; el.style.border = ''; } }
+ function hideElement(el) { if(el) { el.classList.add('is-hidden'); } }
+ function displayError(element, message) { if (element) { element.textContent = message; showElement(element); } }
+ function hideError(element) { if (element) { element.textContent = ''; hideElement(element); } }
+ function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
 
-// --- Utility Functions (remain the same) ---
-function showElement(el) { if(el) { el.classList.remove('is-hidden'); el.style.height = ''; el.style.opacity = ''; el.style.visibility = ''; el.style.pointerEvents = ''; el.style.margin = ''; el.style.padding = ''; el.style.border = ''; } }
-function hideElement(el) { if(el) { el.classList.add('is-hidden'); } }
-function displayError(element, message) { if (element) { element.textContent = message; showElement(element); } }
-function hideError(element) { if (element) { element.textContent = ''; hideElement(element); } }
-function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
+ // --- Local Storage Functions --- (No changes needed in LS logic)
+ function loadMoviesFromStorage() { const storedMovies = localStorage.getItem(MOVIES_STORAGE_KEY); movies = []; if (storedMovies) { try { movies = JSON.parse(storedMovies); if (!Array.isArray(movies)) movies = []; } catch (e) { movies = []; } } if (movies.length === 0) { movies = [ { title: "Inception", poster: "https://placehold.co/400x600/3b82f6/ffffff?text=Inception", description: "A thief who steals corporate secrets...", genre: "Sci-Fi", duration: 148, showtimes: "11:00 AM, 2:00 PM, 8:00 PM" }, { title: "The Grand Budapest Hotel", poster: "https://placehold.co/400x600/ef4444/ffffff?text=Grand+Budapest", description: "The adventures of Gustave H...", genre: "Adventure", duration: 100, showtimes: "10:30 AM, 1:30 PM, 7:30 PM" }, { title: "Parasite", poster: "https://placehold.co/400x600/10b981/ffffff?text=Parasite", description: "Greed and class discrimination...", genre: "Thriller", duration: 132, showtimes: "12:00 PM, 3:00 PM, 9:00 PM" } ]; movies.forEach(m => { m.movieId = generateId(); m.ratings = []; }); saveMoviesToStorage(); } else { let updated = false; movies.forEach(m => { if (!m.movieId) { m.movieId = generateId(); updated = true; } if (!m.ratings) { m.ratings = []; updated = true; } }); if (updated) saveMoviesToStorage(); } console.log("Movies loaded:", movies.length); }
+ function saveMoviesToStorage() { localStorage.setItem(MOVIES_STORAGE_KEY, JSON.stringify(movies)); }
+ function loadCustomersFromStorage() { const storedCustomers = localStorage.getItem(CUSTOMERS_STORAGE_KEY); customerUsers = []; if (storedCustomers) { try { customerUsers = JSON.parse(storedCustomers); if (!Array.isArray(customerUsers)) customerUsers = []; } catch (e) { customerUsers = []; } } console.log("Customers loaded:", customerUsers.length); }
+ function saveCustomersToStorage() { localStorage.setItem(CUSTOMERS_STORAGE_KEY, JSON.stringify(customerUsers)); }
+ function loadUserRatingsFromStorage() { const storedUserRatings = localStorage.getItem(USER_RATINGS_STORAGE_KEY); userRatings = {}; if(storedUserRatings){ try { userRatings = JSON.parse(storedUserRatings); } catch(e) { userRatings = {}; } } console.log("User ratings loaded"); }
+ function saveUserRatingsToStorage() { localStorage.setItem(USER_RATINGS_STORAGE_KEY, JSON.stringify(userRatings)); }
+ function loadAuthFromStorage() { const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY); authState = { isLoggedIn: false, user: null }; if(storedAuth){ try{ const parsedAuth = JSON.parse(storedAuth); const isValidAuth = parsedAuth && typeof parsedAuth.isLoggedIn === 'boolean' && ( !parsedAuth.isLoggedIn || (parsedAuth.user && parsedAuth.user.email && parsedAuth.user.type) ); if (isValidAuth) { authState = parsedAuth; } } catch(e) { console.error("Error parsing auth state:", e); } } console.log("Auth state loaded:", authState.isLoggedIn); }
+ function saveAuthToStorage() { localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState)); }
+ function clearAuthStorage() { authState = { isLoggedIn: false, user: null }; localStorage.removeItem(AUTH_STORAGE_KEY); }
+ function getBookedSeatsKey(movieId, showtime) { if (!movieId || !showtime) { console.error("Cannot generate booked seats key without movieId and showtime."); return null; } const normalizedShowtime = showtime.trim().replace(/\s+/g, '_'); return `${BOOKED_SEATS_STORAGE_KEY_PREFIX}${movieId}_${normalizedShowtime}`; }
+ function loadBookedSeats(movieId, showtime) { const key = getBookedSeatsKey(movieId, showtime); if (!key) return []; const storedData = localStorage.getItem(key); if (storedData) { try { const bookedSeats = JSON.parse(storedData); if (Array.isArray(bookedSeats) && bookedSeats.every(s => typeof s === 'string')) { return bookedSeats; } } catch (e) { console.error(`Error parsing booked seats for ${key}:`, e); } } return []; }
+ function saveBookedSeats(movieId, showtime, seatsToBook) { const key = getBookedSeatsKey(movieId, showtime); if (!key || !Array.isArray(seatsToBook) || seatsToBook.length === 0) { console.error("Invalid input for saving booked seats availability."); return; } const existingBookedSeats = loadBookedSeats(movieId, showtime); const updatedBookedSeats = [...new Set([...existingBookedSeats, ...seatsToBook])]; try { localStorage.setItem(key, JSON.stringify(updatedBookedSeats)); console.log(`Saved seat availability for ${key}:`, updatedBookedSeats); } catch (e) { console.error(`Error saving seat availability for ${key}:`, e); alert("Could not save booking availability. Local storage might be full."); } }
+ function loadAllBookingsFromStorage() { const storedBookings = localStorage.getItem(ALL_BOOKINGS_STORAGE_KEY); allBookings = []; if (storedBookings) { try { const parsed = JSON.parse(storedBookings); if (Array.isArray(parsed) && parsed.every(b => b && b.bookingId && b.userEmail && b.movieId && b.movieTitle && b.showtime && Array.isArray(b.seats))) { allBookings = parsed; console.log("Loaded all bookings:", allBookings.length, "entries"); } else { console.warn("Stored central booking data is invalid or malformed. Resetting."); } } catch (e) { console.error("Error parsing all bookings:", e); } } else { console.log("No central booking data found in storage."); } }
+ function saveAllBookingsToStorage() { try { localStorage.setItem(ALL_BOOKINGS_STORAGE_KEY, JSON.stringify(allBookings)); console.log("Saved all bookings to storage:", allBookings.length, "entries"); } catch (e) { console.error("Error saving all bookings:", e); alert("Could not save booking details. Local storage might be full."); } }
+ function addBookingToList(bookingData) { if (!bookingData || !bookingData.bookingId) { console.error("Invalid booking data provided to addBookingToList."); return; } loadAllBookingsFromStorage(); if (allBookings.some(b => b.bookingId === bookingData.bookingId)) { console.warn(`Booking ID ${bookingData.bookingId} already exists. Skipping add.`); return; } allBookings.push(bookingData); saveAllBookingsToStorage(); }
 
-// --- Local Storage Functions ---
-// Movie, Customer, Rating, Auth storage (remain the same)
-function loadMoviesFromStorage() { /* ... no change ... */
-    const storedMovies = localStorage.getItem(MOVIES_STORAGE_KEY);
-    if (storedMovies) {
-        try { movies = JSON.parse(storedMovies); if (!Array.isArray(movies)) movies = []; }
-        catch (e) { movies = []; }
-    }
-    if (movies.length === 0) {
-         movies = [ { title: "Inception", poster: "https://placehold.co/400x600/3b82f6/ffffff?text=Inception", description: "...", genre: "Sci-Fi", duration: 148, showtimes: "11:00 AM, 2:00 PM, 8:00 PM" }, { title: "The Grand Budapest Hotel", poster: "https://placehold.co/400x600/ef4444/ffffff?text=Grand+Budapest", description: "...", genre: "Adventure", duration: 100, showtimes: "10:30 AM, 1:30 PM, 7:30 PM" }, { title: "Parasite", poster: "https://placehold.co/400x600/10b981/ffffff?text=Parasite", description: "...", genre: "Thriller", duration: 132, showtimes: "12:00 PM, 3:00 PM, 9:00 PM" } ];
-         movies.forEach(m => { m.movieId = generateId(); m.ratings = []; });
-         saveMoviesToStorage();
-    } else {
-         movies.forEach(m => { if (!m.movieId) m.movieId = generateId(); if (!m.ratings) m.ratings = []; });
-         saveMoviesToStorage();
-    }
-}
-function saveMoviesToStorage() { localStorage.setItem(MOVIES_STORAGE_KEY, JSON.stringify(movies)); }
-function loadCustomersFromStorage() { /* ... no change ... */
-    const storedCustomers = localStorage.getItem(CUSTOMERS_STORAGE_KEY);
-     if (storedCustomers) { try { customerUsers = JSON.parse(storedCustomers); if (!Array.isArray(customerUsers)) customerUsers = []; } catch (e) { customerUsers = []; } }
-}
-function saveCustomersToStorage() { localStorage.setItem(CUSTOMERS_STORAGE_KEY, JSON.stringify(customerUsers)); }
-function loadUserRatingsFromStorage() { /* ... no change ... */
-    const storedUserRatings = localStorage.getItem(USER_RATINGS_STORAGE_KEY);
-    if(storedUserRatings){ try { userRatings = JSON.parse(storedUserRatings); } catch(e) { userRatings = {}; } } else { userRatings = {}; }
-}
-function saveUserRatingsToStorage() { localStorage.setItem(USER_RATINGS_STORAGE_KEY, JSON.stringify(userRatings)); }
-function loadAuthFromStorage() { /* ... no change ... */
-     const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
-    if(storedAuth){ try{ const parsedAuth = JSON.parse(storedAuth); const isValidAuth = parsedAuth && typeof parsedAuth.isLoggedIn === 'boolean' && ( !parsedAuth.isLoggedIn || (parsedAuth.user && parsedAuth.user.email && parsedAuth.user.type) ); if (isValidAuth) { authState = parsedAuth; } else { clearAuthStorage(); } } catch(e) { console.error("Error parsing auth state:", e); clearAuthStorage(); } }
-}
-function saveAuthToStorage() { localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState)); }
-function clearAuthStorage() { authState = { isLoggedIn: false, user: null }; localStorage.removeItem(AUTH_STORAGE_KEY); }
+ // --- Rating Functions --- (No changes needed)
+ function calculateAverageRating(movie) { if (!movie || !movie.ratings || movie.ratings.length === 0) { return { average: 0, count: 0 }; } const sum = movie.ratings.reduce((acc, r) => acc + r.rating, 0); const average = sum / movie.ratings.length; return { average: average, count: movie.ratings.length }; }
+ function renderStars(container, averageRating, count = 0, interactive = false, userRating = null, movieId = null) { if (!container) return; container.innerHTML = ''; container.classList.toggle('interactive', interactive); container.dataset.movieId = movieId || ''; const ratingValue = Math.round(averageRating); const displayRating = interactive && userRating !== null ? userRating : ratingValue; for (let i = 1; i <= 5; i++) { const star = document.createElement('i'); star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star'); star.dataset.rating = i; if (interactive) { star.style.cursor = 'pointer'; star.onclick = () => handleStarClick(movieId, i); star.onmouseover = () => highlightStars(container, i); star.onmouseout = () => highlightStars(container, userRating || 0); } container.appendChild(star); } if (!interactive) { const ratingText = document.createElement('span'); ratingText.className = 'ml-2 text-sm text-gray-500'; if (averageRating > 0) { ratingText.textContent = `${averageRating.toFixed(1)} (${count} ${count === 1 ? 'rating' : 'ratings'})`; } else { ratingText.textContent = 'No ratings yet'; } container.appendChild(ratingText); } }
+ function highlightStars(container, rating) { const stars = container.querySelectorAll('i'); stars.forEach(star => { const starRating = parseInt(star.dataset.rating, 10); star.classList.toggle('fas', starRating <= rating); star.classList.toggle('fa-regular', starRating > rating); }); }
+ function handleStarClick(movieId, rating) { if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer' || !movieId) return; const userId = authState.user.email; const movieIndex = movies.findIndex(m => m.movieId === movieId); if (movieIndex === -1) return; if (!userRatings[userId]) userRatings[userId] = {}; if (userRatings[userId][movieId]) return; movies[movieIndex].ratings.push({ userId, rating }); userRatings[userId][movieId] = rating; saveMoviesToStorage(); saveUserRatingsToStorage(); const avgData = calculateAverageRating(movies[movieIndex]); renderStars(modalAvgRatingContainer, avgData.average, avgData.count); renderStars(modalStarsContainer, 0, 0, false, rating, movieId); modalRatingMessage.textContent = `You rated this movie ${rating} star${rating > 1 ? 's' : ''}.`; modalStarsContainer.classList.remove('interactive'); modalStarsContainer.style.cursor = 'default'; renderCustomerContent(); }
 
-// Seat Map Availability Storage (Prefix-based - remains the same)
-function getBookedSeatsKey(movieId, showtime) { if (!movieId || !showtime) { console.error("Cannot generate booked seats key without movieId and showtime."); return null; } const normalizedShowtime = showtime.trim().replace(/\s+/g, '_'); return `${BOOKED_SEATS_STORAGE_KEY_PREFIX}${movieId}_${normalizedShowtime}`; }
-function loadBookedSeats(movieId, showtime) { const key = getBookedSeatsKey(movieId, showtime); if (!key) return []; const storedData = localStorage.getItem(key); if (storedData) { try { const bookedSeats = JSON.parse(storedData); if (Array.isArray(bookedSeats) && bookedSeats.every(s => typeof s === 'string')) { return bookedSeats; } } catch (e) { console.error(`Error parsing booked seats for ${key}:`, e); } } return []; }
-function saveBookedSeats(movieId, showtime, seatsToBook) { const key = getBookedSeatsKey(movieId, showtime); if (!key || !Array.isArray(seatsToBook) || seatsToBook.length === 0) { console.error("Invalid input for saving booked seats availability."); return; } const existingBookedSeats = loadBookedSeats(movieId, showtime); const updatedBookedSeats = [...new Set([...existingBookedSeats, ...seatsToBook])]; try { localStorage.setItem(key, JSON.stringify(updatedBookedSeats)); console.log(`Saved seat availability for ${key}:`, updatedBookedSeats); } catch (e) { console.error(`Error saving seat availability for ${key}:`, e); alert("Could not save booking availability. Local storage might be full."); } }
+ // --- UI Rendering Functions ---
+ function renderUI() {
+     loadAllBookingsFromStorage(); // Ensure bookings are loaded for any view render
+     closeModal();
+     if (authState.isLoggedIn && authState.user) {
+         hideElement(authView); showElement(appHeader); loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${authState.user.type})`;
+         if (authState.user.type === 'admin') { hideElement(customerView); showElement(adminView); renderAdminContent(); }
+         else { hideElement(adminView); showElement(customerView); renderCustomerContent(); }
+     } else { hideElement(appHeader); hideElement(adminView); hideElement(customerView); hideElement(myBookingsView); showElement(authView); showCustomerLoginForm(); }
+ }
 
-// --- 3. Central Booking List Storage ---
-function loadAllBookingsFromStorage() {
-    const storedBookings = localStorage.getItem(ALL_BOOKINGS_STORAGE_KEY);
-    if (storedBookings) {
-        try {
-            const parsed = JSON.parse(storedBookings);
-            // Basic validation: ensure it's an array of objects with required keys
-            if (Array.isArray(parsed) && parsed.every(b => b && b.bookingId && b.userEmail && b.movieId && b.movieTitle && b.showtime && Array.isArray(b.seats))) {
-                allBookings = parsed;
-                return;
-            } else {
-                 console.warn("Stored booking data is invalid or malformed. Resetting.");
-            }
-        } catch (e) {
-            console.error("Error parsing all bookings:", e);
-        }
-    }
-    allBookings = []; // Reset if not found or invalid
-}
+ // --- Admin Content Rendering ---
+ function renderAdminContent() {
+      resetForm();
+      // Hide all admin sections first
+      document.querySelectorAll('#admin-view > .admin-section').forEach(sec => hideElement(sec));
+      // Show the target section based on currentAdminTab state
+      const activeSection = document.getElementById(currentAdminTab); // currentAdminTab holds the ID like 'admin-bookings-section'
+      if(activeSection) {
+          showElement(activeSection);
+          console.log("Showing admin section:", currentAdminTab);
+      } else {
+          // Log error and default to the first tab if the target isn't found
+          console.error("Could not find admin section with ID:", currentAdminTab);
+          currentAdminTab = 'admin-manage-movies'; // Default to first tab
+          showElement(adminManageMoviesSection);
+          // Update the active state on the buttons to match the default
+          adminNavButtons.forEach(btn => {
+              btn.classList.toggle('active', btn.dataset.target === currentAdminTab);
+          });
+      }
 
-function saveAllBookingsToStorage() {
-    try {
-        localStorage.setItem(ALL_BOOKINGS_STORAGE_KEY, JSON.stringify(allBookings));
-    } catch (e) {
-        console.error("Error saving all bookings:", e);
-        alert("Could not save booking details. Local storage might be full.");
-    }
-}
+      // Render specific content for the now visible tab
+      console.log("Rendering admin content for tab:", currentAdminTab);
+      if (currentAdminTab === 'admin-manage-movies') { renderMovies(adminMovieListContainer, 'admin'); renderMovies(customerPreviewContainer, 'preview'); }
+      else if (currentAdminTab === 'admin-analytics') { renderAnalyticsDashboard(); }
+      else if (currentAdminTab === 'admin-bookings-section') { renderAdminBookingsList(); } // Match ID
+ }
 
-/**
- * Adds a new booking object to the central list and saves it.
- * @param {object} bookingData - The booking object { bookingId, userEmail, movieId, movieTitle, showtime, seats }
- */
-function addBookingToList(bookingData) {
-    if (!bookingData || !bookingData.bookingId) {
-         console.error("Invalid booking data provided.");
-         return;
-    }
-    // Ensure no duplicate booking ID (highly unlikely with random IDs, but good practice)
-    if (allBookings.some(b => b.bookingId === bookingData.bookingId)) {
-         console.warn(`Booking ID ${bookingData.bookingId} already exists. Skipping.`);
-         return;
-    }
-    allBookings.push(bookingData);
-    saveAllBookingsToStorage();
-    console.log("Added booking to central list:", bookingData);
-}
-
-// --- Rating Functions (remain the same) ---
-function calculateAverageRating(movie) { /* ... no change ... */ if (!movie || !movie.ratings || movie.ratings.length === 0) { return { average: 0, count: 0 }; } const sum = movie.ratings.reduce((acc, r) => acc + r.rating, 0); const average = sum / movie.ratings.length; return { average: average, count: movie.ratings.length }; }
-function renderStars(container, averageRating, count = 0, interactive = false, userRating = null, movieId = null) { /* ... no change ... */ if (!container) return; container.innerHTML = ''; container.classList.toggle('interactive', interactive); container.dataset.movieId = movieId || ''; const ratingValue = Math.round(averageRating); const displayRating = interactive && userRating !== null ? userRating : ratingValue; for (let i = 1; i <= 5; i++) { const star = document.createElement('i'); star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star'); star.dataset.rating = i; if (interactive) { star.style.cursor = 'pointer'; star.onclick = () => handleStarClick(movieId, i); star.onmouseover = () => highlightStars(container, i); star.onmouseout = () => highlightStars(container, userRating || 0); } container.appendChild(star); } if (!interactive) { const ratingText = document.createElement('span'); ratingText.className = 'ml-2 text-sm text-gray-500'; if (averageRating > 0) { ratingText.textContent = `${averageRating.toFixed(1)} (${count} ${count === 1 ? 'rating' : 'ratings'})`; } else { ratingText.textContent = 'No ratings yet'; } container.appendChild(ratingText); } }
-function highlightStars(container, rating) { /* ... no change ... */ const stars = container.querySelectorAll('i'); stars.forEach(star => { const starRating = parseInt(star.dataset.rating, 10); star.classList.toggle('fas', starRating <= rating); star.classList.toggle('fa-regular', starRating > rating); }); }
-function handleStarClick(movieId, rating) { /* ... no change ... */ if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer' || !movieId) return; const userId = authState.user.email; const movieIndex = movies.findIndex(m => m.movieId === movieId); if (movieIndex === -1) return; if (!userRatings[userId]) userRatings[userId] = {}; if (userRatings[userId][movieId]) return; movies[movieIndex].ratings.push({ userId, rating }); userRatings[userId][movieId] = rating; saveMoviesToStorage(); saveUserRatingsToStorage(); const avgData = calculateAverageRating(movies[movieIndex]); renderStars(modalAvgRatingContainer, avgData.average, avgData.count); renderStars(modalStarsContainer, 0, 0, false, rating, movieId); modalRatingMessage.textContent = `You rated this movie ${rating} star${rating > 1 ? 's' : ''}.`; modalStarsContainer.classList.remove('interactive'); modalStarsContainer.style.cursor = 'default'; renderCustomerContent(); }
-
-
-// --- UI Rendering Functions ---
-function renderUI() {
-    closeModal();
-    if (authState.isLoggedIn && authState.user) {
-        hideElement(authView);
-        showElement(appHeader);
-        loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${authState.user.type})`;
-
-        if (authState.user.type === 'admin') {
-            hideElement(customerView);
-            showElement(adminView);
-            renderAdminContent();
-        } else { // Customer
-            hideElement(adminView);
-            showElement(customerView);
-            renderCustomerContent(); // Handles showing movies OR bookings view
-        }
-    } else {
-        hideElement(appHeader);
-        hideElement(adminView);
-        hideElement(customerView);
-        hideElement(myBookingsView); // Ensure bookings view is hidden on logout
-        showElement(authView);
-        showCustomerLoginForm();
-    }
-}
-
-// --- Admin Content Rendering ---
-function renderAdminContent() {
-     resetForm(); // Reset movie form if visible
-     // Handle tab visibility
-     document.querySelectorAll('.admin-section').forEach(sec => {
-         if (sec.id === currentAdminTab) { showElement(sec); }
-         else { hideElement(sec); }
+ // Function to Render Admin Bookings List
+ function renderAdminBookingsList() {
+     if (!adminBookingsListContainer) { console.error("Admin bookings list container not found!"); return; }
+     adminBookingsListContainer.innerHTML = ''; // Clear previous list
+     console.log("Rendering admin bookings list. Total bookings:", allBookings.length);
+     if (allBookings.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No customer bookings found.</p>'; return; }
+     const bookingsByMovie = allBookings.reduce((acc, booking) => { const title = booking.movieTitle || 'Unknown Movie'; if (!acc[title]) { acc[title] = []; } acc[title].push(booking); return acc; }, {});
+     const sortedMovieTitles = Object.keys(bookingsByMovie).sort();
+     if (sortedMovieTitles.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No bookings found after grouping.</p>'; return; }
+     sortedMovieTitles.forEach(movieTitle => {
+         const groupDiv = document.createElement('div'); groupDiv.className = 'admin-booking-group mb-6';
+         const titleHeading = document.createElement('h3'); titleHeading.innerHTML = `<i class="fas fa-film mr-2 text-gray-500"></i>${movieTitle}`; groupDiv.appendChild(titleHeading);
+         const bookingsForMovie = bookingsByMovie[movieTitle]; const listElement = document.createElement('div'); listElement.className = 'space-y-3 pl-4';
+         bookingsForMovie.forEach(booking => {
+             const itemDiv = document.createElement('div'); itemDiv.className = 'admin-booking-item';
+             itemDiv.innerHTML = `<span><i class="fas fa-user"></i>${booking.userEmail}</span><span><i class="fas fa-clock"></i>${booking.showtime}</span><span><i class="fas fa-chair"></i><span class="seats">${booking.seats.sort().join(', ')}</span></span>`;
+             listElement.appendChild(itemDiv);
+         });
+         groupDiv.appendChild(listElement); adminBookingsListContainer.appendChild(groupDiv);
      });
+ }
 
-     // Render content for the active tab
-     if (currentAdminTab === 'admin-manage-movies') {
-         renderMovies(adminMovieListContainer, 'admin');
-         renderMovies(customerPreviewContainer, 'preview');
-     } else if (currentAdminTab === 'admin-analytics') {
-         renderAnalyticsDashboard();
-     } else if (currentAdminTab === 'admin-bookings') { // 2. Render admin bookings
-         renderAdminBookingsList();
+ // --- Customer Content Rendering --- (No changes needed)
+ function renderCustomerContent() { if (isShowingMyBookings) { showMyBookingsView(); } else { showCustomerMovieListView(); } }
+ function showCustomerMovieListView() { isShowingMyBookings = false; hideElement(myBookingsView); showElement(customerMovieListContainer); renderMovies(customerMovieListContainer, 'customer'); toggleMyBookingsBtn.innerHTML = '<i class="fas fa-ticket-alt mr-2"></i>My Bookings'; }
+ function showMyBookingsView() { isShowingMyBookings = true; hideElement(customerMovieListContainer); renderMyBookings(); showElement(myBookingsView); toggleMyBookingsBtn.innerHTML = '<i class="fas fa-film mr-2"></i>Now Showing'; }
+ function renderMyBookings() { myBookingsListContainer.innerHTML = ''; if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') { myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: Login required.</p>'; return; } const currentUserEmail = authState.user.email; const userBookings = allBookings.filter(booking => booking.userEmail === currentUserEmail); if (userBookings.length === 0) { myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>'; return; } userBookings.sort((a, b) => (a.movieTitle || '').localeCompare(b.movieTitle || '')); userBookings.forEach(booking => { const itemDiv = document.createElement('div'); itemDiv.className = 'booking-list-item'; itemDiv.innerHTML = `<p class="text-lg font-semibold mb-1">${booking.movieTitle || 'Unknown Movie'}</p><p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime}</p><p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats.sort().join(', ')}</span></p>`; myBookingsListContainer.appendChild(itemDiv); }); }
+
+ // --- Admin Analytics --- (No changes needed)
+ function renderAnalyticsDashboard() { analyticsAvgRatingsContainer.innerHTML = ''; analyticsOccupancyContainer.innerHTML = ''; if (movies.length === 0) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; return; } let hasRatings = false; movies.forEach(movie => { const { average, count } = calculateAverageRating(movie); if (count > 0) hasRatings = true; const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200'; const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700'; const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count); ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); analyticsAvgRatingsContainer.appendChild(ratingDiv); }); if (!hasRatings) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings submitted yet.</p>'; } movies.forEach(movie => { const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0'; const movieTitleH4 = document.createElement('h4'); movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitleH4.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitleH4); const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach(time => { const bookedCount = allBookings.reduce((count, booking) => (booking.movieId === movie.movieId && booking.showtime === time) ? count + booking.seats.length : count, 0); const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0; let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular'; if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; } else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; } const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1'; showtimeDiv.innerHTML = `<span class="text-gray-600">${time}</span><span><span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span><span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span></span>`; movieOccupancyDiv.appendChild(showtimeDiv); }); } else { movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>'; } analyticsOccupancyContainer.appendChild(movieOccupancyDiv); }); if (analyticsOccupancyContainer.innerHTML === '') { analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; } }
+
+ // --- Auth Form Switching --- (No changes needed)
+ function showCustomerLoginForm() { hideElement(customerRegisterForm); hideElement(adminLoginForm); showElement(customerLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); }
+ function showCustomerRegisterForm() { hideElement(customerLoginForm); hideElement(adminLoginForm); showElement(customerRegisterForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); customerRegisterForm.reset(); }
+ function showAdminLoginForm() { hideElement(customerLoginForm); hideElement(customerRegisterForm); showElement(adminLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); }
+
+ // --- Auth Logic --- (No changes needed)
+ function handleCustomerLogin(event) { event.preventDefault(); hideError(customerLoginError); const email = document.getElementById('customer-email').value.trim(); const password = document.getElementById('customer-password').value; const foundUser = customerUsers.find(user => user.email === email && user.password === password); if (foundUser) { authState = { isLoggedIn: true, user: { email: email, type: 'customer' } }; saveAuthToStorage(); renderUI(); customerLoginForm.reset(); } else { displayError(customerLoginError, "Invalid email or password."); } }
+ function handleAdminLogin(event) { event.preventDefault(); hideError(adminLoginError); const email = document.getElementById('admin-email').value.trim(); const password = document.getElementById('admin-password').value; if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) { authState = { isLoggedIn: true, user: { email: email, type: 'admin' } }; saveAuthToStorage(); renderUI(); adminLoginForm.reset(); } else { displayError(adminLoginError, "Invalid admin credentials."); } }
+ function handleRegistration(event) { event.preventDefault(); hideError(registerError); const email = document.getElementById('register-email').value.trim(); const password = document.getElementById('register-password').value; const confirmPassword = document.getElementById('register-confirm-password').value; if (!email || !password) { displayError(registerError, "Email/password required."); return; } if (password !== confirmPassword) { displayError(registerError, "Passwords do not match."); return; } if (password.length < 6) { displayError(registerError, "Password must be at least 6 characters."); return; } if (customerUsers.some(user => user.email === email)) { displayError(registerError, "Email already registered."); return; } customerUsers.push({ email, password }); saveCustomersToStorage(); authState = { isLoggedIn: true, user: { email: email, type: 'customer' } }; saveAuthToStorage(); renderUI(); customerRegisterForm.reset(); }
+ function handleLogout() { clearAuthStorage(); currentAdminTab = 'admin-manage-movies'; isShowingMyBookings = false; renderUI(); }
+
+ // --- Movie Management (Admin) --- (No changes needed)
+ function resetForm() { movieForm.reset(); editingIndex = null; formTitle.textContent = 'Add New Movie'; submitButton.textContent = 'Add Movie'; cancelEditButton.classList.add('hidden'); const editIndexInput = document.getElementById('edit-index'); if(editIndexInput) editIndexInput.value = ''; }
+ function handleMovieFormSubmit(event) { event.preventDefault(); const indexInput = document.getElementById('edit-index').value; const isEditing = indexInput !== ''; const index = isEditing ? parseInt(indexInput, 10) : -1; const movieData = { title: document.getElementById('title').value.trim(), poster: document.getElementById('poster').value.trim(), description: document.getElementById('description').value.trim(), genre: document.getElementById('genre').value.trim(), duration: parseInt(document.getElementById('duration').value, 10), showtimes: document.getElementById('showtimes').value.trim(), movieId: isEditing && index >= 0 && index < movies.length ? movies[index].movieId : generateId(), ratings: isEditing && index >= 0 && index < movies.length ? movies[index].ratings : [] }; if (!movieData.title || !movieData.poster || !movieData.genre || !movieData.showtimes || isNaN(movieData.duration) || movieData.duration <= 0) { alert("Please fill all fields correctly."); return; } if (isEditing) { if (index >= 0 && index < movies.length) { movies[index] = movieData; } else { console.error("Invalid index during edit:", index); return; } } else { movies.push(movieData); } saveMoviesToStorage(); renderAdminContent(); resetForm(); }
+ function showEditForm(index) { if (index < 0 || index >= movies.length) return; editingIndex = index; const movie = movies[index]; document.getElementById('edit-index').value = index; document.getElementById('title').value = movie.title || ''; document.getElementById('poster').value = movie.poster || ''; document.getElementById('description').value = movie.description || ''; document.getElementById('genre').value = movie.genre || ''; document.getElementById('duration').value = movie.duration || ''; document.getElementById('showtimes').value = movie.showtimes || ''; formTitle.textContent = 'Edit Movie'; submitButton.textContent = 'Save Changes'; cancelEditButton.classList.remove('hidden'); movieForm.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+ function deleteMovie(index) { if (index < 0 || index >= movies.length) return; const movieTitle = movies[index]?.title || 'this movie'; const movieIdToDelete = movies[index].movieId; if (confirm(`Delete "${movieTitle}"? This permanently removes the movie, its ratings, and ALL associated customer bookings.`)) { movies.splice(index, 1); saveMoviesToStorage(); Object.keys(userRatings).forEach(userId => { if (userRatings[userId]?.[movieIdToDelete]) delete userRatings[userId][movieIdToDelete]; }); saveUserRatingsToStorage(); for (let i = 0; i < localStorage.length; i++) { const key = localStorage.key(i); if (key && key.startsWith(BOOKED_SEATS_STORAGE_KEY_PREFIX) && key.includes(movieIdToDelete)) { localStorage.removeItem(key); i--; } } loadAllBookingsFromStorage(); const bookingsBefore = allBookings.length; allBookings = allBookings.filter(booking => booking.movieId !== movieIdToDelete); if (bookingsBefore > allBookings.length) { saveAllBookingsToStorage(); console.log(`Removed ${bookingsBefore - allBookings.length} bookings for movie ${movieIdToDelete}.`); } else { console.log(`No bookings found to remove for movie ${movieIdToDelete}.`) } renderAdminContent(); if (editingIndex === index) resetForm(); } }
+
+ // --- Movie Card Creation --- (No changes needed)
+ function createMovieCard(movie, index, viewType) { const card = document.createElement('div'); card.className = 'movie-card flex flex-col'; card.dataset.index = index; card.dataset.movieId = movie.movieId; const img = document.createElement('img'); img.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; img.alt = `${movie.title} Poster`; img.className = 'movie-poster'; img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; }; const content = document.createElement('div'); content.className = 'p-4 flex flex-col flex-grow'; const title = document.createElement('h3'); title.className = 'text-lg font-semibold mb-1 text-gray-800'; title.textContent = movie.title; const avgRatingDiv = document.createElement('div'); avgRatingDiv.className = 'stars-container text-sm mb-2'; const { average, count } = calculateAverageRating(movie); renderStars(avgRatingDiv, average, count); const details = document.createElement('p'); details.className = 'text-sm text-gray-600 mb-1'; details.innerHTML = ` <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'} • <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min `; const description = document.createElement('p'); description.className = 'text-sm text-gray-700 mb-3 flex-grow'; description.textContent = movie.description || 'No description available.'; const showtimes = document.createElement('p'); showtimes.className = 'text-sm text-blue-600 font-medium mt-auto'; showtimes.innerHTML = ` <i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${movie.showtimes || 'N/A'} `; content.appendChild(title); content.appendChild(avgRatingDiv); content.appendChild(details); content.appendChild(description); content.appendChild(showtimes); card.appendChild(img); card.appendChild(content); if (viewType === 'admin') { const adminControls = document.createElement('div'); adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2'; const editButton = document.createElement('button'); editButton.innerHTML = '<i class="fas fa-edit"></i> Edit'; editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2'; editButton.onclick = (e) => { e.stopPropagation(); showEditForm(index); }; const deleteButton = document.createElement('button'); deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'; deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2'; deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(index); }; adminControls.appendChild(editButton); adminControls.appendChild(deleteButton); card.appendChild(adminControls); } else { card.classList.add('cursor-pointer'); card.onclick = () => openModal(movie.movieId); } return card; }
+
+ // --- Movie List Rendering --- (No changes needed)
+ function renderMovies(container, viewType) { container.innerHTML = ''; let noMoviesMsg; if (viewType === 'admin') noMoviesMsg = noMoviesAdminMsg; else if (viewType === 'preview') noMoviesMsg = noMoviesPreviewMsg; else noMoviesMsg = noMoviesCustomerMsg; if (movies.length === 0) { if(noMoviesMsg) showElement(noMoviesMsg); return; } else { if(noMoviesMsg) hideElement(noMoviesMsg); } movies.forEach((movie, index) => { const card = createMovieCard(movie, index, viewType); container.appendChild(card); }); }
+
+ // --- Movie Details Modal Logic --- (No changes needed)
+ function openModal(movieId) { const movie = movies.find(m => m.movieId === movieId); if (!movie) { console.error("Movie not found for modal:", movieId); return; } currentModalMovieId = movieId; modalMovieTitle.textContent = movie.title || 'Movie Details'; modalMoviePoster.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; modalMoviePoster.alt = `${movie.title || 'Movie'} Poster`; modalMovieGenre.textContent = movie.genre || 'N/A'; modalMovieDuration.textContent = movie.duration || 'N/A'; modalMovieDescription.textContent = movie.description || 'No description available.'; const avgData = calculateAverageRating(movie); renderStars(modalAvgRatingContainer, avgData.average, avgData.count); modalShowtimesList.innerHTML = ''; const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach((time, i) => { const radioId = `showtime-${movie.movieId}-${i}`; const radio = document.createElement('input'); radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.movieId}-showtime`; radio.value = time; radio.className = 'showtime-radio'; radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time); const label = document.createElement('label'); label.htmlFor = radioId; label.textContent = time; label.className = 'showtime-label'; modalShowtimesList.appendChild(radio); modalShowtimesList.appendChild(label); }); } else { modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">No showtimes available.</p>'; } if (authState.isLoggedIn && authState.user.type === 'customer') { showElement(modalRatingSection); const userId = authState.user.email; const userCurrentRating = userRatings[userId]?.[movieId] || null; const hasRated = userCurrentRating !== null; renderStars(modalStarsContainer, 0, 0, !hasRated, userCurrentRating, movieId); modalRatingMessage.textContent = hasRated ? `You rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}.` : 'Click stars to rate!'; modalStarsContainer.classList.toggle('interactive', !hasRated); modalStarsContainer.style.cursor = hasRated ? 'default' : 'pointer'; } else { hideElement(modalRatingSection); } hideElement(seatMapContainer); seatGrid.innerHTML = ''; selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; showElement(movieDetailsModal); document.body.classList.add('overflow-hidden'); }
+ function closeModal() { hideElement(movieDetailsModal); document.body.classList.remove('overflow-hidden'); currentModalMovieId = null; }
+ function handleShowtimeSelection(movieId, selectedTime) { console.log(`Showtime selected: ${selectedTime} for movie ${movieId}`); renderSeatMap(movieId, selectedTime, 5, 8); showElement(seatMapContainer); selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; }
+ function renderSeatMap(movieId, showtime, rows, cols) { seatGrid.innerHTML = ''; if (!movieId || !showtime) { seatGrid.innerHTML = '<p class="text-red-500 text-center">Error: Cannot load seats without movie/showtime.</p>'; return; } const bookedSeatIds = loadBookedSeats(movieId, showtime); console.log(`Rendering seat map for ${movieId} at ${showtime}. Booked:`, bookedSeatIds); for (let r = 0; r < rows; r++) { const rowDiv = document.createElement('div'); rowDiv.className = 'seat-row'; const rowLetter = String.fromCharCode(65 + r); for (let c = 0; c < cols; c++) { if (c === 2 || c === 6) { const spacer = document.createElement('div'); spacer.className = 'seat-spacer'; rowDiv.appendChild(spacer); } const seatId = `${rowLetter}${c + 1}`; const seatDiv = document.createElement('div'); seatDiv.className = 'seat'; seatDiv.id = `seat-${seatId}`; seatDiv.dataset.seatId = seatId; seatDiv.innerHTML = `<i class="fas fa-chair"></i>`; if (bookedSeatIds.includes(seatId)) { seatDiv.classList.add('unavailable'); } else { seatDiv.onclick = () => toggleSeatSelection(seatId); } rowDiv.appendChild(seatDiv); } seatGrid.appendChild(rowDiv); } }
+ function toggleSeatSelection(seatId) { const seatElement = document.getElementById(`seat-${seatId}`); if (!seatElement || seatElement.classList.contains('unavailable')) { return; } const index = selectedSeats.indexOf(seatId); if (index > -1) { selectedSeats.splice(index, 1); seatElement.classList.remove('selected'); } else { selectedSeats.push(seatId); seatElement.classList.add('selected'); } updateSelectedSeatsInfo(); }
+ function updateSelectedSeatsInfo() { if (selectedSeats.length === 0) { selectedSeatsInfo.textContent = 'Selected Seats: None'; confirmSelectionButton.disabled = true; } else { selectedSeatsInfo.textContent = `Selected Seats: ${selectedSeats.sort().join(', ')}`; const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked'); confirmSelectionButton.disabled = !selectedShowtimeRadio; } }
+
+ // --- Admin Tab Switching --- (Logic remains correct, relies on HTML data-target)
+ function handleAdminTabClick(event) {
+     const targetId = event.target.dataset.target; // e.g., "admin-bookings-section"
+     if (!targetId || targetId === currentAdminTab || !['admin-manage-movies', 'admin-analytics', 'admin-bookings-section'].includes(targetId)) {
+          return; // Only act if it's a valid, different tab target
      }
-}
-
-// 2. Function to Render Admin Bookings List
-function renderAdminBookingsList() {
-    adminBookingsListContainer.innerHTML = ''; // Clear previous list
-    loadAllBookingsFromStorage(); // Load latest data
-
-    if (allBookings.length === 0) {
-        adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No customer bookings found.</p>';
-        return;
-    }
-
-    // Group bookings by movie title
-    const bookingsByMovie = allBookings.reduce((acc, booking) => {
-        const title = booking.movieTitle || 'Unknown Movie';
-        if (!acc[title]) {
-            acc[title] = [];
-        }
-        acc[title].push(booking);
-        return acc;
-    }, {});
-
-    // Sort movie titles alphabetically for consistent display
-    const sortedMovieTitles = Object.keys(bookingsByMovie).sort();
-
-    sortedMovieTitles.forEach(movieTitle => {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'admin-booking-group';
-
-        const titleHeading = document.createElement('h3');
-        titleHeading.textContent = movieTitle;
-        groupDiv.appendChild(titleHeading);
-
-        const bookingsForMovie = bookingsByMovie[movieTitle];
-        const listElement = document.createElement('div'); // Using divs for easier styling than ul/li here
-        listElement.className = 'space-y-2';
-
-        bookingsForMovie.forEach(booking => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'admin-booking-item';
-            itemDiv.innerHTML = `
-                <span class="block text-gray-700"><strong>User:</strong> ${booking.userEmail}</span>
-                <span class="block text-gray-600"><strong>Showtime:</strong> ${booking.showtime}</span>
-                <span class="block text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats.sort().join(', ')}</span></span>
-            `;
-            listElement.appendChild(itemDiv);
-        });
-
-        groupDiv.appendChild(listElement);
-        adminBookingsListContainer.appendChild(groupDiv);
-    });
-}
-
-
-// --- Customer Content Rendering ---
-function renderCustomerContent() {
-     if (isShowingMyBookings) {
-         showMyBookingsView();
-     } else {
-         showCustomerMovieListView();
-     }
-}
-
-// 1. Show Customer Movie List
-function showCustomerMovieListView() {
-     isShowingMyBookings = false;
-     hideElement(myBookingsView);
-     showElement(customerMovieListContainer);
-     renderMovies(customerMovieListContainer, 'customer');
-     toggleMyBookingsBtn.innerHTML = '<i class="fas fa-ticket-alt mr-2"></i>My Bookings'; // Reset button text
-}
-
-// 1. Show Customer Bookings View
-function showMyBookingsView() {
-     isShowingMyBookings = true;
-     hideElement(customerMovieListContainer);
-     renderMyBookings(); // Render the list
-     showElement(myBookingsView);
-     toggleMyBookingsBtn.innerHTML = '<i class="fas fa-film mr-2"></i>Now Showing'; // Change button text
-}
-
-// 1. Render the "My Bookings" list for the current customer
-function renderMyBookings() {
-    myBookingsListContainer.innerHTML = ''; // Clear previous
-    loadAllBookingsFromStorage(); // Load latest
-
-    if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') {
-         myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: You must be logged in as a customer to view bookings.</p>';
-         return;
-    }
-
-    const currentUserEmail = authState.user.email;
-    const userBookings = allBookings.filter(booking => booking.userEmail === currentUserEmail);
-
-    if (userBookings.length === 0) {
-        myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>';
-        return;
-    }
-
-    userBookings.forEach(booking => {
-         const itemDiv = document.createElement('div');
-         itemDiv.className = 'booking-list-item';
-         itemDiv.innerHTML = `
-            <p class="text-lg font-semibold mb-1">${booking.movieTitle || 'Unknown Movie'}</p>
-            <p class="text-sm text-gray-600 mb-1">
-                <strong>Showtime:</strong> ${booking.showtime}
-            </p>
-            <p class="text-sm text-gray-600">
-                <strong>Seats:</strong> <span class="seats">${booking.seats.sort().join(', ')}</span>
-            </p>
-         `;
-         myBookingsListContainer.appendChild(itemDiv);
-    });
-}
-
-// --- Admin Analytics ---
-function renderAnalyticsDashboard() {
-    analyticsAvgRatingsContainer.innerHTML = '';
-    analyticsOccupancyContainer.innerHTML = '';
-    loadAllBookingsFromStorage(); // Need bookings for occupancy
-
-    if (movies.length === 0) {
-        analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>';
-        analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>';
-        return;
-    }
-
-    // Avg Ratings (same as before)
-     let hasRatings = false;
-     movies.forEach(movie => {
-         const { average, count } = calculateAverageRating(movie);
-         if (count > 0) hasRatings = true;
-         const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200';
-         const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700';
-         const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count);
-         ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); analyticsAvgRatingsContainer.appendChild(ratingDiv);
+     currentAdminTab = targetId; // Set state to the section ID
+     adminNavButtons.forEach(btn => {
+         btn.classList.toggle('active', btn.dataset.target === targetId);
      });
-     if (!hasRatings) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings submitted yet.</p>'; }
+     renderAdminContent(); // Render content based on the new state (which holds the section ID)
+ }
 
-    // Occupancy (Now based on *actual* bookings from allBookings)
-     movies.forEach(movie => {
-         const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0';
-         const movieTitleH4 = document.createElement('h4'); movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitleH4.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitleH4);
-
-         const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : [];
-
-         if (showtimes.length > 0) {
-             showtimes.forEach(time => {
-                 // Count booked seats for this specific movie and showtime from the central list
-                 const bookedCount = allBookings.reduce((count, booking) => {
-                     if (booking.movieId === movie.movieId && booking.showtime === time) {
-                         return count + booking.seats.length;
-                     }
-                     return count;
-                 }, 0);
-
-                 const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0;
-                 let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular';
-                 if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; }
-                 else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; }
-
-                 const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1';
-                 showtimeDiv.innerHTML = `
-                     <span class="text-gray-600">${time}</span>
-                     <span>
-                         <span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span>
-                         <span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span>
-                     </span>`;
-                 movieOccupancyDiv.appendChild(showtimeDiv);
-             });
-         } else {
-             movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>';
-         }
-         analyticsOccupancyContainer.appendChild(movieOccupancyDiv);
+ // --- Initialization ---
+ function initializeApp() {
+     showElement(splashScreen);
+     // Load initial data from storage
+     loadMoviesFromStorage(); loadCustomersFromStorage(); loadUserRatingsFromStorage(); loadAuthFromStorage(); loadAllBookingsFromStorage();
+     // Setup event listeners
+     customerLoginForm.addEventListener('submit', handleCustomerLogin);
+     customerRegisterForm.addEventListener('submit', handleRegistration);
+     adminLoginForm.addEventListener('submit', handleAdminLogin);
+     showRegisterButton.addEventListener('click', showCustomerRegisterForm);
+     showAdminLoginButton.addEventListener('click', showAdminLoginForm);
+     backToCustomerLoginButtons.forEach(btn => btn.addEventListener('click', showCustomerLoginForm));
+     logoutButton.addEventListener('click', handleLogout);
+     adminNavButtons.forEach(btn => btn.addEventListener('click', handleAdminTabClick)); // This listener handles tab switching
+     movieForm.addEventListener('submit', handleMovieFormSubmit);
+     cancelEditButton.addEventListener('click', resetForm);
+     modalCloseButton.addEventListener('click', closeModal);
+     movieDetailsModal.addEventListener('click', (e) => { if (e.target === movieDetailsModal) closeModal(); });
+     toggleMyBookingsBtn.addEventListener('click', () => { isShowingMyBookings ? showCustomerMovieListView() : showMyBookingsView(); });
+     backToMoviesBtn.addEventListener('click', showCustomerMovieListView);
+     confirmSelectionButton.addEventListener('click', () => {
+          const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+          if (!currentModalMovieId || !authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') { alert("An error occurred. Please ensure you are logged in and try again."); return; }
+          if (!selectedShowtimeRadio) { alert("Please select a showtime."); return; }
+          if (selectedSeats.length === 0) { alert("Please select at least one seat."); return; }
+          const selectedShowtime = selectedShowtimeRadio.value; const currentMovie = movies.find(m => m.movieId === currentModalMovieId); const movieTitle = currentMovie?.title || 'Selected Movie'; const userEmail = authState.user.email;
+          console.log("Confirming Booking:", { movieId: currentModalMovieId, showtime: selectedShowtime, seats: selectedSeats, user: userEmail });
+          saveBookedSeats(currentModalMovieId, selectedShowtime, selectedSeats);
+          const newBooking = { bookingId: generateId(), userEmail: userEmail, movieId: currentModalMovieId, movieTitle: movieTitle, showtime: selectedShowtime, seats: [...selectedSeats] };
+          addBookingToList(newBooking);
+          alert(`Booking confirmed!\nMovie: ${movieTitle}\nShowtime: ${selectedShowtime}\nSeats: ${selectedSeats.sort().join(', ')}`); closeModal();
+          if (isShowingMyBookings) { renderMyBookings(); }
+          if (adminView && !adminView.classList.contains('is-hidden')) { if (currentAdminTab === 'admin-bookings-section') renderAdminBookingsList(); if (currentAdminTab === 'admin-analytics') renderAnalyticsDashboard(); } // Match ID here too
      });
-      if (analyticsOccupancyContainer.innerHTML === '') { analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; }
-}
+     // Hide splash and render main UI after delay
+     setTimeout(() => { hideElement(splashScreen); renderUI(); }, 1500);
+ }
 
-// --- Auth Form Switching (remain the same) ---
-function showCustomerLoginForm() { hideElement(customerRegisterForm); hideElement(adminLoginForm); showElement(customerLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); }
-function showCustomerRegisterForm() { hideElement(customerLoginForm); hideElement(adminLoginForm); showElement(customerRegisterForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); customerRegisterForm.reset(); }
-function showAdminLoginForm() { hideElement(customerLoginForm); hideElement(customerRegisterForm); showElement(adminLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); }
-
-// --- Auth Logic (remain the same) ---
-function handleCustomerLogin(event) { event.preventDefault(); hideError(customerLoginError); const email = document.getElementById('customer-email').value.trim(); const password = document.getElementById('customer-password').value; const foundUser = customerUsers.find(user => user.email === email && user.password === password); if (foundUser) { authState = { isLoggedIn: true, user: { email: email, type: 'customer' } }; saveAuthToStorage(); renderUI(); customerLoginForm.reset(); } else { displayError(customerLoginError, "Invalid email or password."); } }
-function handleAdminLogin(event) { event.preventDefault(); hideError(adminLoginError); const email = document.getElementById('admin-email').value.trim(); const password = document.getElementById('admin-password').value; if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) { authState = { isLoggedIn: true, user: { email: email, type: 'admin' } }; saveAuthToStorage(); renderUI(); adminLoginForm.reset(); } else { displayError(adminLoginError, "Invalid admin credentials."); } }
-function handleRegistration(event) { event.preventDefault(); hideError(registerError); const email = document.getElementById('register-email').value.trim(); const password = document.getElementById('register-password').value; const confirmPassword = document.getElementById('register-confirm-password').value; if (!email || !password) { displayError(registerError, "Email/password required."); return; } if (password !== confirmPassword) { displayError(registerError, "Passwords do not match."); return; } if (password.length < 6) { displayError(registerError, "Password >= 6 characters."); return; } if (customerUsers.some(user => user.email === email)) { displayError(registerError, "Email already registered."); return; } customerUsers.push({ email, password }); saveCustomersToStorage(); authState = { isLoggedIn: true, user: { email: email, type: 'customer' } }; saveAuthToStorage(); renderUI(); customerRegisterForm.reset(); }
-function handleLogout() { clearAuthStorage(); currentAdminTab = 'admin-manage-movies'; isShowingMyBookings = false; renderUI(); }
-
-
-// --- Movie Management (Admin) ---
-function resetForm() { /* ... no change ... */ movieForm.reset(); editingIndex = null; formTitle.textContent = 'Add New Movie'; submitButton.textContent = 'Add Movie'; cancelEditButton.classList.add('hidden'); const editIndexInput = document.getElementById('edit-index'); if(editIndexInput) editIndexInput.value = ''; }
-function handleMovieFormSubmit(event) { /* ... no change ... */ event.preventDefault(); const indexInput = document.getElementById('edit-index').value; const isEditing = indexInput !== ''; const index = isEditing ? parseInt(indexInput, 10) : -1; const movieData = { title: document.getElementById('title').value.trim(), poster: document.getElementById('poster').value.trim(), description: document.getElementById('description').value.trim(), genre: document.getElementById('genre').value.trim(), duration: parseInt(document.getElementById('duration').value, 10), showtimes: document.getElementById('showtimes').value.trim(), movieId: isEditing && index >= 0 && index < movies.length ? movies[index].movieId : generateId(), ratings: isEditing && index >= 0 && index < movies.length ? movies[index].ratings : [] }; if (!movieData.title || !movieData.poster || !movieData.genre || !movieData.showtimes || isNaN(movieData.duration) || movieData.duration <= 0) { alert("Please fill all fields correctly."); return; } if (isEditing) { if (index >= 0 && index < movies.length) { movies[index] = movieData; } else { console.error("Invalid index during edit:", index); return; } } else { movies.push(movieData); } saveMoviesToStorage(); renderAdminContent(); resetForm(); }
-function showEditForm(index) { /* ... no change ... */ if (index < 0 || index >= movies.length) return; editingIndex = index; const movie = movies[index]; document.getElementById('edit-index').value = index; document.getElementById('title').value = movie.title || ''; document.getElementById('poster').value = movie.poster || ''; document.getElementById('description').value = movie.description || ''; document.getElementById('genre').value = movie.genre || ''; document.getElementById('duration').value = movie.duration || ''; document.getElementById('showtimes').value = movie.showtimes || ''; formTitle.textContent = 'Edit Movie'; submitButton.textContent = 'Save Changes'; cancelEditButton.classList.remove('hidden'); movieForm.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-function deleteMovie(index) { // Updated to remove central bookings
-    if (index < 0 || index >= movies.length) return;
-    const movieTitle = movies[index]?.title || 'this movie';
-    const movieIdToDelete = movies[index].movieId;
-
-    if (confirm(`Delete "${movieTitle}"? This permanently removes the movie, its ratings, and ALL associated customer bookings.`)) {
-        // 1. Remove from movies array
-        movies.splice(index, 1);
-        saveMoviesToStorage();
-
-        // 2. Remove associated ratings
-        Object.keys(userRatings).forEach(userId => {
-            if (userRatings[userId]?.[movieIdToDelete]) delete userRatings[userId][movieIdToDelete];
-        });
-        saveUserRatingsToStorage();
-
-        // 3. Remove associated seat availability keys
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith(BOOKED_SEATS_STORAGE_KEY_PREFIX) && key.includes(movieIdToDelete)) {
-                localStorage.removeItem(key);
-                console.log(`Removed seat availability key: ${key}`);
-                i--;
-            }
-        }
-
-        // 4. Remove from central bookings list
-        loadAllBookingsFromStorage(); // Load current bookings
-        const bookingsBefore = allBookings.length;
-        allBookings = allBookings.filter(booking => booking.movieId !== movieIdToDelete);
-        const bookingsAfter = allBookings.length;
-        if (bookingsBefore > bookingsAfter) {
-             saveAllBookingsToStorage(); // Save if changes were made
-             console.log(`Removed ${bookingsBefore - bookingsAfter} bookings associated with movie ${movieIdToDelete}.`);
-        }
-
-        // 5. Re-render UI
-        renderAdminContent(); // Refresh admin view
-        if (editingIndex === index) resetForm(); // Reset form if deleting the movie being edited
-    }
-}
-
-// --- Movie Card Creation (remain the same) ---
-function createMovieCard(movie, index, viewType) { /* ... no change ... */ const card = document.createElement('div'); card.className = 'movie-card flex flex-col'; card.dataset.index = index; card.dataset.movieId = movie.movieId; const img = document.createElement('img'); img.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; img.alt = `${movie.title} Poster`; img.className = 'movie-poster'; img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; }; const content = document.createElement('div'); content.className = 'p-4 flex flex-col flex-grow'; const title = document.createElement('h3'); title.className = 'text-lg font-semibold mb-1 text-gray-800'; title.textContent = movie.title; const avgRatingDiv = document.createElement('div'); avgRatingDiv.className = 'stars-container text-sm mb-2'; const { average, count } = calculateAverageRating(movie); renderStars(avgRatingDiv, average, count); const details = document.createElement('p'); details.className = 'text-sm text-gray-600 mb-1'; details.innerHTML = ` <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'} • <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min `; const description = document.createElement('p'); description.className = 'text-sm text-gray-700 mb-3 flex-grow'; description.textContent = movie.description || 'No description available.'; const showtimes = document.createElement('p'); showtimes.className = 'text-sm text-blue-600 font-medium mt-auto'; showtimes.innerHTML = ` <i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${movie.showtimes || 'N/A'} `; content.appendChild(title); content.appendChild(avgRatingDiv); content.appendChild(details); content.appendChild(description); content.appendChild(showtimes); card.appendChild(img); card.appendChild(content); if (viewType === 'admin') { const adminControls = document.createElement('div'); adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2'; const editButton = document.createElement('button'); editButton.innerHTML = '<i class="fas fa-edit"></i> Edit'; editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2'; editButton.onclick = (e) => { e.stopPropagation(); showEditForm(index); }; const deleteButton = document.createElement('button'); deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'; deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2'; deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(index); }; adminControls.appendChild(editButton); adminControls.appendChild(deleteButton); card.appendChild(adminControls); } else { card.classList.add('cursor-pointer'); card.onclick = () => openModal(movie.movieId); } return card; }
-
-// --- Movie List Rendering (remain the same) ---
-function renderMovies(container, viewType) { /* ... no change ... */ container.innerHTML = ''; let noMoviesMsg; if (viewType === 'admin') noMoviesMsg = noMoviesAdminMsg; else if (viewType === 'preview') noMoviesMsg = noMoviesPreviewMsg; else noMoviesMsg = noMoviesCustomerMsg; if (movies.length === 0) { if(noMoviesMsg) showElement(noMoviesMsg); return; } else { if(noMoviesMsg) hideElement(noMoviesMsg); } movies.forEach((movie, index) => { const card = createMovieCard(movie, index, viewType); container.appendChild(card); }); }
-
-
-// --- Movie Details Modal Logic ---
-function openModal(movieId) { /* ... mostly the same, ensure currentModalMovieId is set ... */ const movie = movies.find(m => m.movieId === movieId); if (!movie) { console.error("Movie not found for modal:", movieId); return; } currentModalMovieId = movieId; /* ... rest of the modal setup ... */ modalMovieTitle.textContent = movie.title || 'Movie Details'; modalMoviePoster.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; modalMoviePoster.alt = `${movie.title || 'Movie'} Poster`; modalMovieGenre.textContent = movie.genre || 'N/A'; modalMovieDuration.textContent = movie.duration || 'N/A'; modalMovieDescription.textContent = movie.description || 'No description available.'; const avgData = calculateAverageRating(movie); renderStars(modalAvgRatingContainer, avgData.average, avgData.count); modalShowtimesList.innerHTML = ''; const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach((time, i) => { const radioId = `showtime-${movie.movieId}-${i}`; const radio = document.createElement('input'); radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.movieId}-showtime`; radio.value = time; radio.className = 'showtime-radio'; radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time); const label = document.createElement('label'); label.htmlFor = radioId; label.textContent = time; label.className = 'showtime-label'; modalShowtimesList.appendChild(radio); modalShowtimesList.appendChild(label); }); } else { modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">No showtimes available.</p>'; } if (authState.isLoggedIn && authState.user.type === 'customer') { showElement(modalRatingSection); const userId = authState.user.email; const userCurrentRating = userRatings[userId]?.[movieId] || null; const hasRated = userCurrentRating !== null; renderStars(modalStarsContainer, 0, 0, !hasRated, userCurrentRating, movieId); modalRatingMessage.textContent = hasRated ? `You rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}.` : 'Click stars to rate!'; modalStarsContainer.classList.toggle('interactive', !hasRated); modalStarsContainer.style.cursor = hasRated ? 'default' : 'pointer'; } else { hideElement(modalRatingSection); } hideElement(seatMapContainer); seatGrid.innerHTML = ''; selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; showElement(movieDetailsModal); document.body.classList.add('overflow-hidden'); }
-function closeModal() { /* ... no change ... */ hideElement(movieDetailsModal); document.body.classList.remove('overflow-hidden'); currentModalMovieId = null; }
-function handleShowtimeSelection(movieId, selectedTime) { /* ... no change ... */ console.log(`Showtime selected: ${selectedTime} for movie ${movieId}`); renderSeatMap(movieId, selectedTime, 5, 8); showElement(seatMapContainer); selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; }
-function renderSeatMap(movieId, showtime, rows, cols) { /* ... no change ... */ seatGrid.innerHTML = ''; if (!movieId || !showtime) { seatGrid.innerHTML = '<p class="text-red-500 text-center">Error: Cannot load seats without movie/showtime.</p>'; return; } const bookedSeatIds = loadBookedSeats(movieId, showtime); console.log(`Rendering seat map for ${movieId} at ${showtime}. Booked:`, bookedSeatIds); for (let r = 0; r < rows; r++) { const rowDiv = document.createElement('div'); rowDiv.className = 'seat-row'; const rowLetter = String.fromCharCode(65 + r); for (let c = 0; c < cols; c++) { if (c === 2 || c === 6) { const spacer = document.createElement('div'); spacer.className = 'seat-spacer'; rowDiv.appendChild(spacer); } const seatId = `${rowLetter}${c + 1}`; const seatDiv = document.createElement('div'); seatDiv.className = 'seat'; seatDiv.id = `seat-${seatId}`; seatDiv.dataset.seatId = seatId; seatDiv.innerHTML = `<i class="fas fa-chair"></i>`; if (bookedSeatIds.includes(seatId)) { seatDiv.classList.add('unavailable'); } else { seatDiv.onclick = () => toggleSeatSelection(seatId); } rowDiv.appendChild(seatDiv); } seatGrid.appendChild(rowDiv); } }
-function toggleSeatSelection(seatId) { /* ... no change ... */ const seatElement = document.getElementById(`seat-${seatId}`); if (!seatElement || seatElement.classList.contains('unavailable')) { console.log(`Seat ${seatId} is unavailable.`); return; } const index = selectedSeats.indexOf(seatId); if (index > -1) { selectedSeats.splice(index, 1); seatElement.classList.remove('selected'); } else { selectedSeats.push(seatId); seatElement.classList.add('selected'); } updateSelectedSeatsInfo(); }
-function updateSelectedSeatsInfo() { /* ... no change ... */ if (selectedSeats.length === 0) { selectedSeatsInfo.textContent = 'Selected Seats: None'; confirmSelectionButton.disabled = true; } else { selectedSeatsInfo.textContent = `Selected Seats: ${selectedSeats.sort().join(', ')}`; const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked'); confirmSelectionButton.disabled = !selectedShowtimeRadio; } }
-
-// --- Admin Tab Switching ---
-function handleAdminTabClick(event) { // Updated for new tab
-    const targetId = event.target.dataset.target;
-    if (!targetId || targetId === currentAdminTab) return;
-
-    // Only handle valid admin section IDs
-    if (['admin-manage-movies', 'admin-analytics', 'admin-bookings'].includes(targetId)) {
-        currentAdminTab = targetId;
-        adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === targetId); });
-        renderAdminContent(); // Re-render based on the new tab
-    } else {
-        console.warn("Invalid admin tab target:", targetId);
-    }
-}
-
-// --- Initialization ---
-function initializeApp() {
-    showElement(splashScreen);
-
-    // Load all data from storage
-    loadMoviesFromStorage();
-    loadCustomersFromStorage();
-    loadUserRatingsFromStorage();
-    loadAuthFromStorage();
-    loadAllBookingsFromStorage(); // 3. Load central bookings list on startup
-
-    // Setup event listeners
-    customerLoginForm.addEventListener('submit', handleCustomerLogin);
-    customerRegisterForm.addEventListener('submit', handleRegistration);
-    adminLoginForm.addEventListener('submit', handleAdminLogin);
-    showRegisterButton.addEventListener('click', showCustomerRegisterForm);
-    showAdminLoginButton.addEventListener('click', showAdminLoginForm);
-    backToCustomerLoginButtons.forEach(btn => btn.addEventListener('click', showCustomerLoginForm));
-    logoutButton.addEventListener('click', handleLogout);
-    adminNavButtons.forEach(btn => btn.addEventListener('click', handleAdminTabClick));
-    movieForm.addEventListener('submit', handleMovieFormSubmit);
-    cancelEditButton.addEventListener('click', resetForm);
-    modalCloseButton.addEventListener('click', closeModal);
-    movieDetailsModal.addEventListener('click', (e) => { if (e.target === movieDetailsModal) closeModal(); });
-
-    // 1. Customer View Toggle Listeners
-    toggleMyBookingsBtn.addEventListener('click', () => {
-        if (isShowingMyBookings) {
-            showCustomerMovieListView();
-        } else {
-            showMyBookingsView();
-        }
-    });
-    backToMoviesBtn.addEventListener('click', showCustomerMovieListView);
-
-
-    // 3. Updated Confirm Selection Button Logic
-    confirmSelectionButton.addEventListener('click', () => {
-         const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
-
-         // Validations
-         if (!currentModalMovieId || !authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') {
-             console.error("Booking prerequisites not met (Movie ID/Login state).");
-             alert("An error occurred. Please ensure you are logged in and try again.");
-             return;
-         }
-         if (!selectedShowtimeRadio) { alert("Please select a showtime."); return; }
-         if (selectedSeats.length === 0) { alert("Please select at least one seat."); return; }
-
-         const selectedShowtime = selectedShowtimeRadio.value;
-         const currentMovie = movies.find(m => m.movieId === currentModalMovieId);
-         const movieTitle = currentMovie?.title || 'Selected Movie';
-         const userEmail = authState.user.email;
-
-         // a) Save seat availability for the map (using the old method)
-         saveBookedSeats(currentModalMovieId, selectedShowtime, selectedSeats);
-
-         // b) Create and save the detailed booking object to the central list
-         const newBooking = {
-             bookingId: generateId(),
-             userEmail: userEmail,
-             movieId: currentModalMovieId,
-             movieTitle: movieTitle,
-             showtime: selectedShowtime,
-             seats: [...selectedSeats] // Create a copy
-         };
-         addBookingToList(newBooking);
-
-         // c) Provide feedback and close
-         alert(`Booking confirmed!\nMovie: ${movieTitle}\nShowtime: ${selectedShowtime}\nSeats: ${selectedSeats.sort().join(', ')}\n\n(Booking saved locally in this browser)`);
-         closeModal();
-
-         // Optionally refresh the customer view if they are on the bookings tab
-         if (isShowingMyBookings) {
-            renderMyBookings();
-         }
-         // Optionally trigger analytics update if admin view is active
-         if(adminView && !adminView.classList.contains('is-hidden') && currentAdminTab === 'admin-analytics') {
-            renderAnalyticsDashboard();
-         }
-    });
-
-
-    // Hide splash and render main UI after delay
-    setTimeout(() => {
-        hideElement(splashScreen);
-        renderUI(); // Initial UI render
-    }, 1500); // Splash screen duration
-}
-
-// --- Start the App ---
-window.addEventListener('load', initializeApp);
+ // --- Start the App ---
+ window.addEventListener('load', initializeApp);
