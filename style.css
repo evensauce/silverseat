@@ -4,12 +4,12 @@ body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
 #splash-screen.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 .splash-logo { color: white; font-size: 5rem; animation: pulse 1.5s infinite ease-in-out; line-height: 1; }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-#admin-view, #customer-view, #auth-view, #app-header, #my-bookings-view, #vendor-dashboard-view { transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+#admin-view, #customer-view, #auth-view, #app-header, #my-bookings-view, #vendor-dashboard-view, #payment-modal { transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; } /* Added payment */
 .is-hidden { opacity: 0; visibility: hidden; height: 0; overflow: hidden; pointer-events: none; margin: 0 !important; padding: 0 !important; border: none !important; }
 .movie-card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
 .movie-card:hover { transform: translateY(-5px); }
 .movie-poster { width: 100%; height: 300px; object-fit: cover; background-color: #e5e7eb; }
-.form-input, .form-select { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.75rem 1rem; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+.form-input, .form-select { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.75rem 1rem; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; background-color: white; }
 .form-input:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); outline: none; }
 .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
 .btn { padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-align: center; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
@@ -31,15 +31,17 @@ body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
 .admin-nav-button { padding: 0.5rem 1rem; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-weight: 500; color: #6b7280; transition: color 0.2s ease, border-color 0.2s ease; }
 .admin-nav-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
 .admin-section.is-hidden { display: none; }
-.analytics-card { background-color: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; /* Added margin bottom */ }
+.analytics-card { background-color: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
 .occupancy-tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; color: white; }
 .occupancy-popular { background-color: #10b981; } .occupancy-normal { background-color: #f59e0b; } .occupancy-unpopular { background-color: #ef4444; }
-#movie-details-modal { z-index: 100; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
-#movie-details-modal.is-hidden { opacity: 0; visibility: hidden; pointer-events: none;}
+#movie-details-modal, #payment-modal { z-index: 100; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+#movie-details-modal.is-hidden, #payment-modal.is-hidden { opacity: 0; visibility: hidden; pointer-events: none;}
 .showtime-label { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
-.showtime-label:hover { background-color: #e5e7eb; }
+.showtime-label:hover:not(.disabled) { background-color: #e5e7eb; }
 input[type="radio"]:checked + .showtime-label { background-color: #3b82f6; color: white; border-color: #3b82f6; }
 input[type="radio"].showtime-radio { display: none; }
+input[type="radio"]:disabled + .showtime-label { background-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; opacity: 0.7; } /* Style for disabled showtimes */
+.showtime-label.disabled { background-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; opacity: 0.7; } /* Direct class for disabled */
 .screen { width: 80%; height: 15px; background-color: #4a5568; margin: 15px auto 25px; border-radius: 3px; box-shadow: 0 3px 5px rgba(0,0,0,0.2); color: white; text-align: center; font-size: 0.7rem; line-height: 15px; font-weight: 500; letter-spacing: 1px; }
 .seat-grid { display: flex; flex-direction: column; align-items: center; }
 .seat-row { display: flex; justify-content: center; margin-bottom: 5px; }
@@ -52,17 +54,19 @@ input[type="radio"].showtime-radio { display: none; }
 #customer-login-error.is-hidden, #register-error.is-hidden, #admin-login-error.is-hidden, #vendor-login-error.is-hidden { min-height: 0; }
 
 /* Booking List Styles */
-.booking-list-item { background-color: #fff; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.booking-list-item { background-color: #fff; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; /* Stack vertically */ gap: 0.5rem; }
+.booking-main-info { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;} /* Separate QR/details */
 .booking-details { flex-grow: 1; }
 .booking-list-item strong { color: #1f2937; }
 .booking-list-item .seats { font-family: monospace; background-color: #e5e7eb; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; margin-left: 4px; }
+.booking-meta { font-size: 0.8rem; color: #6b7280; border-top: 1px dashed #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem; } /* Meta below details */
 .admin-booking-group h3 { font-size: 1.25rem; font-weight:600; color: #374151; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; }
 .admin-booking-item { margin-bottom: 0.75rem; padding: 0.75rem; border-left: 4px solid #9ca3af; font-size: 0.9rem; background-color: #f9fafb; border-radius: 0 0.25rem 0.25rem 0; }
 .admin-booking-item span { display: flex; align-items: center; margin-bottom: 0.25rem; }
 .admin-booking-item i { width: 1.25rem; text-align: center; margin-right: 0.5rem; color: #6b7280; }
 .qr-code-container { width: 100px; height: 100px; flex-shrink: 0; border: 1px solid #eee; padding: 4px; background: white; }
 .qr-code-container img { display: block; width: 100%; height: 100%; }
-.status-label { font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 0.25rem; color: white; }
+.status-label { font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 0.25rem; color: white; display: inline-block; }
 .status-used { background-color: #10b981; }
 .status-not-used { background-color: #f59e0b; }
 
@@ -76,6 +80,22 @@ input[type="radio"].showtime-radio { display: none; }
 #validation-status.status-ok { background-color: #dcfce7; color: #166534; }
 #validation-status.status-used { background-color: #fee2e2; color: #991b1b; }
 #validation-status.status-error { background-color: #feefc7; color: #92400e; }
+
+/* Payment Modal Styles */
+#payment-modal .modal-content { max-width: 450px; }
+#payment-total-cost { font-size: 1.1rem; font-weight: 600; color: #1f2937; }
+#payment-form .grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+#payment-form .cvv { grid-column: 1 / 2; }
+#payment-form .expiry { grid-column: 2 / 3; }
+
+/* Calendar Styles */
+#calendar-container { margin-top: 1rem; margin-bottom: 1rem; display: flex; justify-content: center; }
+.pika-single { border: 1px solid #d1d5db; border-radius: 0.375rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.pika-button { background-color: #f3f4f6; }
+.pika-button:hover { background-color: #e5e7eb; }
+.is-selected .pika-button { background-color: #3b82f6; box-shadow: none; color: white; }
+.is-today .pika-button { color: #1d4ed8; font-weight: bold; }
+.is-disabled .pika-button { color: #9ca3af; opacity: 0.5; background: none; }
 
 /* Vendor Badge Style */
 .vendor-badge { display: inline-block; background-color: #e0e7ff; color: #4338ca; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem; vertical-align: middle; }

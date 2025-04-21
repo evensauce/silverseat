@@ -1,11 +1,11 @@
 // --- Constants ---
-const MOVIES_STORAGE_KEY = 'silverSeatMovies'; const AUTH_STORAGE_KEY = 'silverSeatAuth'; const CUSTOMERS_STORAGE_KEY = 'silverSeatCustomers'; const VENDORS_STORAGE_KEY = 'silverSeatVendors'; const USER_RATINGS_STORAGE_KEY = 'silverSeatUserRatings'; const BOOKED_SEATS_STORAGE_KEY_PREFIX = 'silverSeatBookedSeats_'; const ALL_BOOKINGS_STORAGE_KEY = 'silverSeatAllBookings'; const USED_QR_CODES_STORAGE_KEY = 'silverSeatUsedQRCodes'; const ADMIN_EMAIL = 'admin@example.com'; const ADMIN_PASSWORD = 'password'; const TOTAL_SEATS_PER_SCREENING = 5 * 8;
+const MOVIES_STORAGE_KEY = 'silverSeatMovies'; const AUTH_STORAGE_KEY = 'silverSeatAuth'; const CUSTOMERS_STORAGE_KEY = 'silverSeatCustomers'; const VENDORS_STORAGE_KEY = 'silverSeatVendors'; const USER_RATINGS_STORAGE_KEY = 'silverSeatUserRatings'; const BOOKED_SEATS_STORAGE_KEY_PREFIX = 'silverSeatBookedSeats_'; const ALL_BOOKINGS_STORAGE_KEY = 'silverSeatAllBookings'; const USED_QR_CODES_STORAGE_KEY = 'silverSeatUsedQRCodes'; const ADMIN_EMAIL = 'admin@example.com'; const ADMIN_PASSWORD = 'password'; const TOTAL_SEATS_PER_SCREENING = 5 * 8; const TICKET_PRICE_EGP = 90; const MAX_BOOKING_DAYS_AHEAD = 5;
 
 // --- DOM Elements ---
-const splashScreen = document.getElementById('splash-screen'); const authView = document.getElementById('auth-view'); const customerLoginForm = document.getElementById('customer-login-form'); const customerRegisterForm = document.getElementById('customer-register-form'); const adminLoginForm = document.getElementById('admin-login-form'); const vendorLoginForm = document.getElementById('vendor-login-form'); const showRegisterButton = document.getElementById('show-register-button'); const showAdminLoginButton = document.getElementById('show-admin-login-button'); const showVendorLoginButton = document.getElementById('show-vendor-login-button'); const backToCustomerLoginButtons = document.querySelectorAll('.back-to-customer-login'); const customerLoginError = document.getElementById('customer-login-error'); const registerError = document.getElementById('register-error'); const adminLoginError = document.getElementById('admin-login-error'); const vendorLoginError = document.getElementById('vendor-login-error'); const appHeader = document.getElementById('app-header'); const loggedInUserInfo = document.getElementById('logged-in-user-info'); const logoutButton = document.getElementById('logout-button'); const adminView = document.getElementById('admin-view'); const adminNavButtons = document.querySelectorAll('.admin-nav-button'); const adminManageMoviesSection = document.getElementById('admin-manage-movies'); const adminAnalyticsSection = document.getElementById('admin-analytics'); const adminBookingsSection = document.getElementById('admin-bookings-section'); const adminQrScannerSection = document.getElementById('admin-qr-scanner-section'); const adminManageVendorsSection = document.getElementById('admin-manage-vendors'); const adminBookingsListContainer = document.getElementById('admin-bookings-list'); const adminVendorListContainer = document.getElementById('admin-vendor-list'); const adminQrReaderElement = document.getElementById('admin-qr-reader'); const startScanBtn = document.getElementById('start-scan-btn'); const scanStatusElement = document.getElementById('scan-status'); const movieForm = document.getElementById('movie-form'); const formTitle = document.getElementById('form-title'); const submitButton = document.getElementById('submit-button'); const cancelEditButton = document.getElementById('cancel-edit-button'); const movieVendorSelect = document.getElementById('movie-vendor'); const vendorForm = document.getElementById('vendor-form'); const vendorFormTitle = document.getElementById('vendor-form-title'); const vendorSubmitButton = document.getElementById('vendor-submit-button'); const vendorCancelEditButton = document.getElementById('vendor-cancel-edit-button'); const adminMovieListContainer = document.getElementById('admin-movie-list'); const customerPreviewContainer = document.getElementById('customer-movie-list-preview'); const noMoviesAdminMsg = document.getElementById('no-movies-admin'); const noMoviesPreviewMsg = document.getElementById('no-movies-preview'); const analyticsAvgRatingsContainer = document.getElementById('analytics-avg-ratings'); const analyticsOccupancyContainer = document.getElementById('analytics-occupancy'); const customerView = document.getElementById('customer-view'); const customerMovieListContainer = document.getElementById('customer-movie-list'); const noMoviesCustomerMsg = document.getElementById('no-movies-customer'); const toggleMyBookingsBtn = document.getElementById('toggle-my-bookings-btn'); const myBookingsView = document.getElementById('my-bookings-view'); const myBookingsListContainer = document.getElementById('my-bookings-list'); const backToMoviesBtn = document.getElementById('back-to-movies-btn'); const vendorDashboardView = document.getElementById('vendor-dashboard-view'); const vendorMovieListContainer = document.getElementById('vendor-movie-list'); const noVendorMoviesMsg = document.getElementById('no-vendor-movies'); const vendorAnalyticsAvgRatingsContainer = document.getElementById('vendor-analytics-avg-ratings'); /* New */ const vendorAnalyticsOccupancyContainer = document.getElementById('vendor-analytics-occupancy'); /* New */ const movieDetailsModal = document.getElementById('movie-details-modal'); const modalCloseButton = document.getElementById('modal-close-button'); const modalMovieTitle = document.getElementById('modal-movie-title'); const modalMoviePoster = document.getElementById('modal-movie-poster'); const modalAvgRatingContainer = document.getElementById('modal-avg-rating'); const modalMovieGenre = document.getElementById('modal-movie-genre'); const modalMovieDuration = document.getElementById('modal-movie-duration'); const modalMovieDescription = document.getElementById('modal-movie-description'); const modalShowtimesList = document.getElementById('modal-showtimes-list'); const modalRatingSection = document.getElementById('modal-rating-section'); const modalStarsContainer = document.getElementById('modal-stars'); const modalRatingMessage = document.getElementById('modal-rating-message'); const seatMapContainer = document.getElementById('seat-map-container'); const seatGrid = document.getElementById('seat-grid'); const selectedSeatsInfo = document.getElementById('selected-seats-info'); const confirmSelectionButton = document.getElementById('confirm-selection-button'); const qrValidationModal = document.getElementById('qr-validation-modal'); const validationModalCloseBtn = document.getElementById('validation-modal-close-btn'); const validationModalCloseBtnSecondary = document.getElementById('validation-modal-close-btn-secondary'); const validationMovieTitle = document.getElementById('validation-movie-title'); const validationShowtime = document.getElementById('validation-showtime'); const validationSeats = document.getElementById('validation-seats'); const validationEmail = document.getElementById('validation-email'); const validationBookingId = document.getElementById('validation-booking-id'); const validationStatusElement = document.getElementById('validation-status'); const markUsedBtn = document.getElementById('mark-used-btn');
+const splashScreen = document.getElementById('splash-screen'); const authView = document.getElementById('auth-view'); const customerLoginForm = document.getElementById('customer-login-form'); const customerRegisterForm = document.getElementById('customer-register-form'); const adminLoginForm = document.getElementById('admin-login-form'); const vendorLoginForm = document.getElementById('vendor-login-form'); const showRegisterButton = document.getElementById('show-register-button'); const showAdminLoginButton = document.getElementById('show-admin-login-button'); const showVendorLoginButton = document.getElementById('show-vendor-login-button'); const backToCustomerLoginButtons = document.querySelectorAll('.back-to-customer-login'); const customerLoginError = document.getElementById('customer-login-error'); const registerError = document.getElementById('register-error'); const adminLoginError = document.getElementById('admin-login-error'); const vendorLoginError = document.getElementById('vendor-login-error'); const appHeader = document.getElementById('app-header'); const loggedInUserInfo = document.getElementById('logged-in-user-info'); const logoutButton = document.getElementById('logout-button'); const adminView = document.getElementById('admin-view'); const adminNavButtons = document.querySelectorAll('.admin-nav-button'); const adminManageMoviesSection = document.getElementById('admin-manage-movies'); const adminAnalyticsSection = document.getElementById('admin-analytics'); const adminBookingsSection = document.getElementById('admin-bookings-section'); const adminQrScannerSection = document.getElementById('admin-qr-scanner-section'); const adminManageVendorsSection = document.getElementById('admin-manage-vendors'); const adminBookingsListContainer = document.getElementById('admin-bookings-list'); const adminVendorListContainer = document.getElementById('admin-vendor-list'); const adminQrReaderElement = document.getElementById('admin-qr-reader'); const startScanBtn = document.getElementById('start-scan-btn'); const scanStatusElement = document.getElementById('scan-status'); const movieForm = document.getElementById('movie-form'); const formTitle = document.getElementById('form-title'); const submitButton = document.getElementById('submit-button'); const cancelEditButton = document.getElementById('cancel-edit-button'); const movieVendorSelect = document.getElementById('movie-vendor'); const vendorForm = document.getElementById('vendor-form'); const vendorFormTitle = document.getElementById('vendor-form-title'); const vendorSubmitButton = document.getElementById('vendor-submit-button'); const vendorCancelEditButton = document.getElementById('vendor-cancel-edit-button'); const adminMovieListContainer = document.getElementById('admin-movie-list'); const customerPreviewContainer = document.getElementById('customer-movie-list-preview'); const noMoviesAdminMsg = document.getElementById('no-movies-admin'); const noMoviesPreviewMsg = document.getElementById('no-movies-preview'); const analyticsAvgRatingsContainer = document.getElementById('analytics-avg-ratings'); const analyticsOccupancyContainer = document.getElementById('analytics-occupancy'); const adminTotalRevenueElement = document.getElementById('admin-total-revenue'); const customerView = document.getElementById('customer-view'); const customerMovieListContainer = document.getElementById('customer-movie-list'); const noMoviesCustomerMsg = document.getElementById('no-movies-customer'); const toggleMyBookingsBtn = document.getElementById('toggle-my-bookings-btn'); const myBookingsView = document.getElementById('my-bookings-view'); const myBookingsListContainer = document.getElementById('my-bookings-list'); const backToMoviesBtn = document.getElementById('back-to-movies-btn'); const vendorDashboardView = document.getElementById('vendor-dashboard-view'); const vendorMovieListContainer = document.getElementById('vendor-movie-list'); const noVendorMoviesMsg = document.getElementById('no-vendor-movies'); const vendorAnalyticsAvgRatingsContainer = document.getElementById('vendor-analytics-avg-ratings'); const vendorAnalyticsOccupancyContainer = document.getElementById('vendor-analytics-occupancy'); const vendorTotalRevenueElement = document.getElementById('vendor-total-revenue'); const movieDetailsModal = document.getElementById('movie-details-modal'); const modalCloseButton = document.getElementById('modal-close-button'); const modalMovieTitle = document.getElementById('modal-movie-title'); const modalMoviePoster = document.getElementById('modal-movie-poster'); const modalAvgRatingContainer = document.getElementById('modal-avg-rating'); const modalMovieGenre = document.getElementById('modal-movie-genre'); const modalMovieDuration = document.getElementById('modal-movie-duration'); const modalMovieDescription = document.getElementById('modal-movie-description'); const modalDatepickerInput = document.getElementById('modal-datepicker'); /* New */ const dateErrorElement = document.getElementById('date-error'); /* New */ const calendarContainer = document.getElementById('calendar-container'); /* New */ const modalShowtimesContainer = document.getElementById('modal-showtimes-container'); /* New */ const modalShowtimesList = document.getElementById('modal-showtimes-list'); const modalRatingSection = document.getElementById('modal-rating-section'); const modalStarsContainer = document.getElementById('modal-stars'); const modalRatingMessage = document.getElementById('modal-rating-message'); const seatMapContainer = document.getElementById('seat-map-container'); const seatGrid = document.getElementById('seat-grid'); const selectedSeatsInfo = document.getElementById('selected-seats-info'); const confirmSelectionButton = document.getElementById('confirm-selection-button'); const qrValidationModal = document.getElementById('qr-validation-modal'); const validationModalCloseBtn = document.getElementById('validation-modal-close-btn'); const validationModalCloseBtnSecondary = document.getElementById('validation-modal-close-btn-secondary'); const validationMovieTitle = document.getElementById('validation-movie-title'); const validationShowtime = document.getElementById('validation-showtime'); const validationSeats = document.getElementById('validation-seats'); const validationEmail = document.getElementById('validation-email'); const validationBookingId = document.getElementById('validation-booking-id'); const validationStatusElement = document.getElementById('validation-status'); const markUsedBtn = document.getElementById('mark-used-btn'); const paymentModal = document.getElementById('payment-modal'); /* New */ const paymentModalCloseBtn = document.getElementById('payment-modal-close-btn'); /* New */ const paymentModalCloseBtnSecondary = document.getElementById('payment-modal-close-btn-secondary'); /* New */ const paymentForm = document.getElementById('payment-form'); /* New */ const paymentMovieTitle = document.getElementById('payment-movie-title'); const paymentSelectedDate = document.getElementById('payment-selected-date'); const paymentShowtime = document.getElementById('payment-showtime'); const paymentSeats = document.getElementById('payment-seats'); const paymentTotalCost = document.getElementById('payment-total-cost'); const paymentErrorElement = document.getElementById('payment-error'); const payNowBtn = document.getElementById('pay-now-btn'); /* New */
 
 // --- State ---
-let movies = []; let customerUsers = []; let vendors = []; let userRatings = {}; let allBookings = []; let usedQrCodes = []; let authState = { isLoggedIn: false, user: null }; let editingIndex = null; let editingVendorIndex = null; let selectedSeats = []; let currentAdminTab = 'admin-manage-movies'; let currentModalMovieId = null; let isShowingMyBookings = false; let html5QrCodeScanner = null;
+let movies = []; let customerUsers = []; let vendors = []; let userRatings = {}; let allBookings = []; let usedQrCodes = []; let authState = { isLoggedIn: false, user: null }; let editingIndex = null; let editingVendorIndex = null; let selectedSeats = []; let currentAdminTab = 'admin-manage-movies'; let currentModalMovieId = null; let currentSelectedDate = null; /* New */ let isShowingMyBookings = false; let html5QrCodeScanner = null; let pikadayInstance = null; /* New */
 
 // --- Utility Functions ---
 function showElement(el) { if(el) { el.classList.remove('is-hidden'); el.style.height = ''; el.style.opacity = ''; el.style.visibility = ''; el.style.pointerEvents = ''; el.style.margin = ''; el.style.padding = ''; el.style.border = ''; } }
@@ -13,6 +13,8 @@ function hideElement(el) { if(el) { el.classList.add('is-hidden'); } }
 function displayError(element, message) { if (element) { element.textContent = message; showElement(element); } }
 function hideError(element) { if (element) { element.textContent = ''; hideElement(element); } }
 function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
+function formatDateReadable(date) { if (!date) return 'N/A'; return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }); }
+function formatDateYYYYMMDD(date) { if (!date) return null; const d = new Date(date); const month = '' + (d.getMonth() + 1); const day = '' + d.getDate(); const year = d.getFullYear(); return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');}
 
 // --- Local Storage Functions ---
 function loadMoviesFromStorage() { const storedMovies = localStorage.getItem(MOVIES_STORAGE_KEY); movies = []; if (storedMovies) { try { movies = JSON.parse(storedMovies); if (!Array.isArray(movies)) movies = []; } catch (e) { movies = []; } } if (movies.length === 0) { movies = [ { title: "Inception", poster: "https://placehold.co/400x600/3b82f6/ffffff?text=Inception", description: "...", genre: "Sci-Fi", duration: 148, showtimes: "11:00 AM, 2:00 PM, 8:00 PM", vendorName: "Marvel" }, { title: "The Grand Budapest Hotel", poster: "https://placehold.co/400x600/ef4444/ffffff?text=Grand+Budapest", description: "...", genre: "Adventure", duration: 100, showtimes: "10:30 AM, 1:30 PM, 7:30 PM", vendorName: null }, { title: "Parasite", poster: "https://placehold.co/400x600/10b981/ffffff?text=Parasite", description: "...", genre: "Thriller", duration: 132, showtimes: "12:00 PM, 3:00 PM, 9:00 PM", vendorName: "DC" } ]; movies.forEach(m => { m.movieId = generateId(); m.ratings = []; }); saveMoviesToStorage(); } else { let updated = false; movies.forEach(m => { if (!m.movieId) { m.movieId = generateId(); updated = true; } if (!m.ratings) { m.ratings = []; updated = true; } if (m.vendorName === undefined) { m.vendorName = null; updated = true; } }); if (updated) saveMoviesToStorage(); } console.log("Movies loaded:", movies.length); }
@@ -26,10 +28,10 @@ function saveUserRatingsToStorage() { localStorage.setItem(USER_RATINGS_STORAGE_
 function loadAuthFromStorage() { const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY); authState = { isLoggedIn: false, user: null }; if(storedAuth){ try{ const parsedAuth = JSON.parse(storedAuth); const isValidAuth = parsedAuth && typeof parsedAuth.isLoggedIn === 'boolean' && ( !parsedAuth.isLoggedIn || (parsedAuth.user && parsedAuth.user.email && parsedAuth.user.type) ); if (isValidAuth) { authState = parsedAuth; } } catch(e) { console.error("Error parsing auth state:", e); } } console.log("Auth state loaded:", authState.isLoggedIn); }
 function saveAuthToStorage() { localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState)); }
 function clearAuthStorage() { authState = { isLoggedIn: false, user: null }; localStorage.removeItem(AUTH_STORAGE_KEY); }
-function getBookedSeatsKey(movieId, showtime) { if (!movieId || !showtime) { console.error("Cannot generate booked seats key without movieId and showtime."); return null; } const normalizedShowtime = showtime.trim().replace(/\s+/g, '_'); return `${BOOKED_SEATS_STORAGE_KEY_PREFIX}${movieId}_${normalizedShowtime}`; }
-function loadBookedSeats(movieId, showtime) { const key = getBookedSeatsKey(movieId, showtime); if (!key) return []; const storedData = localStorage.getItem(key); if (storedData) { try { const bookedSeats = JSON.parse(storedData); if (Array.isArray(bookedSeats) && bookedSeats.every(s => typeof s === 'string')) { return bookedSeats; } } catch (e) { console.error(`Error parsing booked seats for ${key}:`, e); } } return []; }
-function saveBookedSeats(movieId, showtime, seatsToBook) { const key = getBookedSeatsKey(movieId, showtime); if (!key || !Array.isArray(seatsToBook) || seatsToBook.length === 0) { console.error("Invalid input for saving booked seats availability."); return; } const existingBookedSeats = loadBookedSeats(movieId, showtime); const updatedBookedSeats = [...new Set([...existingBookedSeats, ...seatsToBook])]; try { localStorage.setItem(key, JSON.stringify(updatedBookedSeats)); console.log(`Saved seat availability for ${key}:`, updatedBookedSeats); } catch (e) { console.error(`Error saving seat availability for ${key}:`, e); alert("Could not save booking availability. Local storage might be full."); } }
-function loadAllBookingsFromStorage() { const storedBookings = localStorage.getItem(ALL_BOOKINGS_STORAGE_KEY); allBookings = []; if (storedBookings) { try { const parsed = JSON.parse(storedBookings); if (Array.isArray(parsed) && parsed.every(b => b && b.bookingId && b.userEmail && b.movieId && b.movieTitle && b.showtime && Array.isArray(b.seats))) { allBookings = parsed; console.log("Loaded all bookings:", allBookings.length, "entries"); } else { console.warn("Stored central booking data is invalid or malformed. Resetting."); } } catch (e) { console.error("Error parsing all bookings:", e); } } else { console.log("No central booking data found in storage."); } }
+function getBookedSeatsKey(movieId, showtime, dateStr) { if (!movieId || !showtime || !dateStr) { console.error("Cannot generate booked seats key without movieId, showtime, and date."); return null; } const normalizedShowtime = showtime.trim().replace(/\s+/g, '_'); return `${BOOKED_SEATS_STORAGE_KEY_PREFIX}${movieId}_${dateStr}_${normalizedShowtime}`; }
+function loadBookedSeats(movieId, showtime, date) { const dateStr = formatDateYYYYMMDD(date); const key = getBookedSeatsKey(movieId, showtime, dateStr); if (!key) return []; const storedData = localStorage.getItem(key); if (storedData) { try { const bookedSeats = JSON.parse(storedData); if (Array.isArray(bookedSeats) && bookedSeats.every(s => typeof s === 'string')) { return bookedSeats; } } catch (e) { console.error(`Error parsing booked seats for ${key}:`, e); } } return []; }
+function saveBookedSeats(movieId, showtime, date, seatsToBook) { const dateStr = formatDateYYYYMMDD(date); const key = getBookedSeatsKey(movieId, showtime, dateStr); if (!key || !Array.isArray(seatsToBook) || seatsToBook.length === 0) { console.error("Invalid input for saving booked seats availability."); return; } const existingBookedSeats = loadBookedSeats(movieId, showtime, date); const updatedBookedSeats = [...new Set([...existingBookedSeats, ...seatsToBook])]; try { localStorage.setItem(key, JSON.stringify(updatedBookedSeats)); console.log(`Saved seat availability for ${key}:`, updatedBookedSeats); } catch (e) { console.error(`Error saving seat availability for ${key}:`, e); alert("Could not save booking availability. Local storage might be full."); } }
+function loadAllBookingsFromStorage() { const storedBookings = localStorage.getItem(ALL_BOOKINGS_STORAGE_KEY); allBookings = []; if (storedBookings) { try { const parsed = JSON.parse(storedBookings); if (Array.isArray(parsed) && parsed.every(b => b && b.bookingId && b.userEmail && b.movieId && b.movieTitle && b.selectedDate && b.showtime && Array.isArray(b.seats) && b.paymentInfo && typeof b.totalAmount === 'number' && b.timestamp)) { allBookings = parsed; console.log("Loaded all bookings:", allBookings.length, "entries"); } else { console.warn("Stored central booking data is invalid or malformed. Resetting."); } } catch (e) { console.error("Error parsing all bookings:", e); } } else { console.log("No central booking data found in storage."); } }
 function saveAllBookingsToStorage() { try { localStorage.setItem(ALL_BOOKINGS_STORAGE_KEY, JSON.stringify(allBookings)); console.log("Saved all bookings to storage:", allBookings.length, "entries"); } catch (e) { console.error("Error saving all bookings:", e); alert("Could not save booking details. Local storage might be full."); } }
 function addBookingToList(bookingData) { if (!bookingData || !bookingData.bookingId) { console.error("Invalid booking data provided to addBookingToList."); return; } loadAllBookingsFromStorage(); if (allBookings.some(b => b.bookingId === bookingData.bookingId)) { console.warn(`Booking ID ${bookingData.bookingId} already exists. Skipping add.`); return; } allBookings.push(bookingData); saveAllBookingsToStorage(); }
 function loadUsedQrCodes() { const stored = localStorage.getItem(USED_QR_CODES_STORAGE_KEY); usedQrCodes = []; if (stored) { try { const parsed = JSON.parse(stored); if (Array.isArray(parsed)) { usedQrCodes = parsed; } } catch(e) { console.error("Error parsing used QR codes", e); } } console.log("Loaded used QR codes:", usedQrCodes.length); }
@@ -45,14 +47,8 @@ function handleStarClick(movieId, rating) { if (!authState.isLoggedIn || !authSt
 
 // --- UI Rendering Functions ---
 function renderUI() {
-    loadAllBookingsFromStorage(); loadUsedQrCodes(); closeModal(); closeValidationModal();
-    if (authState.isLoggedIn && authState.user) {
-        hideElement(authView); showElement(appHeader);
-        let userTypeDisplay = authState.user.type; if(authState.user.type === 'vendor' && authState.user.name) { userTypeDisplay = `vendor (${authState.user.name})`; } loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${userTypeDisplay})`;
-        if (authState.user.type === 'admin') { hideElement(customerView); hideElement(vendorDashboardView); showElement(adminView); renderAdminContent(); }
-        else if (authState.user.type === 'vendor') { hideElement(customerView); hideElement(adminView); showElement(vendorDashboardView); renderVendorDashboard(); } // Show Vendor Dashboard
-        else { hideElement(adminView); hideElement(vendorDashboardView); showElement(customerView); renderCustomerContent(); }
-    } else { hideElement(appHeader); hideElement(adminView); hideElement(customerView); hideElement(myBookingsView); hideElement(vendorDashboardView); showElement(authView); showCustomerLoginForm(); }
+    loadAllBookingsFromStorage(); loadUsedQrCodes(); closeModal(); closePaymentModal(); closeValidationModal();
+    if (authState.isLoggedIn && authState.user) { hideElement(authView); showElement(appHeader); let userTypeDisplay = authState.user.type; if(authState.user.type === 'vendor' && authState.user.name) { userTypeDisplay = `vendor (${authState.user.name})`; } loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${userTypeDisplay})`; if (authState.user.type === 'admin') { hideElement(customerView); hideElement(vendorDashboardView); showElement(adminView); renderAdminContent(); } else if (authState.user.type === 'vendor') { hideElement(customerView); hideElement(adminView); showElement(vendorDashboardView); renderVendorDashboard(); } else { hideElement(adminView); hideElement(vendorDashboardView); showElement(customerView); renderCustomerContent(); } } else { hideElement(appHeader); hideElement(adminView); hideElement(customerView); hideElement(myBookingsView); hideElement(vendorDashboardView); showElement(authView); showCustomerLoginForm(); }
 }
 
 // --- Admin Content Rendering ---
@@ -69,100 +65,70 @@ function renderAdminContent() {
      else if (currentAdminTab === 'admin-manage-vendors') { renderAdminVendorManagement(); }
 }
 
-// Render Admin Bookings List (with status)
-function renderAdminBookingsList() { if (!adminBookingsListContainer) { console.error("Admin bookings list container not found!"); return; } adminBookingsListContainer.innerHTML = ''; loadUsedQrCodes(); console.log("Rendering admin bookings list. Total bookings:", allBookings.length, "Used codes:", usedQrCodes.length); if (allBookings.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No customer bookings found.</p>'; return; } const bookingsByMovie = allBookings.reduce((acc, booking) => { const title = booking.movieTitle || 'Unknown Movie'; if (!acc[title]) { acc[title] = []; } acc[title].push(booking); return acc; }, {}); const sortedMovieTitles = Object.keys(bookingsByMovie).sort(); if (sortedMovieTitles.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No bookings found after grouping.</p>'; return; } sortedMovieTitles.forEach(movieTitle => { const groupDiv = document.createElement('div'); groupDiv.className = 'admin-booking-group mb-6'; const titleHeading = document.createElement('h3'); titleHeading.innerHTML = `<i class="fas fa-film mr-2 text-gray-500"></i>${movieTitle}`; groupDiv.appendChild(titleHeading); const bookingsForMovie = bookingsByMovie[movieTitle]; const listElement = document.createElement('div'); listElement.className = 'space-y-3 pl-4'; bookingsForMovie.forEach(booking => { const itemDiv = document.createElement('div'); itemDiv.className = 'admin-booking-item'; const isUsed = isQrCodeUsed(booking.bookingId); const statusLabelClass = isUsed ? 'status-used' : 'status-not-used'; const statusText = isUsed ? '✅ QR Code Used' : '🔄 QR Code Not Used'; itemDiv.innerHTML = `<span><i class="fas fa-user"></i>${booking.userEmail}</span><span><i class="fas fa-clock"></i>${booking.showtime}</span><span><i class="fas fa-chair"></i><span class="seats">${booking.seats.sort().join(', ')}</span></span><div class="mt-2"><span class="status-label ${statusLabelClass}">${statusText}</span></div>`; listElement.appendChild(itemDiv); }); groupDiv.appendChild(listElement); adminBookingsListContainer.appendChild(groupDiv); }); }
+// Render Admin Bookings List (with status & date)
+function renderAdminBookingsList() { if (!adminBookingsListContainer) { console.error("Admin bookings list container not found!"); return; } adminBookingsListContainer.innerHTML = ''; loadUsedQrCodes(); console.log("Rendering admin bookings list. Total bookings:", allBookings.length, "Used codes:", usedQrCodes.length); if (allBookings.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No customer bookings found.</p>'; return; } const bookingsByMovie = allBookings.reduce((acc, booking) => { const title = booking.movieTitle || 'Unknown Movie'; if (!acc[title]) { acc[title] = []; } acc[title].push(booking); return acc; }, {}); const sortedMovieTitles = Object.keys(bookingsByMovie).sort(); if (sortedMovieTitles.length === 0) { adminBookingsListContainer.innerHTML = '<p class="text-gray-500">No bookings found after grouping.</p>'; return; } sortedMovieTitles.forEach(movieTitle => { const groupDiv = document.createElement('div'); groupDiv.className = 'admin-booking-group mb-6'; const titleHeading = document.createElement('h3'); titleHeading.innerHTML = `<i class="fas fa-film mr-2 text-gray-500"></i>${movieTitle}`; groupDiv.appendChild(titleHeading); const bookingsForMovie = bookingsByMovie[movieTitle].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)); /* Sort by recent */ const listElement = document.createElement('div'); listElement.className = 'space-y-3 pl-4'; bookingsForMovie.forEach(booking => { const itemDiv = document.createElement('div'); itemDiv.className = 'admin-booking-item'; const isUsed = isQrCodeUsed(booking.bookingId); const statusLabelClass = isUsed ? 'status-used' : 'status-not-used'; const statusText = isUsed ? '✅ QR Code Used' : '🔄 QR Code Not Used'; itemDiv.innerHTML = `<span><i class="fas fa-user"></i>${booking.userEmail}</span><span><i class="fas fa-calendar-alt"></i>${formatDateReadable(booking.selectedDate)}</span><span><i class="fas fa-clock"></i>${booking.showtime}</span><span><i class="fas fa-chair"></i><span class="seats">${booking.seats.sort().join(', ')}</span></span><span><i class="fas fa-money-bill-wave"></i>${booking.totalAmount} EGP</span><div class="mt-2"><span class="status-label ${statusLabelClass}">${statusText}</span></div>`; listElement.appendChild(itemDiv); }); groupDiv.appendChild(listElement); adminBookingsListContainer.appendChild(groupDiv); }); }
 
 // --- Customer Content Rendering ---
 function renderCustomerContent() { if (isShowingMyBookings) { showMyBookingsView(); } else { showCustomerMovieListView(); } }
 function showCustomerMovieListView() { isShowingMyBookings = false; hideElement(myBookingsView); showElement(customerMovieListContainer); renderMovies(customerMovieListContainer, 'customer'); toggleMyBookingsBtn.innerHTML = '<i class="fas fa-ticket-alt mr-2"></i>My Bookings'; }
 function showMyBookingsView() { isShowingMyBookings = true; hideElement(customerMovieListContainer); renderMyBookings(); showElement(myBookingsView); toggleMyBookingsBtn.innerHTML = '<i class="fas fa-film mr-2"></i>Now Showing'; }
-// Render My Bookings (with QR Code Generation)
-function renderMyBookings() { myBookingsListContainer.innerHTML = ''; if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') { myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: Login required.</p>'; return; } const currentUserEmail = authState.user.email; const userBookings = allBookings.filter(booking => booking.userEmail === currentUserEmail); if (userBookings.length === 0) { myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>'; return; } userBookings.sort((a, b) => (a.movieTitle || '').localeCompare(b.movieTitle || '')); userBookings.forEach(booking => { const itemDiv = document.createElement('div'); itemDiv.className = 'booking-list-item'; const qrData = JSON.stringify({ bookingId: booking.bookingId, movieTitle: booking.movieTitle, showtime: booking.showtime, seats: booking.seats, userEmail: booking.userEmail }); itemDiv.innerHTML = `<div class="booking-details"><p class="text-lg font-semibold mb-1">${booking.movieTitle || 'Unknown Movie'}</p><p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime}</p><p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats.sort().join(', ')}</span></p><p class="text-xs text-gray-400 mt-1">ID: ${booking.bookingId}</p></div><div id="qr-code-${booking.bookingId}" class="qr-code-container" title='${qrData.replace(/'/g, "'")}'></div>`; myBookingsListContainer.appendChild(itemDiv); try { new QRCode(document.getElementById(`qr-code-${booking.bookingId}`), { text: qrData, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M }); } catch (e) { console.error("QR Code generation failed:", e); document.getElementById(`qr-code-${booking.bookingId}`).innerText = "QR Error"; } }); }
+// Render My Bookings (with QR, Date, Cost)
+function renderMyBookings() { myBookingsListContainer.innerHTML = ''; if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') { myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: Login required.</p>'; return; } const currentUserEmail = authState.user.email; const userBookings = allBookings.filter(booking => booking.userEmail === currentUserEmail).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)); if (userBookings.length === 0) { myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>'; return; } userBookings.forEach(booking => { const itemDiv = document.createElement('div'); itemDiv.className = 'booking-list-item'; const qrData = JSON.stringify({ bookingId: booking.bookingId, movieTitle: booking.movieTitle, showtime: booking.showtime, seats: booking.seats, userEmail: booking.userEmail }); itemDiv.innerHTML = `<div class="booking-main-info"><div class="booking-details"><p class="text-lg font-semibold mb-1">${booking.movieTitle || 'Unknown Movie'}</p><p class="text-sm text-gray-600 mb-1"><strong>Date:</strong> ${formatDateReadable(booking.selectedDate)}</p><p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime}</p><p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats.sort().join(', ')}</span></p></div><div id="qr-code-${booking.bookingId}" class="qr-code-container" title='${qrData.replace(/'/g, "&apos;")}'></div></div><div class="booking-meta"><span>Booked: ${new Date(booking.timestamp).toLocaleString()}</span> | <span>Cost: ${booking.totalAmount} EGP</span></div>`; myBookingsListContainer.appendChild(itemDiv); try { new QRCode(document.getElementById(`qr-code-${booking.bookingId}`), { text: qrData, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M }); } catch (e) { console.error("QR Code generation failed:", e); document.getElementById(`qr-code-${booking.bookingId}`).innerText = "QR Error"; } }); }
 
-// --- Admin Analytics ---
-function renderAnalyticsDashboard() { analyticsAvgRatingsContainer.innerHTML = ''; analyticsOccupancyContainer.innerHTML = ''; if (movies.length === 0) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; return; } let hasRatings = false; movies.forEach(movie => { const { average, count } = calculateAverageRating(movie); if (count > 0) hasRatings = true; const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200'; const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700'; const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count); ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); analyticsAvgRatingsContainer.appendChild(ratingDiv); }); if (!hasRatings) { analyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings submitted yet.</p>'; } movies.forEach(movie => { const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0'; const movieTitleH4 = document.createElement('h4'); movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitleH4.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitleH4); const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach(time => { const bookedCount = allBookings.reduce((count, booking) => (booking.movieId === movie.movieId && booking.showtime === time) ? count + booking.seats.length : count, 0); const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0; let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular'; if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; } else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; } const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1'; showtimeDiv.innerHTML = `<span class="text-gray-600">${time}</span><span><span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span><span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span></span>`; movieOccupancyDiv.appendChild(showtimeDiv); }); } else { movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>'; } analyticsOccupancyContainer.appendChild(movieOccupancyDiv); }); if (analyticsOccupancyContainer.innerHTML === '') { analyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No movie data.</p>'; } }
+// --- Admin/Vendor Analytics ---
+function renderAnalyticsDashboard(targetVendorName = null) {
+    const isVendor = targetVendorName !== null;
+    const avgRatingsContainer = isVendor ? vendorAnalyticsAvgRatingsContainer : analyticsAvgRatingsContainer;
+    const occupancyContainer = isVendor ? vendorAnalyticsOccupancyContainer : analyticsOccupancyContainer;
+    const totalRevenueElement = isVendor ? vendorTotalRevenueElement : adminTotalRevenueElement;
+
+    if (!avgRatingsContainer || !occupancyContainer || !totalRevenueElement) return; // Ensure elements exist
+
+    avgRatingsContainer.innerHTML = ''; occupancyContainer.innerHTML = ''; totalRevenueElement.textContent = '0 EGP';
+
+    const relevantMovies = isVendor ? movies.filter(m => m.vendorName === targetVendorName) : movies;
+    const relevantBookings = isVendor ? allBookings.filter(b => relevantMovies.some(m => m.movieId === b.movieId)) : allBookings;
+
+    if (relevantMovies.length === 0) { avgRatingsContainer.innerHTML = `<p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`; occupancyContainer.innerHTML = `<p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`; return; }
+
+    // Total Revenue
+    const totalRevenue = relevantBookings.reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
+    totalRevenueElement.textContent = `${totalRevenue.toFixed(2)} EGP`;
+
+    // Avg Ratings
+    let hasRatings = false; relevantMovies.forEach(movie => { const { average, count } = calculateAverageRating(movie); if (count > 0) hasRatings = true; const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200'; const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700'; const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count); ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); avgRatingsContainer.appendChild(ratingDiv); }); if (!hasRatings) { avgRatingsContainer.innerHTML = `<p class="text-gray-500">No ratings submitted ${isVendor ? 'for your movies' : ''} yet.</p>`; }
+
+    // Occupancy
+    let hasOccupancyData = false;
+    relevantMovies.forEach(movie => { const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0'; const movieTitleH4 = document.createElement('h4'); movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitleH4.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitleH4); const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { hasOccupancyData = true; showtimes.forEach(time => { const bookedCount = relevantBookings.reduce((count, booking) => (booking.movieId === movie.movieId && booking.showtime === time) ? count + booking.seats.length : count, 0); const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0; let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular'; if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; } else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; } const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1'; showtimeDiv.innerHTML = `<span class="text-gray-600">${time}</span><span><span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span><span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span></span>`; movieOccupancyDiv.appendChild(showtimeDiv); }); } else { movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>'; } occupancyContainer.appendChild(movieOccupancyDiv); });
+     if (!hasOccupancyData) { occupancyContainer.innerHTML = `<p class="text-gray-500">No showtime data available ${isVendor ? 'for your movies' : ''}.</p>`; }
+}
 
 // --- Vendor Dashboard Rendering ---
 function renderVendorDashboard() {
     if (!vendorMovieListContainer || !noVendorMoviesMsg || !vendorAnalyticsAvgRatingsContainer || !vendorAnalyticsOccupancyContainer) return;
     vendorMovieListContainer.innerHTML = ''; // Clear previous movies
-    vendorAnalyticsAvgRatingsContainer.innerHTML = ''; // Clear previous analytics
-    vendorAnalyticsOccupancyContainer.innerHTML = ''; // Clear previous analytics
 
     if (!authState.isLoggedIn || authState.user.type !== 'vendor' || !authState.user.name) {
         noVendorMoviesMsg.textContent = 'Error: Invalid vendor session.'; showElement(noVendorMoviesMsg);
-        vendorAnalyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
-        vendorAnalyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
+        // Clear analytics too
+         vendorAnalyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
+         vendorAnalyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
+         if(vendorTotalRevenueElement) vendorTotalRevenueElement.textContent = '0 EGP';
         return;
     }
 
     const vendorName = authState.user.name;
     const vendorMovies = movies.filter(movie => movie.vendorName === vendorName);
 
-    // Render Movie List
-    if (vendorMovies.length === 0) {
-         noVendorMoviesMsg.textContent = `No movies assigned to vendor "${vendorName}".`;
-         showElement(noVendorMoviesMsg);
-     } else {
-        hideElement(noVendorMoviesMsg);
-        vendorMovies.forEach((movie) => {
-            const originalIndex = movies.findIndex(m => m.movieId === movie.movieId);
-            const card = createMovieCard(movie, originalIndex, 'vendor_dashboard'); // Use specific view type
-            vendorMovieListContainer.appendChild(card);
-        });
-    }
+    // Render Movie List for Vendor
+    if (vendorMovies.length === 0) { noVendorMoviesMsg.textContent = `No movies assigned to vendor "${vendorName}".`; showElement(noVendorMoviesMsg); }
+    else { hideElement(noVendorMoviesMsg); vendorMovies.forEach((movie) => { const originalIndex = movies.findIndex(m => m.movieId === movie.movieId); const card = createMovieCard(movie, originalIndex, 'vendor_dashboard'); vendorMovieListContainer.appendChild(card); }); }
 
-    // Render Vendor Analytics
-    renderVendorAnalytics(vendorName, vendorMovies);
+    // Render Vendor Analytics (passing vendor name and filtered movies)
+    renderAnalyticsDashboard(vendorName);
 }
 
-// --- Vendor Analytics Rendering (New Function) ---
-function renderVendorAnalytics(vendorName, vendorMovies) {
-    vendorAnalyticsAvgRatingsContainer.innerHTML = ''; // Clear previous
-    vendorAnalyticsOccupancyContainer.innerHTML = ''; // Clear previous
-
-    if (vendorMovies.length === 0) {
-        vendorAnalyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No assigned movies for rating analytics.</p>';
-        vendorAnalyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No assigned movies for occupancy analytics.</p>';
-        return;
-    }
-
-    const vendorMovieIds = vendorMovies.map(m => m.movieId);
-
-    // Render Average Ratings (Filtered)
-     let vendorHasRatings = false;
-     vendorMovies.forEach(movie => {
-         const { average, count } = calculateAverageRating(movie);
-         if (count > 0) vendorHasRatings = true;
-         const ratingDiv = document.createElement('div'); ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200';
-         const titleSpan = document.createElement('span'); titleSpan.textContent = movie.title; titleSpan.className = 'font-medium text-gray-700';
-         const starsSpan = document.createElement('span'); starsSpan.className = 'stars-container flex items-center'; renderStars(starsSpan, average, count);
-         ratingDiv.appendChild(titleSpan); ratingDiv.appendChild(starsSpan); vendorAnalyticsAvgRatingsContainer.appendChild(ratingDiv);
-     });
-     if (!vendorHasRatings) { vendorAnalyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">No ratings submitted for your movies yet.</p>'; }
-
-    // Render Occupancy (Filtered)
-     vendorMovies.forEach(movie => {
-         const movieOccupancyDiv = document.createElement('div'); movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0';
-         const movieTitleH4 = document.createElement('h4'); movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2'; movieTitleH4.textContent = movie.title; movieOccupancyDiv.appendChild(movieTitleH4);
-         const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : [];
-         if (showtimes.length > 0) {
-             showtimes.forEach(time => {
-                 // Filter bookings relevant ONLY to this vendor's movie AND this showtime
-                 const bookedCount = allBookings.reduce((count, booking) => (booking.movieId === movie.movieId && booking.showtime === time) ? count + booking.seats.length : count, 0);
-                 const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0;
-                 let occupancyLabel = 'Unpopular'; let occupancyClass = 'occupancy-unpopular'; if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; } else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; }
-                 const showtimeDiv = document.createElement('div'); showtimeDiv.className = 'flex justify-between items-center text-sm mb-1';
-                 showtimeDiv.innerHTML = `<span class="text-gray-600">${time}</span><span><span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats)</span><span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span></span>`;
-                 movieOccupancyDiv.appendChild(showtimeDiv);
-             });
-         } else { movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>'; }
-         vendorAnalyticsOccupancyContainer.appendChild(movieOccupancyDiv);
-     });
-     if (vendorAnalyticsOccupancyContainer.innerHTML === '') { // Should not happen if vendorMovies > 0
-         vendorAnalyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">No showtime data available for your movies.</p>';
-     }
-}
 
 // --- Auth Form Switching ---
 function showCustomerLoginForm() { hideElement(customerRegisterForm); hideElement(adminLoginForm); hideElement(vendorLoginForm); showElement(customerLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); hideError(vendorLoginError); }
@@ -193,25 +159,217 @@ function deleteVendor(index) { if (index < 0 || index >= vendors.length) return;
 function populateVendorDropdown(selectElementId) { const select = document.getElementById(selectElementId); if (!select) return; const currentVal = select.value; select.innerHTML = '<option value="">-- None --</option>'; loadVendorsFromStorage(); vendors.forEach(vendor => { const option = document.createElement('option'); option.value = vendor.name; option.textContent = vendor.name; select.appendChild(option); }); select.value = currentVal; }
 
 // --- Movie Card Creation (Add Vendor Badge) ---
-function createMovieCard(movie, index, viewType) { const card = document.createElement('div'); card.className = 'movie-card flex flex-col'; card.dataset.index = index; card.dataset.movieId = movie.movieId; const img = document.createElement('img'); img.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; img.alt = `${movie.title} Poster`; img.className = 'movie-poster'; img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; }; const content = document.createElement('div'); content.className = 'p-4 flex flex-col flex-grow'; const title = document.createElement('h3'); title.className = 'text-lg font-semibold mb-1 text-gray-800 flex items-center'; title.textContent = movie.title; if (movie.vendorName) { const vendorBadge = document.createElement('span'); vendorBadge.className = 'vendor-badge'; vendorBadge.textContent = movie.vendorName; title.appendChild(vendorBadge); } const avgRatingDiv = document.createElement('div'); avgRatingDiv.className = 'stars-container text-sm mb-2'; const { average, count } = calculateAverageRating(movie); renderStars(avgRatingDiv, average, count); const details = document.createElement('p'); details.className = 'text-sm text-gray-600 mb-1'; details.innerHTML = ` <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'} • <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min `; const description = document.createElement('p'); description.className = 'text-sm text-gray-700 mb-3 flex-grow'; description.textContent = movie.description || 'No description available.'; const showtimes = document.createElement('p'); showtimes.className = 'text-sm text-blue-600 font-medium mt-auto'; showtimes.innerHTML = ` <i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${movie.showtimes || 'N/A'} `; content.appendChild(title); content.appendChild(avgRatingDiv); content.appendChild(details); content.appendChild(description); content.appendChild(showtimes); card.appendChild(img); card.appendChild(content); if (viewType === 'admin') { const adminControls = document.createElement('div'); adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2'; const editButton = document.createElement('button'); editButton.innerHTML = '<i class="fas fa-edit"></i> Edit'; editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2'; editButton.onclick = (e) => { e.stopPropagation(); showEditForm(index); }; const deleteButton = document.createElement('button'); deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'; deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2'; deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(index); }; adminControls.appendChild(editButton); adminControls.appendChild(deleteButton); card.appendChild(adminControls); } else if (viewType === 'customer' || viewType === 'preview') { card.classList.add('cursor-pointer'); card.onclick = () => openModal(movie.movieId); } else if (viewType === 'vendor_dashboard') { /* No vendor controls for now */ } return card; }
+function createMovieCard(movie, index, viewType) { const card = document.createElement('div'); card.className = 'movie-card flex flex-col'; card.dataset.index = index; card.dataset.movieId = movie.movieId; const img = document.createElement('img'); img.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; img.alt = `${movie.title} Poster`; img.className = 'movie-poster'; img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; }; const content = document.createElement('div'); content.className = 'p-4 flex flex-col flex-grow'; const title = document.createElement('h3'); title.className = 'text-lg font-semibold mb-1 text-gray-800 flex items-center'; title.textContent = movie.title; if (movie.vendorName) { const vendorBadge = document.createElement('span'); vendorBadge.className = 'vendor-badge'; vendorBadge.textContent = movie.vendorName; title.appendChild(vendorBadge); } const avgRatingDiv = document.createElement('div'); avgRatingDiv.className = 'stars-container text-sm mb-2'; const { average, count } = calculateAverageRating(movie); renderStars(avgRatingDiv, average, count); const details = document.createElement('p'); details.className = 'text-sm text-gray-600 mb-1'; details.innerHTML = ` <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'} &bull; <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min `; const description = document.createElement('p'); description.className = 'text-sm text-gray-700 mb-3 flex-grow'; description.textContent = movie.description || 'No description available.'; const showtimes = document.createElement('p'); showtimes.className = 'text-sm text-blue-600 font-medium mt-auto'; showtimes.innerHTML = ` <i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${movie.showtimes || 'N/A'} `; content.appendChild(title); content.appendChild(avgRatingDiv); content.appendChild(details); content.appendChild(description); content.appendChild(showtimes); card.appendChild(img); card.appendChild(content); if (viewType === 'admin') { const adminControls = document.createElement('div'); adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2'; const editButton = document.createElement('button'); editButton.innerHTML = '<i class="fas fa-edit"></i> Edit'; editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2'; editButton.onclick = (e) => { e.stopPropagation(); showEditForm(index); }; const deleteButton = document.createElement('button'); deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'; deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2'; deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(index); }; adminControls.appendChild(editButton); adminControls.appendChild(deleteButton); card.appendChild(adminControls); } else if (viewType === 'customer' || viewType === 'preview') { card.classList.add('cursor-pointer'); card.onclick = () => openModal(movie.movieId); } else if (viewType === 'vendor_dashboard') { /* No vendor controls */ } return card; }
 
 // --- Movie List Rendering ---
-function renderMovies(container, viewType) { container.innerHTML = ''; let noMoviesMsg; if (viewType === 'admin') noMoviesMsg = noMoviesAdminMsg; else if (viewType === 'preview') noMoviesMsg = noMoviesPreviewMsg; else if (viewType === 'vendor_dashboard') noMoviesMsg = noVendorMoviesMsg; else noMoviesMsg = noMoviesCustomerMsg; if (movies.length === 0 && viewType !== 'vendor_dashboard') { if(noMoviesMsg) showElement(noMoviesMsg); return; } else { if(noMoviesMsg) hideElement(noMoviesMsg); } const moviesToRender = viewType === 'vendor_dashboard' ? movies.filter(m => m.vendorName === authState?.user?.name) : movies; if(moviesToRender.length === 0 && viewType === 'vendor_dashboard') { if(noMoviesMsg) {noMoviesMsg.textContent = `No movies assigned to vendor "${authState?.user?.name}".`; showElement(noMoviesMsg); } return; } moviesToRender.forEach((movie) => { const originalIndex = movies.findIndex(m => m.movieId === movie.movieId); const card = createMovieCard(movie, originalIndex, viewType); container.appendChild(card); }); }
+function renderMovies(container, viewType) { container.innerHTML = ''; let noMoviesMsg; if (viewType === 'admin') noMoviesMsg = noMoviesAdminMsg; else if (viewType === 'preview') noMoviesMsg = noMoviesPreviewMsg; else if (viewType === 'vendor_dashboard') noMoviesMsg = noVendorMoviesMsg; else noMoviesMsg = noMoviesCustomerMsg; const moviesToRender = viewType === 'vendor_dashboard' ? movies.filter(m => m.vendorName === authState?.user?.name) : movies; if(moviesToRender.length === 0) { if(noMoviesMsg) { if (viewType === 'vendor_dashboard') { noMoviesMsg.textContent = `No movies assigned to vendor "${authState?.user?.name || ''}".`; } showElement(noMoviesMsg); } return; } else { if(noMoviesMsg) hideElement(noMoviesMsg); } moviesToRender.forEach((movie) => { const originalIndex = movies.findIndex(m => m.movieId === movie.movieId); const card = createMovieCard(movie, originalIndex, viewType); container.appendChild(card); }); }
 
-// --- Movie Details Modal Logic ---
-function openModal(movieId) { const movie = movies.find(m => m.movieId === movieId); if (!movie) { console.error("Movie not found for modal:", movieId); return; } currentModalMovieId = movieId; modalMovieTitle.textContent = movie.title || 'Movie Details'; modalMoviePoster.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; modalMoviePoster.alt = `${movie.title || 'Movie'} Poster`; modalMovieGenre.textContent = movie.genre || 'N/A'; modalMovieDuration.textContent = movie.duration || 'N/A'; modalMovieDescription.textContent = movie.description || 'No description available.'; const avgData = calculateAverageRating(movie); renderStars(modalAvgRatingContainer, avgData.average, avgData.count); modalShowtimesList.innerHTML = ''; const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : []; if (showtimes.length > 0) { showtimes.forEach((time, i) => { const radioId = `showtime-${movie.movieId}-${i}`; const radio = document.createElement('input'); radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.movieId}-showtime`; radio.value = time; radio.className = 'showtime-radio'; radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time); const label = document.createElement('label'); label.htmlFor = radioId; label.textContent = time; label.className = 'showtime-label'; modalShowtimesList.appendChild(radio); modalShowtimesList.appendChild(label); }); } else { modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">No showtimes available.</p>'; } if (authState.isLoggedIn && authState.user.type === 'customer') { showElement(modalRatingSection); const userId = authState.user.email; const userCurrentRating = userRatings[userId]?.[movieId] || null; const hasRated = userCurrentRating !== null; renderStars(modalStarsContainer, 0, 0, !hasRated, userCurrentRating, movieId); modalRatingMessage.textContent = hasRated ? `You rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}.` : 'Click stars to rate!'; modalStarsContainer.classList.toggle('interactive', !hasRated); modalStarsContainer.style.cursor = hasRated ? 'default' : 'pointer'; } else { hideElement(modalRatingSection); } hideElement(seatMapContainer); seatGrid.innerHTML = ''; selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; showElement(movieDetailsModal); document.body.classList.add('overflow-hidden'); }
-function closeModal() { hideElement(movieDetailsModal); document.body.classList.remove('overflow-hidden'); currentModalMovieId = null; }
-function handleShowtimeSelection(movieId, selectedTime) { console.log(`Showtime selected: ${selectedTime} for movie ${movieId}`); renderSeatMap(movieId, selectedTime, 5, 8); showElement(seatMapContainer); selectedSeats = []; updateSelectedSeatsInfo(); confirmSelectionButton.disabled = true; }
-function renderSeatMap(movieId, showtime, rows, cols) { seatGrid.innerHTML = ''; if (!movieId || !showtime) { seatGrid.innerHTML = '<p class="text-red-500 text-center">Error: Cannot load seats without movie/showtime.</p>'; return; } const bookedSeatIds = loadBookedSeats(movieId, showtime); console.log(`Rendering seat map for ${movieId} at ${showtime}. Booked:`, bookedSeatIds); for (let r = 0; r < rows; r++) { const rowDiv = document.createElement('div'); rowDiv.className = 'seat-row'; const rowLetter = String.fromCharCode(65 + r); for (let c = 0; c < cols; c++) { if (c === 2 || c === 6) { const spacer = document.createElement('div'); spacer.className = 'seat-spacer'; rowDiv.appendChild(spacer); } const seatId = `${rowLetter}${c + 1}`; const seatDiv = document.createElement('div'); seatDiv.className = 'seat'; seatDiv.id = `seat-${seatId}`; seatDiv.dataset.seatId = seatId; seatDiv.innerHTML = `<i class="fas fa-chair"></i>`; if (bookedSeatIds.includes(seatId)) { seatDiv.classList.add('unavailable'); } else { seatDiv.onclick = () => toggleSeatSelection(seatId); } rowDiv.appendChild(seatDiv); } seatGrid.appendChild(rowDiv); } }
+
+// --- Movie Details Modal Logic (Integrate Calendar) ---
+function openModal(movieId) {
+    const movie = movies.find(m => m.movieId === movieId); if (!movie) { console.error("Movie not found for modal:", movieId); return; }
+    currentModalMovieId = movieId; currentSelectedDate = null; // Reset date on open
+    modalMovieTitle.textContent = movie.title || 'Movie Details'; modalMoviePoster.src = movie.poster || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; modalMoviePoster.alt = `${movie.title || 'Movie'} Poster`; modalMovieGenre.textContent = movie.genre || 'N/A'; modalMovieDuration.textContent = movie.duration || 'N/A'; modalMovieDescription.textContent = movie.description || 'No description available.';
+    const avgData = calculateAverageRating(movie); renderStars(modalAvgRatingContainer, avgData.average, avgData.count);
+
+    // Reset fields related to selection
+    modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">Select a date first.</p>';
+    hideElement(modalShowtimesContainer);
+    hideElement(seatMapContainer);
+    seatGrid.innerHTML = ''; selectedSeats = []; updateSelectedSeatsInfo();
+    confirmSelectionButton.disabled = true;
+    confirmSelectionButton.textContent = 'Proceed to Payment'; // Reset button text
+
+    // Initialize/Reset Pikaday
+    if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } // Destroy previous if exists
+    modalDatepickerInput.value = ''; // Clear input
+    hideError(dateErrorElement);
+
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + MAX_BOOKING_DAYS_AHEAD);
+
+     pikadayInstance = new Pikaday({
+         field: modalDatepickerInput,
+         bound: false, // Allow calendar to float
+         container: calendarContainer, // Optional: attach to specific container
+         minDate: today,
+         maxDate: maxDate,
+         toString(date, format) { return formatDateReadable(date); },
+         onSelect: function(date) {
+             console.log("Date selected:", date);
+             hideError(dateErrorElement);
+             currentSelectedDate = new Date(date); // Store the selected date object
+             modalDatepickerInput.value = formatDateReadable(date); // Update input field display
+             renderAndValidateShowtimes(movie, currentSelectedDate);
+             showElement(modalShowtimesContainer);
+             hideElement(seatMapContainer); // Hide seats until showtime selected
+             selectedSeats = []; // Reset seats
+             updateSelectedSeatsInfo(); // Update button state etc.
+         }
+     });
+
+    // Rating section logic
+    if (authState.isLoggedIn && authState.user.type === 'customer') { showElement(modalRatingSection); const userId = authState.user.email; const userCurrentRating = userRatings[userId]?.[movieId] || null; const hasRated = userCurrentRating !== null; renderStars(modalStarsContainer, 0, 0, !hasRated, userCurrentRating, movieId); modalRatingMessage.textContent = hasRated ? `You rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}.` : 'Click stars to rate!'; modalStarsContainer.classList.toggle('interactive', !hasRated); modalStarsContainer.style.cursor = hasRated ? 'default' : 'pointer'; } else { hideElement(modalRatingSection); }
+
+    showElement(movieDetailsModal); document.body.classList.add('overflow-hidden');
+}
+
+function closeModal() { hideElement(movieDetailsModal); document.body.classList.remove('overflow-hidden'); currentModalMovieId = null; currentSelectedDate = null; if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } } // Destroy calendar on close
+
+// Render and Validate Showtimes based on selected date
+function renderAndValidateShowtimes(movie, selectedDate) {
+    modalShowtimesList.innerHTML = ''; // Clear previous
+    const showtimes = movie.showtimes ? movie.showtimes.split(',').map(st => st.trim()).filter(st => st) : [];
+    if (showtimes.length === 0) { modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">No showtimes available for this movie.</p>'; return; }
+
+    const now = new Date();
+    const todayStr = formatDateYYYYMMDD(now);
+    const selectedDateStr = formatDateYYYYMMDD(selectedDate);
+    const isToday = (todayStr === selectedDateStr);
+
+    let hasAvailableShowtimes = false;
+
+    showtimes.forEach((time, i) => {
+        const radioId = `showtime-${movie.movieId}-${i}`;
+        const radio = document.createElement('input'); radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.movieId}-showtime`; radio.value = time; radio.className = 'showtime-radio';
+        const label = document.createElement('label'); label.htmlFor = radioId; label.textContent = time; label.className = 'showtime-label';
+
+        let isPast = false;
+        if (isToday) {
+            // Parse time (handle AM/PM)
+            const timeParts = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (timeParts) {
+                let hours = parseInt(timeParts[1], 10);
+                const minutes = parseInt(timeParts[2], 10);
+                const ampm = timeParts[3].toUpperCase();
+                if (ampm === 'PM' && hours < 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0; // Midnight case
+
+                const showtimeDate = new Date(selectedDate);
+                showtimeDate.setHours(hours, minutes, 0, 0);
+
+                if (showtimeDate < now) { isPast = true; }
+            } else { console.warn("Could not parse showtime:", time); /* Treat unparseable as potentially past? */ }
+        }
+
+        if (isPast) {
+            radio.disabled = true;
+            label.classList.add('disabled');
+            label.title = "This showtime has already passed.";
+        } else {
+            radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time, currentSelectedDate); // Pass date
+            hasAvailableShowtimes = true;
+        }
+
+        modalShowtimesList.appendChild(radio); modalShowtimesList.appendChild(label);
+    });
+
+     if (!hasAvailableShowtimes && showtimes.length > 0) {
+          modalShowtimesList.innerHTML = '<p class="text-orange-600 text-sm">All showtimes for today have passed.</p>';
+     } else if (!hasAvailableShowtimes && showtimes.length === 0) {
+         // Already handled above
+     }
+}
+
+function handleShowtimeSelection(movieId, selectedTime, selectedDate) { console.log(`Showtime selected: ${selectedTime} on ${formatDateYYYYMMDD(selectedDate)} for movie ${movieId}`); renderSeatMap(movieId, selectedTime, selectedDate, 5, 8); showElement(seatMapContainer); selectedSeats = []; updateSelectedSeatsInfo(); } // Pass date to renderSeatMap
+function renderSeatMap(movieId, showtime, date, rows, cols) { seatGrid.innerHTML = ''; if (!movieId || !showtime || !date) { seatGrid.innerHTML = '<p class="text-red-500 text-center">Error: Cannot load seats without movie/showtime/date.</p>'; return; } const bookedSeatIds = loadBookedSeats(movieId, showtime, date); console.log(`Rendering seat map for ${movieId} at ${showtime} on ${formatDateYYYYMMDD(date)}. Booked:`, bookedSeatIds); for (let r = 0; r < rows; r++) { const rowDiv = document.createElement('div'); rowDiv.className = 'seat-row'; const rowLetter = String.fromCharCode(65 + r); for (let c = 0; c < cols; c++) { if (c === 2 || c === 6) { const spacer = document.createElement('div'); spacer.className = 'seat-spacer'; rowDiv.appendChild(spacer); } const seatId = `${rowLetter}${c + 1}`; const seatDiv = document.createElement('div'); seatDiv.className = 'seat'; seatDiv.id = `seat-${seatId}`; seatDiv.dataset.seatId = seatId; seatDiv.innerHTML = `<i class="fas fa-chair"></i>`; if (bookedSeatIds.includes(seatId)) { seatDiv.classList.add('unavailable'); } else { seatDiv.onclick = () => toggleSeatSelection(seatId); } rowDiv.appendChild(seatDiv); } seatGrid.appendChild(rowDiv); } }
 function toggleSeatSelection(seatId) { const seatElement = document.getElementById(`seat-${seatId}`); if (!seatElement || seatElement.classList.contains('unavailable')) { return; } const index = selectedSeats.indexOf(seatId); if (index > -1) { selectedSeats.splice(index, 1); seatElement.classList.remove('selected'); } else { selectedSeats.push(seatId); seatElement.classList.add('selected'); } updateSelectedSeatsInfo(); }
-function updateSelectedSeatsInfo() { if (selectedSeats.length === 0) { selectedSeatsInfo.textContent = 'Selected Seats: None'; confirmSelectionButton.disabled = true; } else { selectedSeatsInfo.textContent = `Selected Seats: ${selectedSeats.sort().join(', ')}`; const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked'); confirmSelectionButton.disabled = !selectedShowtimeRadio; } }
+function updateSelectedSeatsInfo() { if (selectedSeats.length === 0) { selectedSeatsInfo.textContent = 'Selected Seats: None'; confirmSelectionButton.disabled = true; } else { selectedSeatsInfo.textContent = `Selected Seats: ${selectedSeats.sort().join(', ')}`; const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked:not(:disabled)'); const selectedDateValid = !!currentSelectedDate; confirmSelectionButton.disabled = !selectedShowtimeRadio || !selectedDateValid; } }
+
+// --- Payment Modal Logic ---
+function openPaymentModal() {
+    if (!currentModalMovieId || !currentSelectedDate || selectedSeats.length === 0) { alert("Please select a movie, date, showtime, and seats first."); return; }
+    const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+    if (!selectedShowtimeRadio) { alert("Please select a showtime."); return; }
+
+    const movie = movies.find(m => m.movieId === currentModalMovieId);
+    const showtime = selectedShowtimeRadio.value;
+    const totalCost = selectedSeats.length * TICKET_PRICE_EGP;
+
+    // Populate payment modal details
+    paymentMovieTitle.textContent = movie?.title || 'N/A';
+    paymentSelectedDate.textContent = formatDateReadable(currentSelectedDate);
+    paymentShowtime.textContent = showtime;
+    paymentSeats.textContent = selectedSeats.sort().join(', ');
+    paymentTotalCost.textContent = `${totalCost} EGP`;
+
+    hideError(paymentErrorElement); // Clear previous errors
+    paymentForm.reset(); // Clear form fields
+    showElement(paymentModal);
+}
+
+function closePaymentModal() { hideElement(paymentModal); }
+
+function handlePaymentFormSubmit(event) {
+     event.preventDefault(); // Prevent default form submission if needed
+     hideError(paymentErrorElement);
+
+     // Gather data (already have most from state vars)
+     const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+     if (!currentModalMovieId || !currentSelectedDate || selectedSeats.length === 0 || !selectedShowtimeRadio || !authState.isLoggedIn || authState.user.type !== 'customer') {
+         displayError(paymentErrorElement, "Booking information incomplete or invalid session.");
+         return;
+     }
+
+     // Fake Payment Details
+     const cardName = document.getElementById('cardholder-name').value.trim();
+     const cardNumber = document.getElementById('card-number').value.trim();
+     const cardCvv = document.getElementById('card-cvv').value.trim();
+     const cardExpiry = document.getElementById('card-expiry').value.trim();
+
+     // Basic validation (can be more sophisticated)
+     if (!cardName || !cardNumber || !cardCvv || !cardExpiry) {
+         displayError(paymentErrorElement, "Please fill in all payment details.");
+         return;
+     }
+
+     const movie = movies.find(m => m.movieId === currentModalMovieId);
+     const showtime = selectedShowtimeRadio.value;
+     const totalAmount = selectedSeats.length * TICKET_PRICE_EGP;
+     const bookingId = generateId();
+     const timestamp = new Date().toISOString();
+     const userEmail = authState.user.email;
+
+     // Save seat availability map FIRST
+     saveBookedSeats(currentModalMovieId, showtime, currentSelectedDate, selectedSeats);
+
+     // Create the detailed booking object
+     const newBooking = {
+         bookingId: bookingId,
+         userEmail: userEmail,
+         movieId: currentModalMovieId,
+         movieTitle: movie?.title || 'Unknown Movie',
+         selectedDate: formatDateYYYYMMDD(currentSelectedDate), // Store consistent format
+         showtime: showtime,
+         seats: [...selectedSeats],
+         paymentInfo: { cardName, cardNumber: "**** **** **** " + cardNumber.slice(-4), cardExpiry }, // Mask card number
+         totalAmount: totalAmount,
+         timestamp: timestamp
+     };
+
+     // Add to central booking list
+     addBookingToList(newBooking);
+
+     // --- Success Feedback ---
+     alert(`Booking Successful!\nMovie: ${newBooking.movieTitle}\nDate: ${formatDateReadable(newBooking.selectedDate)}\nTime: ${newBooking.showtime}\nSeats: ${newBooking.seats.join(', ')}\nAmount: ${newBooking.totalAmount} EGP`);
+
+     closePaymentModal();
+     closeModal(); // Close movie details modal too
+
+     // Refresh relevant views if active
+     if (isShowingMyBookings) { renderMyBookings(); }
+     if (adminView && !adminView.classList.contains('is-hidden')) { if (currentAdminTab === 'admin-bookings-section') renderAdminBookingsList(); if (currentAdminTab === 'admin-analytics') renderAnalyticsDashboard(); }
+     if (vendorDashboardView && !vendorDashboardView.classList.contains('is-hidden')) { renderVendorDashboard(); } // Refresh vendor view
+}
+
 
 // --- Admin Tab Switching ---
 function handleAdminTabClick(event) { const targetId = event.target.dataset.target; const validTargets = ['admin-manage-movies', 'admin-analytics', 'admin-bookings-section', 'admin-qr-scanner-section', 'admin-manage-vendors']; if (!targetId || targetId === currentAdminTab || !validTargets.includes(targetId)) { return; } currentAdminTab = targetId; adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === targetId); }); renderAdminContent(); }
 
 // --- QR Code Scanner Logic ---
 function startQrScanner() { if (html5QrCodeScanner?.getState() === Html5QrcodeScannerState.SCANNING) { return; } if (!adminQrReaderElement) { scanStatusElement.textContent = "Error: Scanner display area missing."; return; } scanStatusElement.textContent = "Initializing Camera..."; startScanBtn.disabled = true; startScanBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Starting...'; if (!html5QrCodeScanner) { html5QrCodeScanner = new Html5Qrcode("admin-qr-reader"); } const config = { fps: 10, qrbox: { width: 250, height: 250 }, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] }; html5QrCodeScanner.start( { facingMode: "environment" }, config, onScanSuccess, onScanFailure ).then(() => { scanStatusElement.textContent = "Scanning... Point camera at QR code."; startScanBtn.textContent = "Stop Scanning"; startScanBtn.disabled = false; startScanBtn.onclick = stopQrScanner; console.log("QR Scanner started."); }).catch(err => { console.error("Error starting QR scanner:", err); scanStatusElement.textContent = `Error: Could not start scanner (${err})`; startScanBtn.textContent = "Start Scanning"; startScanBtn.disabled = false; startScanBtn.onclick = startQrScanner; }); }
-function stopQrScanner() { if (html5QrCodeScanner?.getState() === Html5QrcodeScannerState.SCANNING) { html5QrCodeScanner.stop().then(() => { console.log("QR Scanner stopped successfully."); scanStatusElement.textContent = "Scanner stopped. Click Start Scanning to scan again."; startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; adminQrReaderElement.innerHTML = ""; }).catch(err => { console.error("Error stopping QR scanner:", err); scanStatusElement.textContent = "Error stopping scanner."; startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; }); } else { console.log("Scanner not running or already stopped."); scanStatusElement.textContent = "Scanner is not running."; startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; adminQrReaderElement.innerHTML = ""; } }
+function stopQrScanner() { if (html5QrCodeScanner?.getState() === Html5QrcodeScannerState.SCANNING) { html5QrCodeScanner.stop().then(() => { console.log("QR Scanner stopped successfully."); scanStatusElement.textContent = "Scanner stopped. Click Start Scanning to scan again."; startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; adminQrReaderElement.innerHTML = ""; }).catch(err => { console.error("Error stopping QR scanner:", err); scanStatusElement.textContent = "Error stopping scanner."; startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; }); } else { console.log("Scanner not running or already stopped."); if(scanStatusElement) scanStatusElement.textContent = "Scanner is not running."; if(startScanBtn) { startScanBtn.textContent = "Start Scanning"; startScanBtn.onclick = startQrScanner; } if(adminQrReaderElement) adminQrReaderElement.innerHTML = ""; } }
 function onScanSuccess(decodedText, decodedResult) { console.log(`Code matched = ${decodedText}`, decodedResult); stopQrScanner(); scanStatusElement.textContent = `Scan successful! Validating...`; try { const bookingData = JSON.parse(decodedText); if (bookingData && bookingData.bookingId && bookingData.movieTitle && bookingData.showtime && bookingData.seats && bookingData.userEmail) { handleValidScan(bookingData); } else { throw new Error("Invalid QR code data structure."); } } catch (e) { console.error("Error parsing QR code data:", e); scanStatusElement.textContent = "Error: Invalid QR code data format."; alert("Scanned code does not contain valid booking information."); } }
 function onScanFailure(error) { /* Optional */ }
 function handleValidScan(bookingData) { loadUsedQrCodes(); const isUsed = isQrCodeUsed(bookingData.bookingId); validationMovieTitle.textContent = bookingData.movieTitle || 'N/A'; validationShowtime.textContent = bookingData.showtime || 'N/A'; validationSeats.textContent = Array.isArray(bookingData.seats) ? bookingData.seats.sort().join(', ') : 'N/A'; validationEmail.textContent = bookingData.userEmail || 'N/A'; validationBookingId.textContent = bookingData.bookingId || 'N/A'; qrValidationModal.dataset.bookingId = bookingData.bookingId || ''; if (isUsed) { validationStatusElement.textContent = "This QR Code has already been used."; validationStatusElement.className = 'status-used'; markUsedBtn.disabled = true; } else { validationStatusElement.textContent = "QR Code is valid and not yet used."; validationStatusElement.className = 'status-ok'; markUsedBtn.disabled = false; } showElement(qrValidationModal); }
@@ -244,7 +402,11 @@ function initializeApp() {
     validationModalCloseBtn.addEventListener('click', closeValidationModal);
     validationModalCloseBtnSecondary.addEventListener('click', closeValidationModal);
     markUsedBtn.addEventListener('click', () => { const bookingIdToMark = qrValidationModal.dataset.bookingId; if (markQrCodeAsUsed(bookingIdToMark)) { validationStatusElement.textContent = "Successfully marked as used!"; validationStatusElement.className = 'status-used'; markUsedBtn.disabled = true; if (currentAdminTab === 'admin-bookings-section') { renderAdminBookingsList(); } } else { validationStatusElement.textContent = "Already marked as used or error occurred."; validationStatusElement.className = 'status-error'; markUsedBtn.disabled = true; } });
-    confirmSelectionButton.addEventListener('click', () => { const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked'); if (!currentModalMovieId || !authState.isLoggedIn || !authState.user || authState.user.type !== 'customer') { alert("An error occurred. Please ensure you are logged in and try again."); return; } if (!selectedShowtimeRadio) { alert("Please select a showtime."); return; } if (selectedSeats.length === 0) { alert("Please select at least one seat."); return; } const selectedShowtime = selectedShowtimeRadio.value; const currentMovie = movies.find(m => m.movieId === currentModalMovieId); const movieTitle = currentMovie?.title || 'Selected Movie'; const userEmail = authState.user.email; const bookingId = generateId(); console.log("Confirming Booking:", { bookingId: bookingId, movieId: currentModalMovieId, showtime: selectedShowtime, seats: selectedSeats, user: userEmail }); saveBookedSeats(currentModalMovieId, selectedShowtime, selectedSeats); const newBooking = { bookingId: bookingId, userEmail: userEmail, movieId: currentModalMovieId, movieTitle: movieTitle, showtime: selectedShowtime, seats: [...selectedSeats] }; addBookingToList(newBooking); alert(`Booking confirmed!\nMovie: ${movieTitle}\nShowtime: ${selectedShowtime}\nSeats: ${selectedSeats.sort().join(', ')}`); closeModal(); if (isShowingMyBookings) { renderMyBookings(); } if (adminView && !adminView.classList.contains('is-hidden')) { if (currentAdminTab === 'admin-bookings-section') renderAdminBookingsList(); if (currentAdminTab === 'admin-analytics') renderAnalyticsDashboard(); } });
+    confirmSelectionButton.addEventListener('click', openPaymentModal); // Open payment modal instead of direct booking
+    paymentModalCloseBtn.addEventListener('click', closePaymentModal);
+    paymentModalCloseBtnSecondary.addEventListener('click', closePaymentModal);
+    payNowBtn.addEventListener('click', handlePaymentFormSubmit); // Handle fake payment
+
     // Hide splash and render UI
     setTimeout(() => { hideElement(splashScreen); renderUI(); }, 1500);
 }
