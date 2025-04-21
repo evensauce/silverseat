@@ -2,7 +2,7 @@
 import {
     db, auth,
     collection, getDocs, addDoc, doc, setDoc, getDoc, query, where, updateDoc, deleteDoc, writeBatch, serverTimestamp, Timestamp, onSnapshot,
-    createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, orderBy
 } from './firebase.js';
 
 // --- Constants ---
@@ -835,29 +835,50 @@ function showMyBookingsView() {
     showElement(myBookingsView);
     toggleMyBookingsBtn.innerHTML = '<i class="fas fa-film mr-2"></i>Now Showing';
 }
-// Render My Bookings (Using Firestore data)
-function renderMyBookings() {
-    myBookingsListContainer.innerHTML = '<p class="text-gray-500">Loading your bookings...</p>'; // Loading state
+
+// Render My Bookings (Fetch directly from Firestore on demand)
+
+async function renderMyBookings() {
+    myBookingsListContainer.innerHTML = '<p class="text-gray-500">Loading your bookings...</p>'; // Set loading state
+
+    // 1. Check if user is logged in
     if (!authState.isLoggedIn || !authState.user || !authState.user.uid) {
         myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: Login required to view bookings.</p>';
         return;
     }
     const currentUserUid = authState.user.uid;
 
-    // Filter pre-loaded bookings for the current user
-    const userBookings = allBookings
-        .filter(booking => booking.userId === currentUserUid)
-        .sort((a, b) => (b.timestamp?.toDate?.() || 0) - (a.timestamp?.toDate?.() || 0)); // Sort by Firestore Timestamp
+    try {
+        // 2. Query Firestore specifically for this user's bookings, ordered by time
+        console.log(`Fetching bookings from Firestore for user: ${currentUserUid}`);
+        const q = query(
+            collection(db, "bookings"),
+            where("userId", "==", currentUserUid),
+            orderBy("timestamp", "desc") // Order by newest first
+        );
+        const querySnapshot = await getDocs(q);
 
-    if (userBookings.length === 0) {
-        myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>';
-        return;
+        // 3. Process the results
+        const userBookings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log(`Found ${userBookings.length} bookings for user.`);
+
+        if (userBookings.length === 0) {
+            myBookingsListContainer.innerHTML = '<p class="text-gray-500">You have no bookings yet.</p>';
+            return;
+        }
+
+        // 4. Render the fetched bookings
+        myBookingsListContainer.innerHTML = ''; // Clear loading/previous messages
+        userBookings.forEach(booking => {
+            // createBookingListItem should still work as it takes a booking object
+            myBookingsListContainer.appendChild(createBookingListItem(booking, 'customer'));
+        });
+
+    } catch (error) {
+        // 5. Handle errors during fetch
+        console.error("Error fetching user bookings:", error);
+        myBookingsListContainer.innerHTML = '<p class="text-red-600">Could not load your bookings. Please try again.</p>';
     }
-
-    myBookingsListContainer.innerHTML = ''; // Clear loading/previous
-    userBookings.forEach(booking => {
-        myBookingsListContainer.appendChild(createBookingListItem(booking, 'customer'));
-    });
 }
 
 // --- Admin/Vendor Analytics ---
@@ -1378,12 +1399,44 @@ function renderAdminVendorManagement() {
 }
 function renderVendorList() {
     if (!adminVendorListContainer) return;
-    adminVendorListContainer.innerHTML = '';
+    adminVendorListContainer.innerHTML = ''; // Clear previous
 
     if (vendors.length === 0) {
         adminVendorListContainer.innerHTML = '<p class="text-gray-500">No vendors registered yet.</p>';
         return;
     }
+
+    vendors.forEach((vendor) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'vendor-list-item';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'flex-grow pr-4';
+        infoDiv.innerHTML = `<span class="font-medium text-gray-800">${vendor.name}</span><span class="block text-sm text-gray-500">${vendor.email}</span>`;
+
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'flex-shrink-0 flex gap-2';
+
+        // Edit Button
+        const editButton = document.createElement('button');
+        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2 edit-vendor-btn'; // Add class
+        editButton.dataset.vendorId = vendor.id; // Add data attribute
+        editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
+        // REMOVE inline onclick logic
+
+        // Delete Button
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2 delete-vendor-btn'; // Add class
+        deleteButton.dataset.vendorId = vendor.id; // Add data attribute
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        // REMOVE inline onclick logic
+
+        controlsDiv.appendChild(editButton);
+        controlsDiv.appendChild(deleteButton);
+        itemDiv.appendChild(infoDiv);
+        itemDiv.appendChild(controlsDiv);
+        adminVendorListContainer.appendChild(itemDiv);
+    });
     
 
     vendors.forEach((vendor) => {
@@ -1731,14 +1784,19 @@ function createMovieCard(movie, _indexUnused, viewType) {
     if (viewType === 'admin') {
         const adminControls = document.createElement('div');
         adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2';
+        
         const editButton = document.createElement('button');
         editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
-        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2';
-        editButton.onclick = (e) => { e.stopPropagation(); showEditForm(movie.id); }; // Pass Firestore ID
+        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2 edit-movie-btn'; // Add class
+        editButton.dataset.movieId = movie.id; // Add data attribute for ID
+        // REMOVE: editButton.onclick = (e) => { e.stopPropagation(); showEditForm(movie.id); };
+        
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
-        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2';
-        deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(movie.id); }; // Pass Firestore ID
+        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2 delete-movie-btn'; // Add class
+        deleteButton.dataset.movieId = movie.id; // Add data attribute for ID
+        // REMOVE: deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(movie.id); };
+        
         adminControls.appendChild(editButton);
         adminControls.appendChild(deleteButton);
         card.appendChild(adminControls);
@@ -2511,17 +2569,16 @@ function initializeApp() {
 
     // Event listeners (Mostly unchanged)
     customerLoginForm.addEventListener('submit', handleCustomerLogin);
-// customerRegisterForm.addEventListener('submit', handleRegistration); // REMOVE old listener
-    sendOtpButton.addEventListener('click', handleSendOtp); // ADD listener for OTP button
-    customerRegisterForm.addEventListener('submit', handleVerifyOtpAndRegister); // ADD listener for form submission (which now means verify+register)
+    sendOtpButton.addEventListener('click', handleSendOtp);
+    customerRegisterForm.addEventListener('submit', handleVerifyOtpAndRegister);
     adminLoginForm.addEventListener('submit', handleAdminLogin);
     vendorLoginForm.addEventListener('submit', handleVendorLogin);
     showRegisterButton.addEventListener('click', showCustomerRegisterForm);
     showAdminLoginButton.addEventListener('click', showAdminLoginForm);
-    showVendorLoginButton.addEventListener('click', showVendorLoginForm);
+    showVendorLoginButton.addEventListener('click', showVendorLoginButton);
     backToCustomerLoginButtons.forEach(btn => btn.addEventListener('click', showCustomerLoginForm));
     logoutButton.addEventListener('click', handleLogout);
-    adminNavButtons.forEach(btn => btn.addEventListener('click', handleAdminTabClick)); // Use currentTarget in handler
+    adminNavButtons.forEach(btn => btn.addEventListener('click', handleAdminTabClick));
     movieForm.addEventListener('submit', handleMovieFormSubmit);
     cancelEditButton.addEventListener('click', resetForm);
     vendorForm.addEventListener('submit', handleVendorFormSubmit);
@@ -2530,20 +2587,71 @@ function initializeApp() {
     movieDetailsModal.addEventListener('click', (e) => { if (e.target === movieDetailsModal) closeModal(); });
     toggleMyBookingsBtn.addEventListener('click', () => { isShowingMyBookings ? showCustomerMovieListView() : showMyBookingsView(); });
     backToMoviesBtn.addEventListener('click', showCustomerMovieListView);
-    startScanBtn.addEventListener('click', startQrScanner); // Initial setup
+    startScanBtn.addEventListener('click', startQrScanner);
     validationModalCloseBtn.addEventListener('click', closeValidationModal);
     validationModalCloseBtnSecondary.addEventListener('click', closeValidationModal);
-    markUsedBtn.addEventListener('click', markQrCodeAsUsed); // Call async function
+    markUsedBtn.addEventListener('click', markQrCodeAsUsed);
     confirmSelectionButton.addEventListener('click', openPaymentModal);
     paymentModalCloseBtn.addEventListener('click', closePaymentModal);
     paymentModalCloseBtnSecondary.addEventListener('click', closePaymentModal);
-    payNowBtn.addEventListener('click', handlePaymentFormSubmit); // Call async function
+    payNowBtn.addEventListener('click', handlePaymentFormSubmit);
     qrZoomCloseBtn.addEventListener('click', closeQrZoomModal);
-    qrZoomModal.addEventListener('click', (e) => { // Close if clicking background
-    if (e.target === qrZoomModal) {
-        closeQrZoomModal();
-    }
-});
+    qrZoomModal.addEventListener('click', (e) => { if (e.target === qrZoomModal) closeQrZoomModal(); });
+
+        // Event Delegation for Admin Movie List actions (Edit/Delete)
+        if (adminMovieListContainer) { // Check if container exists
+            adminMovieListContainer.addEventListener('click', (event) => {
+                const targetButton = event.target.closest('button'); // Find the clicked button
+                if (!targetButton) return; // Exit if click wasn't on or inside a button
+    
+                if (targetButton.classList.contains('delete-movie-btn')) {
+                    event.stopPropagation(); // Prevent card click if needed
+                    const movieId = targetButton.dataset.movieId;
+                    if (movieId) {
+                        deleteMovie(movieId); // Call your delete function
+                    } else {
+                        console.error("Missing data-movie-id on delete button");
+                    }
+                } else if (targetButton.classList.contains('edit-movie-btn')) {
+                     event.stopPropagation();
+                     const movieId = targetButton.dataset.movieId;
+                     if (movieId) {
+                        showEditForm(movieId); // Call your edit function
+                     } else {
+                         console.error("Missing data-movie-id on edit button");
+                     }
+                }
+            });
+        } else {
+            console.warn("Admin movie list container not found for event delegation.");
+        }
+    
+    
+        // Event Delegation for Admin Vendor List actions (Edit/Delete)
+        if (adminVendorListContainer) { // Check if container exists
+            adminVendorListContainer.addEventListener('click', (event) => {
+                const targetButton = event.target.closest('button'); // Find the clicked button
+                if (!targetButton) return; // Exit if click wasn't on or inside a button
+    
+                if (targetButton.classList.contains('delete-vendor-btn')) {
+                    const vendorId = targetButton.dataset.vendorId;
+                    if (vendorId) {
+                        deleteVendor(vendorId); // Call your delete function
+                    } else {
+                         console.error("Missing data-vendor-id on delete button");
+                    }
+                } else if (targetButton.classList.contains('edit-vendor-btn')) {
+                     const vendorId = targetButton.dataset.vendorId;
+                     if (vendorId) {
+                        showEditVendorForm(vendorId); // Call your edit function
+                     } else {
+                         console.error("Missing data-vendor-id on edit button");
+                     }
+                }
+            });
+        } else {
+            console.warn("Admin vendor list container not found for event delegation.");
+        }
 
     // --- Firebase Auth State Listener ---
     onAuthStateChanged(auth, async (user) => {
