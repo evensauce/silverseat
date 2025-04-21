@@ -119,6 +119,15 @@ const otpSection = document.getElementById('otp-section');
 const otpInput = document.getElementById('register-otp');
 const sendOtpButton = document.getElementById('send-otp-button');
 const registerSubmitButton = document.getElementById('register-submit-button');
+const bookingSuccessModal = document.getElementById('booking-success-modal');
+const successModalCloseBtn = document.getElementById('success-modal-close-btn');
+const successModalCloseBtnSecondary = document.getElementById('success-modal-close-btn-secondary');
+const successMovieTitle = document.getElementById('success-movie-title');
+const successSelectedDate = document.getElementById('success-selected-date');
+const successShowtime = document.getElementById('success-showtime');
+const successSeats = document.getElementById('success-seats');
+const successTotalCost = document.getElementById('success-total-cost');
+const successBookingId = document.getElementById('success-booking-id');
 
 // --- State ---
 let movies = [];       // Holds movie data fetched from Firestore
@@ -1211,17 +1220,26 @@ async function handleRegistration(event) {
 }
 
 async function handleVendorLogin(event) {
+    console.log("Attempting Vendor Login..."); // ADD THIS LOG
     event.preventDefault();
     hideError(vendorLoginError);
     const email = document.getElementById('vendor-email').value.trim();
     const password = document.getElementById('vendor-password').value;
     try {
+        // Attempt sign in
         await signInWithEmailAndPassword(auth, email, password);
-        // Success: onAuthStateChanged handles role check and UI update
+        // !! IMPORTANT: If this line succeeds, Firebase Auth considers the user logged in.
+        // The rest depends on onAuthStateChanged correctly identifying the role.
+        console.log("Vendor signInWithEmailAndPassword successful (waiting for onAuthStateChanged)..."); // ADD THIS LOG
+
+        // We don't set local storage here; onAuthStateChanged handles confirmation
         vendorLoginForm.reset();
     } catch (error) {
-        console.error("Vendor Login Error:", error);
+        // This block runs if signInWithEmailAndPassword FAILS (wrong password, user not found etc.)
+        console.error("Vendor Login Firebase Auth Error:", error.code, error.message); // Log specific code
         displayError(vendorLoginError, "Invalid vendor email or password.");
+        // Clear potentially stale optimistic login data if login fails
+        localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
     }
 }
 
@@ -2296,19 +2314,36 @@ async function handlePaymentFormSubmit(event) {
 
     try {
         const docRef = await addDoc(collection(db, "bookings"), newBookingData);
-        console.log("Booking added with ID:", docRef.id);
-
-         // Add the new booking to the local cache immediately
-        allBookings.push({ id: docRef.id, ...newBookingData, timestamp: new Date() }); // Use local date temporarily
-
-        // --- Success Feedback ---
-        alert(`Booking Successful!\nMovie: ${newBookingData.movieTitle}\nDate: ${formatDateReadable(new Date(newBookingData.selectedDate.replace(/-/g, '\/')))}\nTime: ${newBookingData.showtime}\nSeats: ${newBookingData.seats.join(', ')}\nAmount: ${newBookingData.totalAmount} EGP`); // Corrected date formatting for alert
-
-        closePaymentModal();
-        closeModal(); // Close movie details modal too
-
+        const newBookingId = docRef.id; // Get the newly created booking ID
+        console.log("Booking added with ID:", newBookingId);
+    
+        // Add the new booking to the local cache immediately
+        // Ensure timestamp is handled appropriately if needed immediately elsewhere
+        allBookings.push({ id: newBookingId, ...newBookingData, timestamp: Timestamp.now() }); // Use Firestore Timestamp for consistency
+    
+        // --- Success: Show Custom Modal ---
+        // Populate the success modal
+        if(successMovieTitle) successMovieTitle.textContent = newBookingData.movieTitle;
+        // Format date string back to readable format for modal display
+        const dateForModal = newBookingData.selectedDate ? new Date(newBookingData.selectedDate.replace(/-/g, '/')) : null; // Handle potential null date
+        if(successSelectedDate && dateForModal) successSelectedDate.textContent = formatDateReadable(dateForModal); else if (successSelectedDate) successSelectedDate.textContent = 'N/A';
+        if(successShowtime) successShowtime.textContent = newBookingData.showtime;
+        if(successSeats) successSeats.textContent = newBookingData.seats.join(', ');
+        if(successTotalCost) successTotalCost.textContent = `${newBookingData.totalAmount} EGP`;
+        if(successBookingId) successBookingId.textContent = newBookingId; // Display the ID
+    
+        closePaymentModal(); // Close payment modal first
+        closeModal(); // Close movie details modal
+        if (bookingSuccessModal) { // Check if modal exists
+            showElement(bookingSuccessModal); // Show the success modal
+        } else { // Fallback alert if modal element is missing
+            alert(`Booking Successful!\nMovie: ${newBookingData.movieTitle}\nDate: ${formatDateReadable(dateForModal)}\nTime: ${newBookingData.showtime}\nSeats: ${newBookingData.seats.join(', ')}\nAmount: ${newBookingData.totalAmount} EGP\nBooking ID: ${newBookingId}`);
+        }
+        // --- End Success Modal Handling ---
+    
+    
         // Refresh relevant views using the updated local allBookings array
-        if (isShowingMyBookings) { renderMyBookings(); } // Uses updated allBookings
+        if (isShowingMyBookings) { await renderMyBookings(); } // Refresh if already on bookings view
 
         if (adminView && !adminView.classList.contains('is-hidden')) {
             if (currentAdminTab === 'admin-bookings-section') {
@@ -2617,6 +2652,12 @@ function closeQrZoomModal() {
     }
 }
 
+function closeSuccessModal() {
+    if (bookingSuccessModal) { // Check if element exists
+        hideElement(bookingSuccessModal);
+    }
+}
+
 function formatCardNumber(event) {
     const input = event.target;
     let value = input.value.replace(/\D/g, ''); // Remove non-digit characters
@@ -2674,6 +2715,7 @@ function initializeApp() {
     customerRegisterForm.addEventListener('submit', handleVerifyOtpAndRegister);
     adminLoginForm.addEventListener('submit', handleAdminLogin);
     vendorLoginForm.addEventListener('submit', handleVendorLogin);
+    showVendorLoginButton.addEventListener('click', showVendorLoginForm);
     showRegisterButton.addEventListener('click', showCustomerRegisterForm);
     showAdminLoginButton.addEventListener('click', showAdminLoginForm);
     showVendorLoginButton.addEventListener('click', showVendorLoginButton);
@@ -2720,6 +2762,13 @@ function initializeApp() {
         console.log("Card expiry listener attached."); // Add log
     } else {
         console.warn("Card expiry input not found for listener attachment.");
+    }
+
+    if (successModalCloseBtn) {
+        successModalCloseBtn.addEventListener('click', closeSuccessModal);
+    }
+    if (successModalCloseBtnSecondary) {
+        successModalCloseBtnSecondary.addEventListener('click', closeSuccessModal);
     }
     // Optional: Add blur validation for CVV if needed
     // if (cardCvvInput) {

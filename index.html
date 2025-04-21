@@ -526,6 +526,31 @@
          </div> <!-- End modal-content -->
      </div> <!-- End payment-modal -->
 
+     <!-- Booking Success Modal -->
+     <div id="booking-success-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden" style="z-index: 120;"> <!-- Ensure z-index is high -->
+        <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b bg-green-50"> <!-- Green header -->
+                <h2 class="text-xl font-semibold text-green-800"> <i class="fas fa-check-circle mr-2"></i>Booking Successful!</h2>
+                <button id="success-modal-close-btn" class="text-green-700 hover:text-green-900 text-2xl">×</button>
+            </div>
+            <div class="modal-body p-6 space-y-3">
+                <p class="text-gray-700">Your booking details:</p>
+                <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm">
+                     <p><strong>Movie:</strong> <span id="success-movie-title">--</span></p>
+                     <p><strong>Date:</strong> <span id="success-selected-date">--</span></p>
+                     <p><strong>Showtime:</strong> <span id="success-showtime">--</span></p>
+                     <p><strong>Seats:</strong> <span id="success-seats" class="font-mono">--</span></p>
+                     <p class="mt-2"><strong>Total Cost:</strong> <span id="success-total-cost">0 EGP</span></p>
+                     <p class="mt-2 text-xs text-gray-500"><strong>Booking ID:</strong> <span id="success-booking-id">--</span></p>
+                </div>
+                <p class="text-gray-600 text-sm">You can view this booking and your QR code under "My Bookings".</p>
+            </div>
+            <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
+                 <button id="success-modal-close-btn-secondary" class="btn btn-primary">OK</button> <!-- Use primary style for main action -->
+            </div>
+        </div> <!-- End modal-content -->
+    </div> <!-- End booking-success-modal -->
+
      <!-- Load main script as module -->
      <script type="module" src="script.js"></script>
 
