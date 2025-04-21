@@ -237,29 +237,88 @@
                  </div>
             </div> <!-- End admin-manage-movies section -->
 
-            <!-- Admin Section: Analytics -->
-            <div id="admin-analytics" class="admin-section is-hidden space-y-6">
-                 <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
-                 <div class="analytics-card">
-                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Total Revenue</h3>
-                     <p id="admin-total-revenue" class="text-2xl font-bold text-green-600">0 EGP</p>
+               <!-- Admin Section: Analytics (REVISED STRUCTURE) -->
+    <div id="admin-analytics" class="admin-section space-y-6"> <!-- Removed is-hidden if active by default -->
+        <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
+
+        <!-- Summary Box -->
+        <div id="admin-summary-box" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="summary-card">
+                <h3 class="summary-card-title">Total Revenue</h3>
+                <p id="admin-total-revenue" class="summary-card-value text-green-600">0 EGP</p>
+            </div>
+            <div class="summary-card">
+                <h3 class="summary-card-title">Seats Booked Today</h3>
+                <p id="admin-seats-today" class="summary-card-value text-blue-600">0</p>
+            </div>
+            <div class="summary-card">
+                <h3 class="summary-card-title">Overall Daily Capacity</h3>
+                <p id="admin-capacity-today" class="summary-card-value text-purple-600">0%</p>
+                <p id="admin-capacity-detail" class="text-xs text-gray-500 mt-1">Based on scheduled showtimes today</p>
+            </div>
+        </div>
+
+        <!-- Daily Highlights -->
+        <div id="admin-daily-highlights" class="analytics-card">
+             <h3 class="text-lg font-semibold mb-3 text-gray-600">Today's Booking Highlights</h3>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                 <div>
+                     <span class="font-medium text-gray-500 block">Most Booked Movie:</span>
+                     <span id="admin-most-booked-today" class="text-gray-800 font-semibold">--</span>
                  </div>
-                 <div class="analytics-card">
-                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
-                     <div id="analytics-avg-ratings" class="space-y-2">
-                         <p class="text-gray-500">No ratings data available.</p>
-                         <!-- Ratings populated by JS -->
-                     </div>
+                  <div>
+                     <span class="font-medium text-gray-500 block">Least Booked Movie:</span>
+                     <span id="admin-least-booked-today" class="text-gray-800 font-semibold">--</span>
                  </div>
-                 <div class="analytics-card">
-                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy (Based on Bookings)</h3>
-                     <div id="analytics-occupancy" class="space-y-4">
-                         <p class="text-gray-500">No movie data available for occupancy analysis.</p>
-                         <!-- Occupancy populated by JS -->
-                     </div>
-                 </div>
-                 <!-- Monthly seats card will be appended here by JS -->
-            </div> <!-- End admin-analytics section -->
+             </div>
+        </div>
+
+        <!-- *** NEW: Daily Movie Performance Section *** -->
+        <div id="admin-daily-movie-performance" class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-600">Today's Performance Per Movie</h3>
+            <div id="daily-movie-perf-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <!-- Daily movie performance cards populated by JS -->
+                 <p class="text-gray-500 md:col-span-2">Loading daily movie data...</p>
+            </div>
+        </div>
+        <!-- *** END NEW SECTION *** -->
+
+        <!-- Weekly Occupancy Analysis -->
+        <div id="admin-weekly-occupancy" class="analytics-card">
+            <h3 class="text-lg font-semibold mb-3 text-gray-600">Weekly Movie Performance (Avg. Last 7 Days)</h3>
+            <div class="overflow-x-auto">
+                <table id="admin-weekly-occupancy-table" class="w-full text-sm text-left text-gray-600">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-2">Movie Title</th>
+                            <th scope="col" class="px-4 py-2 text-right">Avg. Seats Booked</th>
+                            <th scope="col" class="px-4 py-2 text-right">Avg. % Occupancy</th>
+                            <th scope="col" class="px-4 py-2 text-center">Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows populated by JS -->
+                        <tr class="bg-white border-b">
+                            <td colspan="4" class="px-4 py-3 text-center text-gray-500">Loading weekly data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Existing Sections (Keep if needed) -->
+        <div class="analytics-card">
+            <h3 class="text-lg font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
+            <div id="analytics-avg-ratings" class="space-y-2">
+                <p class="text-gray-500">No ratings data available.</p>
+                <!-- Ratings populated by JS -->
+            </div>
+        </div>
+
+        <!-- Monthly seats card will still be appended here by JS -->
+        <!-- Ensure the old #analytics-occupancy div is removed -->
+
+    </div> <!-- End admin-analytics section -->
 
             <!-- Admin Section: Bookings List -->
             <div id="admin-bookings-section" class="admin-section is-hidden space-y-6">

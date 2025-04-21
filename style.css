@@ -156,3 +156,157 @@ input[type="radio"]:disabled + .showtime-label, .showtime-label.disabled { backg
     width: auto; /* Maintain aspect ratio */
     height: auto; /* Maintain aspect ratio */
 }
+
+/* Analytics Summary Box */
+.summary-box {
+    /* Styles for the grid container if needed */
+}
+
+.summary-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem; /* Reduced padding */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); /* Lighter shadow */
+    border: 1px solid #e5e7eb; /* Light border */
+    text-align: center; /* Center content */
+}
+
+.summary-card-title {
+    font-weight: 500;
+    color: #6b7280; /* Gray-500 */
+    font-size: 0.875rem; /* text-sm */
+    margin-bottom: 0.25rem;
+}
+
+.summary-card-value {
+    font-size: 1.75rem; /* text-2xl or adjust as needed */
+    font-weight: 600;
+    line-height: 1;
+}
+
+/* Revised Occupancy Labels (for weekly table) */
+.occupancy-label {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 9999px; /* pill shape */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500;
+    text-align: center;
+    min-width: 70px; /* Ensure labels have some width */
+}
+
+.occupancy-empty { background-color: #f3f4f6; color: #6b7280; } /* gray-100 / gray-500 */
+.occupancy-low { background-color: #fff1f2; color: #e11d48; } /* rose-50 / rose-600 */
+.occupancy-moderate { background-color: #fef9c3; color: #ca8a04; } /* yellow-50 / yellow-600 */
+.occupancy-high { background-color: #f0fdf4; color: #16a34a; } /* green-50 / green-600 */
+
+
+/* Weekly Occupancy Table */
+#admin-weekly-occupancy-table {
+    /* Basic table styling */
+    border-collapse: collapse;
+}
+
+#admin-weekly-occupancy-table thead th {
+    font-weight: 600;
+    color: #4b5563; /* Gray-600 */
+    background-color: #f9fafb; /* Slightly off-white */
+}
+
+#admin-weekly-occupancy-table tbody tr:nth-child(even) {
+    background-color: #f9fafb; /* Zebra striping */
+}
+#admin-weekly-occupancy-table tbody tr:hover {
+    background-color: #f3f4f6; /* Hover effect */
+}
+
+#admin-weekly-occupancy-table td, #admin-weekly-occupancy-table th {
+    padding: 0.75rem 1rem; /* py-3 px-4 */
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Ensure analytics card base style is suitable */
+.analytics-card {
+     background-color: white;
+     border-radius: 0.5rem;
+     padding: 1.25rem; /* Increased padding slightly */
+     box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+     border: 1px solid #e5e7eb;
+     margin-bottom: 1.5rem; /* Keep margin */
+}
+
+/* Daily Movie Performance Cards */
+#admin-daily-movie-performance {
+    /* Container styling if needed, but space-y-4 in HTML helps */
+     margin-bottom: 1.5rem; /* Add margin below the section */
+}
+
+#daily-movie-perf-list {
+    /* Grid styling is handled by Tailwind */
+}
+
+.daily-perf-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem; /* Slightly less padding than main analytics cards */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Space between elements */
+}
+
+.daily-perf-card .movie-title {
+    font-weight: 600;
+    color: #1f2937; /* gray-800 */
+    font-size: 1rem; /* text-base */
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Prevent long titles breaking layout */
+}
+
+.daily-perf-card .details {
+    font-size: 0.875rem; /* text-sm */
+    color: #4b5563; /* gray-600 */
+    display: flex;
+    justify-content: space-between; /* Align items horizontally */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 0.5rem;
+}
+
+.daily-perf-card .details .seats {
+    font-weight: 500;
+}
+
+.daily-perf-card .details .percentage {
+    font-weight: 500;
+}
+
+/* Occupancy Bar */
+.occupancy-bar-container {
+    width: 100%;
+    height: 8px; /* Slim bar */
+    background-color: #e5e7eb; /* gray-200 */
+    border-radius: 9999px; /* Rounded */
+    overflow: hidden; /* Clip the inner bar */
+    margin-top: 0.5rem; /* Space above the bar */
+    margin-bottom: 0.5rem; /* Space below the bar */
+}
+
+.occupancy-bar-fill {
+    height: 100%;
+    border-radius: 9999px; /* Rounded */
+    transition: width 0.5s ease-in-out; /* Smooth transition */
+    /* Background color will be set dynamically based on occupancy level */
+}
+
+/* Match bar colors to label colors */
+.occupancy-bar-fill.occupancy-low { background-color: #e11d48; } /* rose-600 */
+.occupancy-bar-fill.occupancy-moderate { background-color: #ca8a04; } /* yellow-600 */
+.occupancy-bar-fill.occupancy-high { background-color: #16a34a; } /* green-600 */
+.occupancy-bar-fill.occupancy-empty { background-color: #d1d5db; } /* gray-300 - for empty */
+
+.daily-perf-card .performance-label-container {
+    text-align: right; /* Align label to the right */
+}

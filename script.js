@@ -890,200 +890,384 @@ async function renderMyBookings() {
     }
 }
 
-// --- Admin/Vendor Analytics ---
+// --- Refactored Analytics Function ---
 function renderAnalyticsDashboard(targetVendorName = null) {
+    console.log(`Rendering analytics for ${targetVendorName ? 'Vendor: ' + targetVendorName : 'Admin'}`);
     const isVendor = targetVendorName !== null;
-    const avgRatingsContainer = isVendor ? vendorAnalyticsAvgRatingsContainer : analyticsAvgRatingsContainer;
-    const occupancyContainer = isVendor ? vendorAnalyticsOccupancyContainer : analyticsOccupancyContainer;
-    const totalRevenueElement = isVendor ? vendorTotalRevenueElement : adminTotalRevenueElement;
-    // Get the correct parent section to append the monthly card later
-    const analyticsSection = isVendor ? document.getElementById('vendor-analytics') : adminAnalyticsSection;
 
-    // --- Basic Check & Clear ---
-    if (!avgRatingsContainer || !occupancyContainer || !totalRevenueElement || !analyticsSection) {
-        console.error("Analytics containers not found.");
-        // Add loading/error states to visible containers if they exist
-        if (avgRatingsContainer) avgRatingsContainer.innerHTML = '<p class="text-red-500">Error: Rating container missing.</p>';
-        if (occupancyContainer) occupancyContainer.innerHTML = '<p class="text-red-500">Error: Occupancy container missing.</p>';
-        if (totalRevenueElement) totalRevenueElement.textContent = 'Error';
-        return;
+    // --- Get DOM Elements ---
+    // (Keep all the getElementById/querySelector calls as they are)
+    const avgRatingsContainer = isVendor ? vendorAnalyticsAvgRatingsContainer : analyticsAvgRatingsContainer;
+    const totalRevenueElement = isVendor ? vendorTotalRevenueElement : adminTotalRevenueElement;
+    const analyticsSection = isVendor ? document.getElementById('vendor-analytics') : adminAnalyticsSection;
+    const seatsTodayElement = !isVendor ? document.getElementById('admin-seats-today') : null;
+    const capacityTodayElement = !isVendor ? document.getElementById('admin-capacity-today') : null;
+    const capacityDetailElement = !isVendor ? document.getElementById('admin-capacity-detail') : null;
+    const mostBookedElement = !isVendor ? document.getElementById('admin-most-booked-today') : null;
+    const leastBookedElement = !isVendor ? document.getElementById('admin-least-booked-today') : null;
+    const weeklyTableBody = !isVendor ? document.querySelector('#admin-weekly-occupancy-table tbody') : null;
+    const dailyMoviePerfList = !isVendor ? document.getElementById('daily-movie-perf-list') : null;
+
+    // --- Basic Check & Clear/Loading States ---
+    if (!analyticsSection || !totalRevenueElement || !avgRatingsContainer) {
+         console.error("Essential analytics containers not found for", isVendor ? "vendor" : "admin");
+         return;
+    }
+     // Check admin-specific elements (This check itself is fine)
+     if (!isVendor && (!seatsTodayElement || !capacityTodayElement || !capacityDetailElement || !mostBookedElement || !leastBookedElement || !weeklyTableBody || !dailyMoviePerfList)) {
+         // Log which element might be null for detailed debugging if needed
+         console.error("One or more specific admin analytics elements are missing.", {
+             seatsTodayElement, capacityTodayElement, capacityDetailElement, mostBookedElement, leastBookedElement, weeklyTableBody, dailyMoviePerfList
+         });
+         if (avgRatingsContainer) avgRatingsContainer.innerHTML = '<p class="text-red-500">Error: UI elements missing.</p>';
+         if (totalRevenueElement) totalRevenueElement.textContent = 'Error';
+         return;
+     }
+
+    // Set loading/default states
+    totalRevenueElement.textContent = '0 EGP';
+    avgRatingsContainer.innerHTML = '<p class="text-gray-500">Loading ratings...</p>';
+    if (!isVendor) {
+        seatsTodayElement.textContent = '0';
+        capacityTodayElement.textContent = '0%';
+        capacityDetailElement.textContent = 'Calculating...';
+        mostBookedElement.textContent = '--';
+        leastBookedElement.textContent = '--';
+        // *** FIX: Removed the duplicate line below ***
+        weeklyTableBody.innerHTML = `<tr class="bg-white border-b"><td colspan="4" class="px-4 py-3 text-center text-gray-500">Loading weekly data...</td></tr>`;
+        dailyMoviePerfList.innerHTML = '<p class="text-gray-500 md:col-span-2">Loading daily movie data...</p>';
+        // The second assignment to weeklyTableBody.innerHTML was removed here
     }
 
-    // Set loading states while calculating
-    avgRatingsContainer.innerHTML = '<p class="text-gray-500">Loading ratings...</p>';
-    occupancyContainer.innerHTML = '<p class="text-gray-500">Loading occupancy...</p>';
-    totalRevenueElement.textContent = '0 EGP';
-    // Remove previous monthly card immediately to prevent duplicates during render
+    // Remove previous monthly card (still generated later)
     const oldMonthlyCard = analyticsSection.querySelector('#admin-monthly-seats-card');
     if (oldMonthlyCard) oldMonthlyCard.remove();
 
+
     // --- Filter Data ---
+    console.log("Analytics: Global data state:", { movies: movies.length, allBookings: allBookings.length }); // Log global counts
     const relevantMovies = isVendor ? movies.filter(m => m.vendorName === targetVendorName) : movies;
     const relevantMovieIds = relevantMovies.map(m => m.id);
+    // Filter bookings for relevant movies only ONCE
     const relevantBookings = allBookings.filter(b => relevantMovieIds.includes(b.movieId));
+    console.log("Analytics: Filtered data:", { relevantMovies: relevantMovies.length, relevantBookings: relevantBookings.length }); // Log filtered counts
+
 
     // --- Handle No Movies Case ---
     if (relevantMovies.length === 0) {
-        avgRatingsContainer.innerHTML = `<p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`;
-        occupancyContainer.innerHTML = `<p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`;
-        // Also add message for monthly seats if no movies
-         const monthlySeatsContainer = document.createElement('div');
-         monthlySeatsContainer.id = 'admin-monthly-seats-card'; // Keep ID for consistency
-         monthlySeatsContainer.className = 'analytics-card';
-         monthlySeatsContainer.innerHTML = `
-              <h3 class="text-xl font-semibold mb-3 text-gray-600">Seats Booked Per Month</h3>
-              <p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`;
-         analyticsSection.appendChild(monthlySeatsContainer); // Append directly to parent section
-        return;
+        console.log("Analytics: No relevant movies found."); // Log path
+        const noMovieMsg = `<p class="text-gray-500">No movies ${isVendor ? 'assigned' : ''}.</p>`;
+        avgRatingsContainer.innerHTML = noMovieMsg;
+        if (!isVendor) {
+            seatsTodayElement.textContent = '0';
+            capacityTodayElement.textContent = 'N/A';
+            capacityDetailElement.textContent = 'No movies scheduled.';
+            mostBookedElement.textContent = 'N/A';
+            leastBookedElement.textContent = 'N/A';
+            weeklyTableBody.innerHTML = `<tr class="bg-white border-b"><td colspan="4" class="px-4 py-3 text-center text-gray-500">No movie data for weekly analysis.</td></tr>`;
+            dailyMoviePerfList.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies scheduled for daily analysis.</p>';
+        }
+        appendMonthlySeatsCard(analyticsSection, {}, isVendor ? 'for your movies' : ''); // Pass empty data
+        return; // Exit if no movies
     }
 
-    // --- Calculate and Render Total Revenue ---
+    // --- Calculate Total Revenue ---
     const totalRevenue = relevantBookings.reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
     totalRevenueElement.textContent = `${totalRevenue.toFixed(2)} EGP`;
+    console.log("Analytics: Total Revenue Calculated:", totalRevenue); // Log revenue
 
     // --- Calculate and Render Avg Ratings ---
+    console.log("Analytics: Calling renderAverageRatings...");
+    renderAverageRatings(avgRatingsContainer, relevantMovies, isVendor);
+
+    // --- Calculate Daily Metrics (Admin Only) ---
+    if (!isVendor) {
+        console.log("Analytics: Calling calculateAndRenderDailyMetrics...");
+        calculateAndRenderDailyMetrics(relevantMovies, relevantBookings, seatsTodayElement, capacityTodayElement, capacityDetailElement, mostBookedElement, leastBookedElement);
+        console.log("Analytics: Calling calculateAndRenderDailyMoviePerformance...");
+        calculateAndRenderDailyMoviePerformance(relevantMovies, relevantBookings, dailyMoviePerfList);
+    }
+
+    // --- Calculate Weekly Metrics (Admin Only) ---
+    if (!isVendor) {
+         console.log("Analytics: Calling calculateAndRenderWeeklyMetrics...");
+         calculateAndRenderWeeklyMetrics(relevantMovies, relevantBookings, weeklyTableBody);
+    }
+
+    // --- Calculate and Render Monthly Booked Seats (Appended at the end) ---
+    console.log("Analytics: Calling calculateMonthlyBookedSeats...");
+    const monthlyData = calculateMonthlyBookedSeats(relevantBookings);
+    console.log("Analytics: Calling appendMonthlySeatsCard...");
+    appendMonthlySeatsCard(analyticsSection, monthlyData, isVendor ? 'for your movies' : '');
+
+    console.log("Analytics: Rendering finished.");
+
+}
+
+function calculateAndRenderDailyMoviePerformance(movies, bookings, listContainer) {
+    listContainer.innerHTML = ''; // Clear loading message
+    const todayStr = formatDateYYYYMMDD(new Date());
+    let moviesWithShowtimesToday = 0;
+
+    // Sort movies alphabetically by title for consistent display order
+    const sortedMovies = [...movies].sort((a, b) => a.title.localeCompare(b.title));
+
+    sortedMovies.forEach(movie => {
+        const showtimesTodayCount = Array.isArray(movie.showtimes) ? movie.showtimes.length : 0;
+
+        // Skip movies with no showtimes scheduled at all today (or ever listed)
+        if (showtimesTodayCount === 0) {
+            return; // Go to the next movie
+        }
+
+        moviesWithShowtimesToday++; // Count movies that *could* have bookings today
+
+        const totalPossibleSeatsToday = showtimesTodayCount * TOTAL_SEATS_PER_SCREENING;
+        let seatsBookedToday = 0;
+
+        // Sum bookings for *this specific movie* today
+        bookings.forEach(booking => {
+            if (booking.movieId === movie.id && booking.selectedDate === todayStr && Array.isArray(booking.seats)) {
+                seatsBookedToday += booking.seats.length;
+            }
+        });
+
+        const occupancyPercent = totalPossibleSeatsToday > 0 ? (seatsBookedToday / totalPossibleSeatsToday) * 100 : 0;
+        const { text: labelText, class: labelClass } = getOccupancyLabel(occupancyPercent);
+
+        // Create the performance card element
+        const card = document.createElement('div');
+        card.className = 'daily-perf-card';
+
+        card.innerHTML = `
+            <div class="movie-title">${movie.title}</div>
+            <div class="details">
+                <span class="seats">Seats Booked: <strong>${seatsBookedToday} / ${totalPossibleSeatsToday}</strong></span>
+                <span class="percentage">Occupancy: <strong>${occupancyPercent.toFixed(1)}%</strong></span>
+            </div>
+            <div class="occupancy-bar-container" title="${occupancyPercent.toFixed(1)}% Occupancy">
+                <div class="occupancy-bar-fill ${labelClass}" style="width: ${occupancyPercent.toFixed(1)}%;"></div>
+            </div>
+            <div class="performance-label-container">
+                 <span class="occupancy-label ${labelClass}">${labelText}</span>
+            </div>
+        `;
+
+        listContainer.appendChild(card);
+    });
+
+    // Handle case where movies exist, but none have showtimes scheduled today
+    if (moviesWithShowtimesToday === 0 && movies.length > 0) {
+         listContainer.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies have scheduled showtimes for today.</p>';
+    } else if (movies.length === 0) { // Should be caught earlier, but double-check
+        listContainer.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies to analyze.</p>';
+    }
+}
+
+// --- Helper function to render average ratings ---
+function renderAverageRatings(container, moviesToRate, isVendor) {
+    container.innerHTML = ''; // Clear loading state
     let hasRatings = false;
-    avgRatingsContainer.innerHTML = ''; // Clear loading state
-    relevantMovies.forEach(movie => {
+    moviesToRate.forEach(movie => {
         const { average, count } = calculateAverageRating(movie); // Pass movie object with ID
         if (count > 0) hasRatings = true;
         const ratingDiv = document.createElement('div');
-        ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200';
+        ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200 last:border-b-0';
         const titleSpan = document.createElement('span');
         titleSpan.textContent = movie.title;
-        titleSpan.className = 'font-medium text-gray-700';
+        titleSpan.className = 'font-medium text-gray-700 truncate pr-2'; // Added truncate
         const starsSpan = document.createElement('span');
-        starsSpan.className = 'stars-container flex items-center';
+        starsSpan.className = 'stars-container flex items-center flex-shrink-0'; // Added shrink
         renderStars(starsSpan, average, count, false); // Render non-interactive stars
         ratingDiv.appendChild(titleSpan);
         ratingDiv.appendChild(starsSpan);
-        avgRatingsContainer.appendChild(ratingDiv);
+        container.appendChild(ratingDiv);
     });
     if (!hasRatings) {
-        avgRatingsContainer.innerHTML = `<p class="text-gray-500">No ratings submitted ${isVendor ? 'for your movies' : ''} yet.</p>`;
+        container.innerHTML = `<p class="text-gray-500">No ratings submitted ${isVendor ? 'for your movies' : ''} yet.</p>`;
     }
+}
 
-    // --- Calculate and Render Daily Showtime Occupancy ---
-    let hasOccupancyData = false;
-    occupancyContainer.innerHTML = ''; // Clear loading state
-    const todayStr = formatDateYYYYMMDD(new Date()); // Get today's date string YYYY-MM-DD
+// --- Helper function for Daily Metrics (Admin only) ---
+function calculateAndRenderDailyMetrics(movies, bookings, seatsEl, capacityEl, capacityDetailEl, mostEl, leastEl) {
+    const todayStr = formatDateYYYYMMDD(new Date());
+    let totalSeatsBookedToday = 0;
+    let totalScheduledShowtimesToday = 0;
+    const dailyBookingsByMovie = {}; // { movieId: seatsBooked }
 
-    // Add title for the occupancy section
-    const occupancyTitle = document.createElement('h3');
-    occupancyTitle.className = 'text-xl font-semibold mb-3 text-gray-600';
-    occupancyTitle.textContent = `Today's Showtime Occupancy (${formatDateReadable(new Date())})`;
-    occupancyContainer.appendChild(occupancyTitle);
-
-    relevantMovies.forEach(movie => {
-        const movieOccupancyDiv = document.createElement('div');
-        movieOccupancyDiv.className = 'mb-4 pb-4 border-b border-gray-200 last:border-b-0';
-        const movieTitleH4 = document.createElement('h4');
-        movieTitleH4.className = 'text-lg font-semibold text-gray-800 mb-2';
-        movieTitleH4.textContent = movie.title;
-        movieOccupancyDiv.appendChild(movieTitleH4);
-
-        // Use showtimes array directly from movie object
-        const showtimes = Array.isArray(movie.showtimes) ? movie.showtimes : [];
-
-        if (showtimes.length > 0) {
-             let movieHasBookingsToday = false; // Track if this movie has any relevant bookings
-             showtimes.forEach(time => {
-                 // Filter bookings for THIS movie, THIS showtime, and ONLY for TODAY
-                 const bookedCount = relevantBookings.reduce((count, booking) =>
-                     (booking.movieId === movie.id && booking.showtime === time && booking.selectedDate === todayStr && Array.isArray(booking.seats))
-                         ? count + booking.seats.length
-                         : count,
-                 0);
-
-                 if (bookedCount > 0) {
-                     hasOccupancyData = true; // Mark if *any* booking found across all movies today
-                     movieHasBookingsToday = true;
-                 }
-
-                 const occupancyPercent = TOTAL_SEATS_PER_SCREENING > 0 ? (bookedCount / TOTAL_SEATS_PER_SCREENING) * 100 : 0;
-                 // Adjusted labels for clarity
-                 let occupancyLabel = 'Empty';
-                 let occupancyClass = 'occupancy-unpopular'; // Default class for empty/low
-                 if (occupancyPercent >= 67) { occupancyLabel = 'Popular'; occupancyClass = 'occupancy-popular'; }
-                 else if (occupancyPercent >= 34) { occupancyLabel = 'Normal'; occupancyClass = 'occupancy-normal'; }
-                 else if (occupancyPercent > 0) { occupancyLabel = 'Low'; /* Keep unpopular class */ }
-
-
-                 const showtimeDiv = document.createElement('div');
-                 showtimeDiv.className = 'flex justify-between items-center text-sm mb-1';
-                 showtimeDiv.innerHTML = `
-                     <span class="text-gray-600">${time}</span>
-                     <span>
-                         <span class="text-gray-500 mr-2">(${bookedCount}/${TOTAL_SEATS_PER_SCREENING} seats booked for today)</span>
-                         <span class="occupancy-tag ${occupancyClass}">${occupancyLabel}</span>
-                     </span>`;
-                 movieOccupancyDiv.appendChild(showtimeDiv);
-             });
-              // Add message if movie has showtimes but no bookings *today*
-             if (!movieHasBookingsToday && showtimes.length > 0) { // Check if showtimes existed
-                 movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500 italic mt-1">No bookings found for today.</p>';
-             }
-        } else {
-            movieOccupancyDiv.innerHTML += '<p class="text-sm text-gray-500">No showtimes listed.</p>';
-        }
-        occupancyContainer.appendChild(movieOccupancyDiv); // Append this movie's div to the main occupancy container
+    // Calculate total scheduled showtimes today across relevant movies
+    movies.forEach(movie => {
+        totalScheduledShowtimesToday += Array.isArray(movie.showtimes) ? movie.showtimes.length : 0;
     });
 
-     // Add a general message if NO bookings found for today across *all* relevant movies
-     if (!hasOccupancyData && relevantMovies.length > 0) { // Check if movies existed but had no bookings
-        occupancyContainer.innerHTML += `<p class="text-gray-500 mt-4">No booking data available for today ${isVendor ? 'for your movies' : ''}.</p>`;
+    const totalAvailableSeatsToday = totalScheduledShowtimesToday * TOTAL_SEATS_PER_SCREENING;
+
+    // Calculate seats booked today and group by movie
+    bookings.forEach(booking => {
+        if (booking.selectedDate === todayStr && Array.isArray(booking.seats)) {
+            const seatsCount = booking.seats.length;
+            totalSeatsBookedToday += seatsCount;
+            if (!dailyBookingsByMovie[booking.movieId]) {
+                dailyBookingsByMovie[booking.movieId] = 0;
+            }
+            dailyBookingsByMovie[booking.movieId] += seatsCount;
+        }
+    });
+
+    // Calculate capacity percentage
+    const dailyCapacityPercentage = totalAvailableSeatsToday > 0
+        ? (totalSeatsBookedToday / totalAvailableSeatsToday) * 100
+        : 0;
+
+    // Update DOM for summary box
+    seatsEl.textContent = totalSeatsBookedToday;
+    capacityEl.textContent = `${dailyCapacityPercentage.toFixed(1)}%`;
+    capacityDetailEl.textContent = `(${totalSeatsBookedToday} / ${totalAvailableSeatsToday} seats)`;
+
+
+    // Determine Most/Least Booked Movie Today
+    let mostBookedSeats = -1;
+    let leastBookedSeats = Infinity;
+    let mostBookedMovieId = null;
+    let leastBookedMovieId = null;
+
+     // Initialize with all movie IDs having 0 bookings today
+     const movieSeatsToday = movies.reduce((acc, movie) => {
+        acc[movie.id] = dailyBookingsByMovie[movie.id] || 0;
+        return acc;
+    }, {});
+
+    for (const movieId in movieSeatsToday) {
+        const seats = movieSeatsToday[movieId];
+        // Most booked
+        if (seats > mostBookedSeats) {
+            mostBookedSeats = seats;
+            mostBookedMovieId = movieId;
+        }
+        // Least booked (must have had at least one booking to qualify, otherwise all 0s are least)
+        // Correction: Find minimum among *all* movies today, including those with 0 bookings.
+        if (seats < leastBookedSeats) {
+            leastBookedSeats = seats;
+            leastBookedMovieId = movieId;
+        }
+    }
+
+
+    // Find movie titles
+    const mostBookedMovie = movies.find(m => m.id === mostBookedMovieId);
+    const leastBookedMovie = movies.find(m => m.id === leastBookedMovieId);
+
+    // Update DOM for daily highlights
+    if (totalSeatsBookedToday > 0) {
+         mostEl.textContent = mostBookedMovie ? `${mostBookedMovie.title} (${mostBookedSeats} seats)` : 'N/A';
+         leastEl.textContent = leastBookedMovie ? `${leastBookedMovie.title} (${leastBookedSeats} seats)` : 'N/A';
+    } else {
+         mostEl.textContent = 'None';
+         leastEl.textContent = 'None';
+    }
+
+}
+
+// --- Helper function for Weekly Metrics (Admin only) ---
+function calculateAndRenderWeeklyMetrics(movies, bookings, tableBody) {
+    tableBody.innerHTML = ''; // Clear loading/previous content
+
+    const weeklyOccupancyData = {}; // { movieId: { booked: totalSeats, screenings: totalScheduledScreenings } }
+    const pastWeekDates = getPastWeekDates(); // Get ['today', 'yesterday', ...] YYYY-MM-DD
+
+    // Initialize weekly data structure for all relevant movies
+    movies.forEach(movie => {
+        const scheduledScreeningsWeekly = (Array.isArray(movie.showtimes) ? movie.showtimes.length : 0) * 7; // Approx. total scheduled
+        weeklyOccupancyData[movie.id] = {
+            booked: 0,
+            screenings: scheduledScreeningsWeekly, // Store scheduled screenings
+            title: movie.title // Store title for easy access later
+        };
+    });
+
+    // Aggregate booked seats over the past week
+    bookings.forEach(booking => {
+        if (pastWeekDates.includes(booking.selectedDate) && Array.isArray(booking.seats)) {
+            if (weeklyOccupancyData[booking.movieId]) { // Check if movie exists in our structure
+                 weeklyOccupancyData[booking.movieId].booked += booking.seats.length;
+            }
+        }
+    });
+
+    // Calculate averages and render table rows
+    const movieIdsSorted = Object.keys(weeklyOccupancyData).sort((a, b) => weeklyOccupancyData[a].title.localeCompare(weeklyOccupancyData[b].title));
+
+     if (movieIdsSorted.length === 0) {
+          tableBody.innerHTML = `<tr class="bg-white border-b"><td colspan="4" class="px-4 py-3 text-center text-gray-500">No movie data for weekly analysis.</td></tr>`;
+          return;
      }
 
+    movieIdsSorted.forEach(movieId => {
+        const data = weeklyOccupancyData[movieId];
+        const totalPossibleSeatsWeekly = data.screenings * TOTAL_SEATS_PER_SCREENING;
 
-    // --- Calculate and Render Monthly Booked Seats ---
-    const monthlySeatsContainer = document.createElement('div');
-    monthlySeatsContainer.className = 'analytics-card'; // Reuse card style
-    monthlySeatsContainer.id = 'admin-monthly-seats-card'; // Keep ID for removal/styling
-    const monthlyTitle = document.createElement('h3');
-    monthlyTitle.className = 'text-xl font-semibold mb-3 text-gray-600';
-    monthlyTitle.textContent = 'Seats Booked Per Month';
-    monthlySeatsContainer.appendChild(monthlyTitle);
-    const monthlyList = document.createElement('div');
-    monthlyList.className = 'space-y-2 text-sm';
+        const avgSeatsBooked = data.screenings > 0 ? (data.booked / 7) : 0; // Average per day
+        const avgOccupancyPercent = totalPossibleSeatsWeekly > 0 ? (data.booked / totalPossibleSeatsWeekly) * 100 : 0;
 
-    const monthlyData = relevantBookings.reduce((acc, booking) => {
-        // Check if timestamp exists and is a Firestore Timestamp or valid Date source
+        const { text: labelText, class: labelClass } = getOccupancyLabel(avgOccupancyPercent);
+
+        const row = document.createElement('tr');
+        row.className = 'bg-white border-b';
+        row.innerHTML = `
+            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap">${data.title}</td>
+            <td class="px-4 py-2 text-right">${avgSeatsBooked.toFixed(1)}</td>
+            <td class="px-4 py-2 text-right">${avgOccupancyPercent.toFixed(1)}%</td>
+            <td class="px-4 py-2 text-center">
+                <span class="occupancy-label ${labelClass}">${labelText}</span>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// --- Helper function for Monthly Metrics ---
+function calculateMonthlyBookedSeats(bookings) {
+    const monthlyData = bookings.reduce((acc, booking) => {
         if (booking.timestamp && booking.seats && Array.isArray(booking.seats) && booking.seats.length > 0) {
             try {
-                // Ensure timestamp is a Date object
                 const date = booking.timestamp instanceof Timestamp ? booking.timestamp.toDate() : new Date(booking.timestamp);
-                // Basic validation if it's from a string/number source
-                if (isNaN(date.getTime())) {
-                     throw new Error("Invalid Date object created from timestamp");
-                 }
-
+                if (isNaN(date.getTime())) { throw new Error("Invalid Date"); }
                 const year = date.getFullYear();
-                const month = date.getMonth(); // 0-indexed (Jan=0)
-                const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`; // Format YYYY-MM
-
-                if (!acc[monthKey]) {
-                    acc[monthKey] = 0;
-                }
-                acc[monthKey] += booking.seats.length; // Sum seats for the month
+                const month = date.getMonth(); // 0-indexed
+                const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+                if (!acc[monthKey]) acc[monthKey] = 0;
+                acc[monthKey] += booking.seats.length;
             } catch (e) {
-                 // Log error for debugging if timestamp conversion fails
-                 console.warn("Could not process timestamp for monthly analytics:", booking.id, booking.timestamp, e);
+                console.warn("Could not process timestamp for monthly analytics:", booking.id, booking.timestamp, e);
             }
         }
         return acc;
     }, {});
+    return monthlyData;
+}
 
-    const sortedMonths = Object.keys(monthlyData).sort().reverse(); // Sort recent months first
+// --- Helper function to append Monthly Seats Card ---
+function appendMonthlySeatsCard(analyticsSection, monthlyData, contextSuffix) {
+    const monthlySeatsContainer = document.createElement('div');
+    monthlySeatsContainer.className = 'analytics-card';
+    monthlySeatsContainer.id = 'admin-monthly-seats-card'; // Keep ID for potential removal
+    monthlySeatsContainer.innerHTML = `
+        <h3 class="text-lg font-semibold mb-3 text-gray-600">Total Seats Booked Per Month</h3>
+        <div class="space-y-2 text-sm" id="monthly-seats-list">
+            <!-- Monthly data populated here -->
+        </div>
+    `;
+    const monthlyList = monthlySeatsContainer.querySelector('#monthly-seats-list');
+    const sortedMonths = Object.keys(monthlyData).sort().reverse();
 
     if (sortedMonths.length > 0) {
         sortedMonths.forEach(monthKey => {
             const [year, monthNum] = monthKey.split('-');
-             // Ensure parsing as integers for Date constructor
             const dateForMonthName = new Date(parseInt(year), parseInt(monthNum) - 1, 1);
             const monthName = dateForMonthName.toLocaleString('default', { month: 'long' });
             const seats = monthlyData[monthKey];
             const item = document.createElement('div');
-            item.className = 'flex justify-between items-center pb-1 border-b border-gray-200';
+            item.className = 'flex justify-between items-center pb-1 border-b border-gray-200 last:border-b-0';
             item.innerHTML = `
                 <span class="font-medium text-gray-700">${monthName} ${year}</span>
                 <span class="font-semibold text-blue-600">${seats} ${seats === 1 ? 'seat' : 'seats'}</span>
@@ -1091,13 +1275,11 @@ function renderAnalyticsDashboard(targetVendorName = null) {
             monthlyList.appendChild(item);
         });
     } else {
-        monthlyList.innerHTML = `<p class="text-gray-500">No monthly booking data available ${isVendor ? 'for your movies' : ''}.</p>`;
+        monthlyList.innerHTML = `<p class="text-gray-500">No monthly booking data available ${contextSuffix}.</p>`;
     }
-
-    monthlySeatsContainer.appendChild(monthlyList);
-    // Append the fully constructed monthly card to the correct parent section
     analyticsSection.appendChild(monthlySeatsContainer);
 }
+
 
 // --- Vendor Dashboard Rendering ---
 function renderVendorDashboard() {
@@ -1453,23 +1635,6 @@ function renderVendorList() {
         controlsDiv.appendChild(deleteButton);
         itemDiv.appendChild(infoDiv);
         itemDiv.appendChild(controlsDiv);
-        adminVendorListContainer.appendChild(itemDiv);
-    });
-    
-
-    vendors.forEach((vendor) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'vendor-list-item';
-        // Pass Firestore ID to edit/delete functions
-        itemDiv.innerHTML = `
-            <div class="flex-grow pr-4">
-                <span class="font-medium text-gray-800">${vendor.name}</span>
-                <span class="block text-sm text-gray-500">${vendor.email}</span>
-            </div>
-            <div class="flex-shrink-0 flex gap-2">
-                <button class="btn btn-secondary btn-icon text-xs !py-1 !px-2" onclick="showEditVendorForm('${vendor.id}')"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn btn-danger btn-icon text-xs !py-1 !px-2" onclick="deleteVendor('${vendor.id}')"><i class="fas fa-trash"></i> Delete</button>
-            </div>`;
         adminVendorListContainer.appendChild(itemDiv);
     });
 }
@@ -1966,6 +2131,27 @@ function closeModal() {
     currentModalMovieId = null;
     currentSelectedDate = null;
     if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } // Destroy calendar on close
+}
+
+// --- Utility Functions (Add if not present) ---
+function getPastWeekDates(today = new Date()) {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(formatDateYYYYMMDD(date)); // Store as YYYY-MM-DD
+    }
+    return dates; // Returns [today, yesterday, day_before, ...]
+}
+
+// Revised Occupancy Label Function
+function getOccupancyLabel(percentage) {
+    if (percentage === null || isNaN(percentage)) return { text: 'N/A', class: 'occupancy-empty' };
+    if (percentage === 0) return { text: 'Empty', class: 'occupancy-empty' };
+    if (percentage < 25) return { text: 'Low', class: 'occupancy-low' };
+    if (percentage <= 60) return { text: 'Moderate', class: 'occupancy-moderate' };
+    // if (percentage > 60)
+    return { text: 'High', class: 'occupancy-high' };
 }
 
 // Render and Validate Showtimes based on selected date
