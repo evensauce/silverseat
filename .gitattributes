@@ -1,0 +1,2 @@
+# Highlight .js files as JavaScript, not vendored/generated
+*.js linguist-language=JavaScript
