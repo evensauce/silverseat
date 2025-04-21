@@ -139,3 +139,20 @@ input[type="radio"]:disabled + .showtime-label, .showtime-label.disabled { backg
 /* Vendor Management List Style */
 .vendor-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; }
 .vendor-list-item:last-child { border-bottom: none; }
+
+/* QR Zoom Modal Styles */
+#qr-zoom-modal {
+    z-index: 150; /* Ensure it's above other modals if needed */
+}
+#qr-zoom-modal.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+#qr-zoom-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto; /* Maintain aspect ratio */
+    height: auto; /* Maintain aspect ratio */
+}

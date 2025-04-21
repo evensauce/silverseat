@@ -13,13 +13,26 @@
 
     <!-- QR Code Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <!-- Use the correct path for html5-qrcode -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
 
     <!-- Pikaday Date Picker -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+
+    <!-- *** UPDATE EMAILJS LIBRARY to v4 *** -->
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+       (function(){
+          // *** UPDATE EMAILJS INITIALIZATION SYNTAX for v4 ***
+          emailjs.init({
+            publicKey: "OQFnbNSELBj3GimNO" // Use your Public Key here
+            // You can add other options from the example here if needed,
+            // but start simple to ensure basic sending works.
+          });
+       })();
+    </script>
 
     <!-- Reference to the style.css file -->
     <link rel="stylesheet" href="style.css">
@@ -27,8 +40,7 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Splash Screen Removed -->
-
+    <!-- App Header -->
     <div id="app-header" class="is-hidden">
          <div class="container mx-auto flex justify-between items-center">
              <span class="text-lg font-semibold text-gray-700">SilverSeat</span>
@@ -37,17 +49,34 @@
                  <button id="logout-button" class="btn btn-secondary btn-sm !py-1 !px-3">Logout</button>
              </div>
          </div>
-     </div>
+    </div>
+
+    <!-- QR Code Zoom Modal -->
+    <div id="qr-zoom-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 is-hidden" style="z-index: 150;">
+        <div class="relative bg-white p-2 rounded shadow-lg">
+            <button id="qr-zoom-close-btn" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg leading-none font-bold z-10">×</button>
+            <div id="qr-zoom-content" class="max-w-[80vw] max-h-[80vh]">
+                <!-- Zoomed QR Code Image will be placed here -->
+            </div>
+        </div>
+    </div>
 
     <!-- Auth View -->
-    <div id="auth-view" class="is-hidden">
+    <div id="auth-view"> <!-- Should not be hidden initially if logged out -->
         <div class="auth-container">
+
             <!-- Customer Login Form -->
             <form id="customer-login-form" class="space-y-6">
                 <h2 class="text-2xl font-bold text-center text-gray-800">Customer Login</h2>
                 <p id="customer-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
-                <div><label for="customer-email" class="form-label">Email:</label><input type="email" id="customer-email" class="form-input" required></div>
-                <div><label for="customer-password" class="form-label">Password:</label><input type="password" id="customer-password" class="form-input" required></div>
+                <div>
+                    <label for="customer-email" class="form-label">Email:</label>
+                    <input type="email" id="customer-email" class="form-input" required>
+                </div>
+                <div>
+                    <label for="customer-password" class="form-label">Password:</label>
+                    <input type="password" id="customer-password" class="form-input" required>
+                </div>
                 <button type="submit" class="btn btn-primary w-full">Login</button>
                 <div class="text-center text-sm text-gray-600 space-x-2">
                     <button type="button" id="show-register-button" class="btn-link">Register</button>
@@ -57,41 +86,86 @@
                     <button type="button" id="show-vendor-login-button" class="btn-link">Vendor</button>
                 </div>
             </form>
-            <!-- Customer Register Form -->
-             <form id="customer-register-form" class="space-y-6 is-hidden">
-                 <h2 class="text-2xl font-bold text-center text-gray-800">Register Account</h2>
-                 <p id="register-error" class="text-red-500 text-sm text-center is-hidden"></p>
-                 <div><label for="register-email" class="form-label">Email:</label><input type="email" id="register-email" class="form-input" required></div>
-                 <div><label for="register-password" class="form-label">Password (min 6 chars):</label><input type="password" id="register-password" class="form-input" required></div>
-                 <div><label for="register-confirm-password" class="form-label">Confirm Password:</label><input type="password" id="register-confirm-password" class="form-input" required></div>
-                 <button type="submit" class="btn btn-primary w-full">Register</button>
-                 <div class="text-center"><button type="button" class="btn-link back-to-customer-login">Back to Login</button></div>
-             </form>
-            <!-- Admin Login Form -->
-             <form id="admin-login-form" class="space-y-6 is-hidden">
-                 <h2 class="text-2xl font-bold text-center text-gray-800">Admin Login</h2>
-                 <p id="admin-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
-                 <div><label for="admin-email" class="form-label">Email:</label><input type="email" id="admin-email" class="form-input" required value="admin@example.com"></div>
-                 <div><label for="admin-password" class="form-label">Password:</label><input type="password" id="admin-password" class="form-input" required value=""></div>
-                 <button type="submit" class="btn btn-primary w-full">Admin Login</button>
-                 <div class="text-center"><button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button></div>
-             </form>
-            <!-- Vendor Login Form -->
-             <form id="vendor-login-form" class="space-y-6 is-hidden">
-                 <h2 class="text-2xl font-bold text-center text-gray-800">Vendor Login</h2>
-                 <p id="vendor-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
-                 <div><label for="vendor-email" class="form-label">Vendor Email:</label><input type="email" id="vendor-email" class="form-input" required></div>
-                 <div><label for="vendor-password" class="form-label">Password:</label><input type="password" id="vendor-password" class="form-input" required></div>
-                 <button type="submit" class="btn btn-primary w-full">Vendor Login</button>
-                 <div class="text-center"><button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button></div>
-             </form>
-        </div>
-    </div>
 
+            <!-- Customer Register Form -->
+            <form id="customer-register-form" class="space-y-6 is-hidden">
+                <h2 class="text-2xl font-bold text-center text-gray-800">Register Account</h2>
+                <p id="register-error" class="text-red-500 text-sm text-center is-hidden"></p>
+                <div>
+                    <label for="register-email" class="form-label">Email:</label>
+                    <input type="email" id="register-email" class="form-input" required>
+                </div>
+                <div>
+                    <label for="register-password" class="form-label">Password (min 6 chars):</label>
+                    <input type="password" id="register-password" class="form-input" required>
+                </div>
+                <div>
+                    <label for="register-confirm-password" class="form-label">Confirm Password:</label>
+                    <input type="password" id="register-confirm-password" class="form-input" required>
+                </div>
+
+                <!-- OTP Field (Initially Hidden) -->
+                <div id="otp-section" class="is-hidden space-y-2">
+                    <p class="text-sm text-green-600">An OTP has been sent to your email. Please enter it below (valid for 15 mins).</p>
+                    <label for="register-otp" class="form-label">OTP:</label>
+                    <input type="text" id="register-otp" class="form-input" placeholder="Enter OTP" maxlength="6">
+                </div>
+
+                <!-- Buttons - Toggle Visibility -->
+                <button type="button" id="send-otp-button" class="btn btn-secondary w-full">Send OTP</button>
+                <button type="submit" id="register-submit-button" class="btn btn-primary w-full is-hidden">Verify OTP & Register</button>
+
+                <div class="text-center">
+                    <button type="button" class="btn-link back-to-customer-login">Back to Login</button>
+                </div>
+            </form>
+
+            <!-- Admin Login Form -->
+            <form id="admin-login-form" class="space-y-6 is-hidden">
+                <h2 class="text-2xl font-bold text-center text-gray-800">Admin Login</h2>
+                <p id="admin-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
+                <div>
+                    <label for="admin-email" class="form-label">Email:</label>
+                    <input type="email" id="admin-email" class="form-input" required value="admin@example.com">
+                </div>
+                <div>
+                    <label for="admin-password" class="form-label">Password:</label>
+                    <input type="password" id="admin-password" class="form-input" required value="">
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Admin Login</button>
+                <div class="text-center">
+                    <button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button>
+                </div>
+            </form>
+
+            <!-- Vendor Login Form -->
+            <form id="vendor-login-form" class="space-y-6 is-hidden">
+                <h2 class="text-2xl font-bold text-center text-gray-800">Vendor Login</h2>
+                <p id="vendor-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
+                <div>
+                    <label for="vendor-email" class="form-label">Vendor Email:</label>
+                    <input type="email" id="vendor-email" class="form-input" required>
+                </div>
+                <div>
+                    <label for="vendor-password" class="form-label">Password:</label>
+                    <input type="password" id="vendor-password" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Vendor Login</button>
+                <div class="text-center">
+                    <button type="button" class="btn-link back-to-customer-login">Back to Customer Login</button>
+                </div>
+            </form>
+
+        </div> <!-- End auth-container -->
+    </div> <!-- End auth-view -->
+
+    <!-- Main Content Area -->
     <div class="container mx-auto p-4 md:p-6 lg:p-8 relative">
+
         <!-- ==== ADMIN VIEW ==== -->
         <div id="admin-view" class="is-hidden space-y-8">
             <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Admin Panel</h1>
+            <!-- Admin Navigation -->
             <div id="admin-nav" class="mb-4 border-b border-gray-300">
                 <button data-target="admin-manage-movies" class="admin-nav-button active">Manage Movies</button>
                 <button data-target="admin-analytics" class="admin-nav-button">Analytics</button>
@@ -100,19 +174,36 @@
                 <button data-target="admin-manage-vendors" class="admin-nav-button">Vendors</button>
             </div>
 
-            <!-- Admin: Manage Movies -->
+            <!-- Admin Section: Manage Movies -->
             <div id="admin-manage-movies" class="admin-section">
                 <!-- Movie Form -->
                 <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
                     <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
                     <form id="movie-form" class="space-y-4">
-                        <!-- Removed hidden edit-index input -->
-                        <div><label for="title" class="form-label">Title:</label><input type="text" id="title" class="form-input" required></div>
-                        <div><label for="poster" class="form-label">Poster Image URL:</label><input type="url" id="poster" class="form-input" placeholder="https://example.com/image.jpg" required></div>
-                        <div><label for="description" class="form-label">Description:</label><textarea id="description" class="form-input" rows="3" required></textarea></div>
-                        <div><label for="genre" class="form-label">Genre:</label><input type="text" id="genre" class="form-input" placeholder="e.g., Action, Comedy, Sci-Fi" required></div>
-                        <div><label for="duration" class="form-label">Duration (minutes):</label><input type="number" id="duration" class="form-input" required></div>
-                        <div><label for="showtimes" class="form-label">Showtimes (comma-separated):</label><input type="text" id="showtimes" class="form-input" placeholder="e.g., 10:00 AM, 1:00 PM, 4:00 PM" required></div>
+                        <div>
+                            <label for="title" class="form-label">Title:</label>
+                            <input type="text" id="title" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="poster" class="form-label">Poster Image URL:</label>
+                            <input type="url" id="poster" class="form-input" placeholder="https://example.com/image.jpg" required>
+                        </div>
+                        <div>
+                            <label for="description" class="form-label">Description:</label>
+                            <textarea id="description" class="form-input" rows="3" required></textarea>
+                        </div>
+                        <div>
+                            <label for="genre" class="form-label">Genre:</label>
+                            <input type="text" id="genre" class="form-input" placeholder="e.g., Action, Comedy, Sci-Fi" required>
+                        </div>
+                        <div>
+                            <label for="duration" class="form-label">Duration (minutes):</label>
+                            <input type="number" id="duration" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="showtimes" class="form-label">Showtimes (comma-separated):</label>
+                            <input type="text" id="showtimes" class="form-input" placeholder="e.g., 10:00 AM, 1:00 PM, 4:00 PM" required>
+                        </div>
                         <div>
                             <label for="movie-vendor" class="form-label">Assign Vendor:</label>
                             <select id="movie-vendor" class="form-select">
@@ -144,9 +235,9 @@
                          </div>
                      </div>
                  </div>
-            </div>
+            </div> <!-- End admin-manage-movies section -->
 
-            <!-- Admin: Analytics -->
+            <!-- Admin Section: Analytics -->
             <div id="admin-analytics" class="admin-section is-hidden space-y-6">
                  <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
                  <div class="analytics-card">
@@ -157,48 +248,58 @@
                      <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
                      <div id="analytics-avg-ratings" class="space-y-2">
                          <p class="text-gray-500">No ratings data available.</p>
+                         <!-- Ratings populated by JS -->
                      </div>
                  </div>
                  <div class="analytics-card">
                      <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy (Based on Bookings)</h3>
                      <div id="analytics-occupancy" class="space-y-4">
                          <p class="text-gray-500">No movie data available for occupancy analysis.</p>
+                         <!-- Occupancy populated by JS -->
                      </div>
                  </div>
-            </div>
+                 <!-- Monthly seats card will be appended here by JS -->
+            </div> <!-- End admin-analytics section -->
 
-            <!-- Admin: Bookings List -->
+            <!-- Admin Section: Bookings List -->
             <div id="admin-bookings-section" class="admin-section is-hidden space-y-6">
                  <h2 class="text-2xl font-semibold text-gray-700">All Customer Bookings</h2>
                  <div id="admin-bookings-list" class="space-y-4 bg-white p-6 rounded-lg shadow">
                      <p class="text-gray-500">Loading bookings...</p>
                      <!-- Bookings populated by JS -->
                  </div>
-            </div>
+            </div> <!-- End admin-bookings-section -->
 
-            <!-- Admin: QR Scanner -->
+            <!-- Admin Section: QR Scanner -->
              <div id="admin-qr-scanner-section" class="admin-section is-hidden space-y-6">
                  <h2 class="text-2xl font-semibold text-gray-700">Scan Customer QR Code</h2>
                  <div class="bg-white p-6 rounded-lg shadow text-center">
-                      <!-- Element where the scanner video feed will appear -->
                      <div id="admin-qr-reader" style="width: 100%; max-width: 400px; margin: 1rem auto; border: 1px solid #ccc;"></div>
                      <p id="scan-status" class="mt-4 text-gray-600 text-sm">Click Start Scanning to activate camera.</p>
                      <button id="start-scan-btn" class="btn btn-primary mt-4">Start Scanning</button>
                  </div>
-             </div>
+             </div> <!-- End admin-qr-scanner-section -->
 
-
-            <!-- Admin: Manage Vendors -->
+            <!-- Admin Section: Manage Vendors -->
             <div id="admin-manage-vendors" class="admin-section is-hidden space-y-6">
                  <h2 class="text-2xl font-semibold text-gray-700">Manage Vendors</h2>
                  <!-- Vendor Form -->
                  <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
                      <h3 class="text-xl font-semibold mb-4 text-gray-700" id="vendor-form-title">Add New Vendor</h3>
                      <form id="vendor-form" class="space-y-4">
-                         <!-- Removed hidden edit-vendor-index -->
-                         <div><label for="vendor-name" class="form-label">Vendor Name:</label><input type="text" id="vendor-name" class="form-input" required></div>
-                         <div><label for="new-vendor-email" class="form-label">Vendor Login Email:</label><input type="email" id="new-vendor-email" class="form-input" required></div>
-                         <div><label for="new-vendor-password" class="form-label">Password:</label><input type="password" id="new-vendor-password" class="form-input" required> <span class="text-xs text-red-600">Warning: Password stored insecurely. Use Firebase Auth for vendors in production.</span></div>
+                         <div>
+                             <label for="vendor-name" class="form-label">Vendor Name:</label>
+                             <input type="text" id="vendor-name" class="form-input" required>
+                         </div>
+                         <div>
+                             <label for="new-vendor-email" class="form-label">Vendor Login Email:</label>
+                             <input type="email" id="new-vendor-email" class="form-input" required>
+                         </div>
+                         <div>
+                             <label for="new-vendor-password" class="form-label">Password:</label>
+                             <input type="password" id="new-vendor-password" class="form-input" required>
+                             <span class="text-xs text-red-600">Warning: Use Firebase Auth for vendors in production.</span>
+                         </div>
                          <div class="flex gap-4 pt-2">
                              <button type="submit" id="vendor-submit-button" class="btn btn-primary">Add Vendor</button>
                              <button type="button" id="vendor-cancel-edit-button" class="btn btn-secondary hidden">Cancel Edit</button>
@@ -213,14 +314,17 @@
                          <!-- Vendors populated by JS -->
                      </div>
                  </div>
-            </div>
-        </div>
+            </div> <!-- End admin-manage-vendors section -->
+
+        </div> <!-- End admin-view -->
 
         <!-- ==== CUSTOMER VIEW ==== -->
         <div id="customer-view" class="is-hidden">
             <div class="flex justify-between items-center mb-6 border-b pb-2">
                 <h1 class="text-3xl font-bold text-gray-800">Now Showing</h1>
-                <button id="toggle-my-bookings-btn" class="btn btn-secondary btn-sm !py-1 !px-3"><i class="fas fa-ticket-alt mr-2"></i>My Bookings</button>
+                <button id="toggle-my-bookings-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+                    <i class="fas fa-ticket-alt mr-2"></i>My Bookings
+                </button>
             </div>
             <!-- Customer Movie List -->
             <div id="customer-movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -231,14 +335,16 @@
             <div id="my-bookings-view" class="is-hidden space-y-4 mt-8">
                  <div class="flex justify-between items-center mb-6 border-b pb-2">
                      <h2 class="text-2xl font-bold text-gray-800">My Bookings</h2>
-                     <button id="back-to-movies-btn" class="btn btn-secondary btn-sm !py-1 !px-3"><i class="fas fa-arrow-left mr-2"></i>Back to Movies</button>
+                     <button id="back-to-movies-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+                         <i class="fas fa-arrow-left mr-2"></i>Back to Movies
+                     </button>
                  </div>
                  <div id="my-bookings-list">
                      <p class="text-gray-500">Loading your bookings...</p>
                      <!-- User bookings populated by JS -->
                  </div>
-            </div>
-        </div>
+            </div> <!-- End my-bookings-view -->
+        </div> <!-- End customer-view -->
 
         <!-- ==== VENDOR DASHBOARD VIEW ==== -->
         <div id="vendor-dashboard-view" class="is-hidden space-y-8">
@@ -262,25 +368,30 @@
                      <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
                      <div id="vendor-analytics-avg-ratings" class="space-y-2">
                          <p class="text-gray-500">No ratings data for your movies.</p>
+                         <!-- Vendor ratings populated by JS -->
                      </div>
                  </div>
                  <div class="analytics-card">
                      <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy</h3>
                      <div id="vendor-analytics-occupancy" class="space-y-4">
                          <p class="text-gray-500">No booking data for your movies.</p>
+                         <!-- Vendor occupancy populated by JS -->
                      </div>
+                     <!-- Monthly seats card will be appended here by JS -->
                  </div>
-             </div>
-        </div>
+             </div> <!-- End vendor-analytics -->
+        </div> <!-- End vendor-dashboard-view -->
 
-    </div>
+    </div> <!-- End main container -->
+
+    <!-- ==== MODALS ==== -->
 
     <!-- Movie Details Modal -->
     <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
             <div class="flex justify-between items-center p-4 border-b border-gray-200">
                 <h2 id="modal-movie-title" class="text-2xl font-semibold text-gray-800">Movie Title</h2>
-                <button id="modal-close-button" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <button id="modal-close-button" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-6">
                 <div class="flex flex-col md:flex-row gap-6">
@@ -289,7 +400,10 @@
                     </div>
                     <div class="flex-grow space-y-3">
                         <div id="modal-avg-rating" class="stars-container text-lg"></div>
-                        <p class="text-sm text-gray-600"><strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> &bull; <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min</p>
+                        <p class="text-sm text-gray-600">
+                            <strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> •
+                            <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min
+                        </p>
                         <p id="modal-movie-description" class="text-gray-700 text-base">Description goes here...</p>
 
                         <!-- Calendar & Showtimes Area -->
@@ -306,8 +420,8 @@
                                 </fieldset>
                             </div>
                         </div>
-                   </div>
-                </div>
+                   </div> <!-- End flex-grow -->
+                </div> <!-- End flex -->
 
                  <!-- Rating Section -->
                  <div id="modal-rating-section" class="pt-4 border-t mt-4 is-hidden">
@@ -323,8 +437,8 @@
                      <h3 class="text-lg font-semibold mb-3 text-gray-700">Select Seats:</h3>
                      <div class="screen">SCREEN</div>
                      <div id="seat-grid" class="seat-grid mb-4">
-                         <!-- Seats populated by JS -->
                          <p class="text-gray-500 text-center">Select a showtime to load seats.</p>
+                         <!-- Seats populated by JS -->
                      </div>
                      <div class="flex justify-center gap-4 text-xs mb-4 text-gray-500">
                          <span><i class="fas fa-chair text-lg align-middle text-gray-300 mr-1"></i> Available</span>
@@ -333,19 +447,19 @@
                      </div>
                      <p id="selected-seats-info" class="text-sm text-gray-600 text-center">Selected Seats: None</p>
                  </div>
-            </div>
+            </div> <!-- End modal body -->
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                  <button id="confirm-selection-button" class="btn btn-primary" disabled>Proceed to Payment</button>
             </div>
-        </div>
-    </div>
+        </div> <!-- End modal content -->
+    </div> <!-- End movie-details-modal -->
 
     <!-- QR Validation Modal (Admin) -->
     <div id="qr-validation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden">
         <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
             <div class="flex justify-between items-center p-4 border-b bg-gray-50">
                 <h2 class="text-xl font-semibold text-gray-800">Scan Result</h2>
-                <button id="validation-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <button id="validation-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
             </div>
             <div class="modal-body p-6 space-y-2">
                 <p><strong>Movie:</strong> <span id="validation-movie-title">--</span></p>
@@ -356,18 +470,20 @@
                 <div id="validation-status" class="text-sm mt-4">Checking status...</div>
             </div>
             <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
-                <button id="mark-used-btn" class="btn btn-success bg-green-500 hover:bg-green-600 text-white" disabled><i class="fas fa-check mr-2"></i>Mark as Used</button>
+                <button id="mark-used-btn" class="btn btn-success" disabled>
+                    <i class="fas fa-check mr-2"></i>Mark as Used
+                </button>
                 <button id="validation-modal-close-btn-secondary" class="btn btn-secondary">Close</button>
             </div>
-        </div>
-    </div>
+        </div> <!-- End modal-content -->
+    </div> <!-- End qr-validation-modal -->
 
      <!-- Fake Payment Modal -->
      <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden">
          <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
              <div class="flex justify-between items-center p-4 border-b bg-gray-50">
                  <h2 class="text-xl font-semibold text-gray-800">Confirm Booking & Payment</h2>
-                 <button id="payment-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                 <button id="payment-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
              </div>
              <div class="modal-body p-6">
                  <p class="mb-4 text-gray-700">Please confirm your booking details and enter payment information.</p>
@@ -380,23 +496,38 @@
                  </div>
 
                  <form id="payment-form" class="space-y-4">
-                     <div><label for="cardholder-name" class="form-label">Cardholder Name</label><input type="text" id="cardholder-name" class="form-input" required placeholder="Full Name"></div>
-                     <div><label for="card-number" class="form-label">Card Number</label><input type="text" id="card-number" class="form-input" required placeholder="xxxx xxxx xxxx xxxx" maxlength="19"></div>
+                     <div>
+                         <label for="cardholder-name" class="form-label">Cardholder Name</label>
+                         <input type="text" id="cardholder-name" class="form-input" required placeholder="Full Name">
+                     </div>
+                     <div>
+                         <label for="card-number" class="form-label">Card Number</label>
+                         <input type="text" id="card-number" class="form-input" required placeholder="xxxx xxxx xxxx xxxx" maxlength="19">
+                     </div>
                      <div class="grid grid-cols-2 gap-4">
-                         <div><label for="card-cvv" class="form-label">CVV</label><input type="text" id="card-cvv" class="form-input" required placeholder="123" maxlength="4"></div>
-                         <div><label for="card-expiry" class="form-label">Expiry Date</label><input type="text" id="card-expiry" class="form-input" required placeholder="MM/YY" maxlength="5"></div>
+                         <div>
+                             <label for="card-cvv" class="form-label">CVV</label>
+                             <input type="text" id="card-cvv" class="form-input" required placeholder="123" maxlength="4">
+                         </div>
+                         <div>
+                             <label for="card-expiry" class="form-label">Expiry Date</label>
+                             <input type="text" id="card-expiry" class="form-input" required placeholder="MM/YY" maxlength="5">
+                         </div>
                      </div>
                      <p id="payment-error" class="text-red-500 text-sm is-hidden"></p>
                  </form>
              </div>
              <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
-                 <button id="pay-now-btn" class="btn btn-primary"><i class="fas fa-credit-card mr-2"></i>Pay Now</button>
+                 <button id="pay-now-btn" class="btn btn-primary">
+                     <i class="fas fa-credit-card mr-2"></i>Pay Now
+                 </button>
                   <button id="payment-modal-close-btn-secondary" class="btn btn-secondary">Cancel</button>
              </div>
-         </div>
-     </div>
+         </div> <!-- End modal-content -->
+     </div> <!-- End payment-modal -->
 
      <!-- Load main script as module -->
      <script type="module" src="script.js"></script>
+
 </body>
 </html>

@@ -21,14 +21,17 @@ Built with **HTML**, **Tailwind CSS**, and **JavaScript**, the platform supports
 - **Mohamed Gasser Yousry Abdelhamid Nour**  
 - **Mohamed Khaled Mohamed Hassan**  
 - **Ali Rashad Ali Albakri**
+- **Amr M. Tolba**
 
 ---
 
 ## 📂 Project Structure
 
 ```
-index.html       # Main app layout and view
+index.html          # Main app layout and view
 style.css           # Custom styles and component formatting
 script.js           # Movie logic, rendering, and event handlers
+.gitattributes      # For Github to count JavaScript within the languages used
+firebase.js         # Firebase API setup
 README.md           # Project overview and team info
 ```
