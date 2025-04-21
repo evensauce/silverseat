@@ -2151,133 +2151,188 @@ function closePaymentModal() {
 
 // Handle Payment and Create Booking in Firestore
 async function handlePaymentFormSubmit(event) {
-     event.preventDefault();
-     hideError(paymentErrorElement);
-     payNowBtn.disabled = true; // Disable button during processing
-     payNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+    event.preventDefault();
+    hideError(paymentErrorElement); // Clear previous errors
 
-     // --- Gather data and validate ---
-     const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
-     if (!currentModalMovieId || !currentSelectedDate || selectedSeats.length === 0 || !selectedShowtimeRadio || !authState.isLoggedIn || !authState.user?.uid) {
-         displayError(paymentErrorElement, "Booking information incomplete or invalid session.");
-         payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
-         return;
-     }
+    // --- Gather raw input values ---
+    const cardName = document.getElementById('cardholder-name').value.trim();
+    const cardNumberRaw = document.getElementById('card-number').value;
+    const cardCvv = document.getElementById('card-cvv').value.trim();
+    const cardExpiryRaw = document.getElementById('card-expiry').value.trim();
 
-     const cardName = document.getElementById('cardholder-name').value.trim();
-     const cardNumber = document.getElementById('card-number').value.trim();
-     const cardCvv = document.getElementById('card-cvv').value.trim();
-     const cardExpiry = document.getElementById('card-expiry').value.trim();
+    // --- FORM VALIDATION ---
+    let isValid = true;
+    let errorMsg = '';
 
-     if (!cardName || !cardNumber || !cardCvv || !cardExpiry) {
-         displayError(paymentErrorElement, "Please fill in all payment details.");
+    // 1. Cardholder Name
+    if (!cardName) {
+        errorMsg = 'Cardholder Name is required.';
+        isValid = false;
+    }
+
+    // 2. Card Number (Basic length check after removing spaces)
+    const cardNumberDigits = cardNumberRaw.replace(/\s/g, ''); // Remove spaces for validation
+    if (isValid && (!cardNumberDigits || cardNumberDigits.length !== 16)) {
+       errorMsg = 'Card Number must be 16 digits.';
+       isValid = false;
+    }
+    // Optional: Add Luhn algorithm check here for better validation if needed
+
+    // 3. CVV (Length check)
+    if (isValid && (!cardCvv || !/^\d{3,4}$/.test(cardCvv))) {
+       errorMsg = 'CVV must be 3 or 4 digits.';
+       isValid = false;
+    }
+
+    // 4. Expiry Date (Format and Logic check)
+    if (isValid) {
+       if (!cardExpiryRaw || !/^\d{2}\/\d{2}$/.test(cardExpiryRaw)) {
+           errorMsg = 'Expiry Date must be in MM/YY format.';
+           isValid = false;
+       } else {
+           const [monthStr, yearStr] = cardExpiryRaw.split('/');
+           const month = parseInt(monthStr, 10);
+           const year = parseInt(`20${yearStr}`, 10); // Assume 20xx
+
+           if (month < 1 || month > 12) {
+               errorMsg = 'Invalid Expiry Month.';
+               isValid = false;
+           } else {
+               const now = new Date();
+               const currentYear = now.getFullYear();
+               const currentMonth = now.getMonth() + 1; // JS months are 0-indexed
+
+               // Check if year is in the past OR
+               // if year is current year but month is in the past
+               if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                   errorMsg = 'Card has expired.';
+                   isValid = false;
+               }
+           }
+       }
+    }
+
+    // If validation failed, display error and stop
+    if (!isValid) {
+        displayError(paymentErrorElement, errorMsg);
+        return; // Stop processing
+    }
+    // --- END FORM VALIDATION ---
+
+
+    // If validation passes, proceed with processing
+    payNowBtn.disabled = true; // Disable button during processing
+    payNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
+    // --- Gather data for booking (rest of the function) ---
+    const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
+    // Check essential booking data again (belt and suspenders)
+    if (!currentModalMovieId || !currentSelectedDate || selectedSeats.length === 0 || !selectedShowtimeRadio || !authState.isLoggedIn || !authState.user?.uid) {
+        displayError(paymentErrorElement, "Booking information incomplete or invalid session.");
+        payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
+        return;
+    }
+
+    const movie = movies.find(m => m.id === currentModalMovieId);
+    const showtime = selectedShowtimeRadio.value;
+    const totalAmount = selectedSeats.length * TICKET_PRICE_EGP;
+    const userUid = authState.user.uid;
+    const userEmail = authState.user.email;
+    const selectedDateStr = formatDateYYYYMMDD(currentSelectedDate);
+
+    // --- Check Seat Availability AGAIN (Race Condition Check) ---
+    try {
+        const q = query(collection(db, "bookings"),
+            where("movieId", "==", currentModalMovieId),
+            where("showtime", "==", showtime),
+            where("selectedDate", "==", selectedDateStr)
+        );
+        const querySnapshot = await getDocs(q);
+        let alreadyBooked = [];
+        querySnapshot.forEach(doc => {
+            const data = doc.data();
+            if (Array.isArray(data.seats)) {
+                alreadyBooked.push(...data.seats);
+            }
+        });
+        alreadyBooked = [...new Set(alreadyBooked)];
+
+        const conflicts = selectedSeats.filter(seat => alreadyBooked.includes(seat));
+        if (conflicts.length > 0) {
+            displayError(paymentErrorElement, `Seats unavailable: ${conflicts.join(', ')}. Please select different seats.`);
+             payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
+             await renderSeatMap(currentModalMovieId, showtime, currentSelectedDate, 5, 8); // Re-render
+            return;
+        }
+
+    } catch(error) {
+         console.error("Error re-checking seat availability:", error);
+         displayError(paymentErrorElement, "Could not verify seat availability. Please try again.");
           payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
          return;
-     }
-     // Add more robust card validation if needed (Luhn algorithm, expiry format check)
-
-     const movie = movies.find(m => m.id === currentModalMovieId);
-     const showtime = selectedShowtimeRadio.value;
-     const totalAmount = selectedSeats.length * TICKET_PRICE_EGP;
-     const userUid = authState.user.uid;
-     const userEmail = authState.user.email;
-     const selectedDateStr = formatDateYYYYMMDD(currentSelectedDate);
-
-     // --- Check Seat Availability AGAIN (Race Condition Check) ---
-     // It's possible seats were booked between selection and payment confirmation
-     try {
-         const q = query(collection(db, "bookings"),
-             where("movieId", "==", currentModalMovieId),
-             where("showtime", "==", showtime),
-             where("selectedDate", "==", selectedDateStr)
-         );
-         const querySnapshot = await getDocs(q);
-         let alreadyBooked = [];
-         querySnapshot.forEach(doc => {
-             const data = doc.data();
-             if (Array.isArray(data.seats)) {
-                 alreadyBooked.push(...data.seats);
-             }
-         });
-         alreadyBooked = [...new Set(alreadyBooked)];
-
-         const conflicts = selectedSeats.filter(seat => alreadyBooked.includes(seat));
-         if (conflicts.length > 0) {
-             displayError(paymentErrorElement, `Seats unavailable: ${conflicts.join(', ')}. Please select different seats.`);
-              payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
-              // Maybe re-render seat map here to show conflicts
-              await renderSeatMap(currentModalMovieId, showtime, currentSelectedDate, 5, 8); // Re-render
-             return;
-         }
-
-     } catch(error) {
-          console.error("Error re-checking seat availability:", error);
-          displayError(paymentErrorElement, "Could not verify seat availability. Please try again.");
-           payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
-          return;
-     }
+    }
 
 
-     // --- Create Booking Document in Firestore ---
-     const newBookingData = {
-         userId: userUid,
-         userEmail: userEmail,
-         movieId: currentModalMovieId,
-         movieTitle: movie?.title || 'Unknown Movie', // Store for convenience
-         selectedDate: selectedDateStr, // Store as YYYY-MM-DD string
-         showtime: showtime,
-         seats: [...selectedSeats].sort(), // Store sorted array
-         paymentInfo: { // Store only non-sensitive info
-             cardName: cardName,
-             last4: cardNumber.slice(-4), // Store only last 4 digits
-             expiry: cardExpiry
-             // DO NOT store full card number or CVV
-         },
-         totalAmount: totalAmount,
-         timestamp: serverTimestamp(), // Use Firestore server timestamp
-         qrCodeUsed: false, // Initialize as not used
-         qrUsedTimestamp: null // Initialize as null
-     };
+    // --- Create Booking Document in Firestore ---
+    const newBookingData = {
+        userId: userUid,
+        userEmail: userEmail,
+        movieId: currentModalMovieId,
+        movieTitle: movie?.title || 'Unknown Movie', // Store for convenience
+        selectedDate: selectedDateStr, // Store as YYYY-MM-DD string
+        showtime: showtime,
+        seats: [...selectedSeats].sort(), // Store sorted array
+        paymentInfo: { // Store only non-sensitive info
+            cardName: cardName,
+            last4: cardNumberDigits.slice(-4), // Use the digit-only string here
+            expiry: cardExpiryRaw // Store the raw MM/YY string
+            // DO NOT store full card number or CVV
+        },
+        totalAmount: totalAmount,
+        timestamp: serverTimestamp(), // Use Firestore server timestamp
+        qrCodeUsed: false, // Initialize as not used
+        qrUsedTimestamp: null // Initialize as null
+    };
 
-     try {
-         const docRef = await addDoc(collection(db, "bookings"), newBookingData);
-         console.log("Booking added with ID:", docRef.id);
+    try {
+        const docRef = await addDoc(collection(db, "bookings"), newBookingData);
+        console.log("Booking added with ID:", docRef.id);
 
-          // Add the new booking to the local cache immediately
-         allBookings.push({ id: docRef.id, ...newBookingData, timestamp: new Date() }); // Use local date temporarily
+         // Add the new booking to the local cache immediately
+        allBookings.push({ id: docRef.id, ...newBookingData, timestamp: new Date() }); // Use local date temporarily
 
-         // --- Success Feedback ---
-         alert(`Booking Successful!\nMovie: ${newBookingData.movieTitle}\nDate: ${formatDateReadable(newBookingData.selectedDate)}\nTime: ${newBookingData.showtime}\nSeats: ${newBookingData.seats.join(', ')}\nAmount: ${newBookingData.totalAmount} EGP`);
+        // --- Success Feedback ---
+        alert(`Booking Successful!\nMovie: ${newBookingData.movieTitle}\nDate: ${formatDateReadable(new Date(newBookingData.selectedDate.replace(/-/g, '\/')))}\nTime: ${newBookingData.showtime}\nSeats: ${newBookingData.seats.join(', ')}\nAmount: ${newBookingData.totalAmount} EGP`); // Corrected date formatting for alert
 
-         closePaymentModal();
-         closeModal(); // Close movie details modal too
- 
-         // Refresh relevant views using the updated local allBookings array
-         if (isShowingMyBookings) { renderMyBookings(); } // Uses updated allBookings
- 
-         if (adminView && !adminView.classList.contains('is-hidden')) {
-             if (currentAdminTab === 'admin-bookings-section') {
-                 renderAdminBookingsList(); // Uses updated allBookings
-             }
-             // Re-render analytics completely to reflect new booking
-             if (currentAdminTab === 'admin-analytics') {
-                 renderAnalyticsDashboard(); // Uses updated allBookings
-             }
-         }
-         // Refresh vendor dashboard if the booked movie belongs to the logged-in vendor
-         if (vendorDashboardView && !vendorDashboardView.classList.contains('is-hidden') && movie?.vendorName === authState.user?.name) {
-              renderVendorDashboard(); // Also uses updated allBookings/movies for analytics
-         }
-         // No full page reload needed - UI updates based on state change + local data update
- 
-     } catch (error) {
-          // ... (error handling)
-     } finally { // Make sure button is re-enabled even on success/error
-         payNowBtn.disabled = false;
-         payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
-     }
+        closePaymentModal();
+        closeModal(); // Close movie details modal too
+
+        // Refresh relevant views using the updated local allBookings array
+        if (isShowingMyBookings) { renderMyBookings(); } // Uses updated allBookings
+
+        if (adminView && !adminView.classList.contains('is-hidden')) {
+            if (currentAdminTab === 'admin-bookings-section') {
+                renderAdminBookingsList(); // Uses updated allBookings
+            }
+            // Re-render analytics completely to reflect new booking
+            if (currentAdminTab === 'admin-analytics') {
+                renderAnalyticsDashboard(); // Uses updated allBookings
+            }
+        }
+        // Refresh vendor dashboard if the booked movie belongs to the logged-in vendor
+        if (vendorDashboardView && !vendorDashboardView.classList.contains('is-hidden') && movie?.vendorName === authState.user?.name) {
+             renderVendorDashboard(); // Also uses updated allBookings/movies for analytics
+        }
+        // No full page reload needed - UI updates based on state change + local data update
+
+    } catch (error) {
+        console.error("Error creating booking:", error); // Log booking creation error
+        displayError(paymentErrorElement, "Failed to save booking after payment validation. Please try again."); // Specific error
+    } finally { // Make sure button is re-enabled even on success/error
+        payNowBtn.disabled = false;
+        payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
+    }
 }
-
 
 // --- Admin Tab Switching ---
 function handleAdminTabClick(event) {
@@ -2562,12 +2617,58 @@ function closeQrZoomModal() {
     }
 }
 
+function formatCardNumber(event) {
+    const input = event.target;
+    let value = input.value.replace(/\D/g, ''); // Remove non-digit characters
+    let formattedValue = '';
+
+    // Limit to 16 digits
+    value = value.substring(0, 16);
+
+    // Add spaces every 4 digits
+    for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) {
+            formattedValue += ' ';
+        }
+        formattedValue += value[i];
+    }
+
+    input.value = formattedValue;
+}
+
+function formatExpiryDate(event) {
+    const input = event.target;
+    let value = input.value.replace(/\D/g, ''); // Remove non-digit chars
+    let formattedValue = '';
+
+    // Handle MM
+    if (value.length > 0) {
+        formattedValue += value.substring(0, 2);
+    }
+    // Handle YY and add slash automatically
+    if (value.length >= 2) {
+         // Add slash only if month is complete and year started
+        if (formattedValue.length === 2 && value.length > 2) {
+             formattedValue += '/';
+        }
+         // Add YY (limit total digits to 4: MMYY)
+        formattedValue += value.substring(2, 4);
+    }
+
+     // Special handling for backspace after slash
+     // If user deletes slash, also delete last digit of month if present
+     if (event.inputType === 'deleteContentBackward' && input.value.length === 3 && input.value.endsWith('/')) {
+         formattedValue = formattedValue.substring(0, 1);
+     }
+
+    input.value = formattedValue;
+}
+
 // --- Initialization ---
 function initializeApp() {
     console.log("Initializing App...");
-    // hideElement(splashScreen); // Splash screen removed
 
-    // Event listeners (Mostly unchanged)
+    // --- Standard Event Listeners ---
     customerLoginForm.addEventListener('submit', handleCustomerLogin);
     sendOtpButton.addEventListener('click', handleSendOtp);
     customerRegisterForm.addEventListener('submit', handleVerifyOtpAndRegister);
@@ -2598,65 +2699,93 @@ function initializeApp() {
     qrZoomCloseBtn.addEventListener('click', closeQrZoomModal);
     qrZoomModal.addEventListener('click', (e) => { if (e.target === qrZoomModal) closeQrZoomModal(); });
 
-        // Event Delegation for Admin Movie List actions (Edit/Delete)
-        if (adminMovieListContainer) { // Check if container exists
-            adminMovieListContainer.addEventListener('click', (event) => {
-                const targetButton = event.target.closest('button'); // Find the clicked button
-                if (!targetButton) return; // Exit if click wasn't on or inside a button
-    
-                if (targetButton.classList.contains('delete-movie-btn')) {
-                    event.stopPropagation(); // Prevent card click if needed
-                    const movieId = targetButton.dataset.movieId;
-                    if (movieId) {
-                        deleteMovie(movieId); // Call your delete function
-                    } else {
-                        console.error("Missing data-movie-id on delete button");
-                    }
-                } else if (targetButton.classList.contains('edit-movie-btn')) {
-                     event.stopPropagation();
-                     const movieId = targetButton.dataset.movieId;
-                     if (movieId) {
-                        showEditForm(movieId); // Call your edit function
-                     } else {
-                         console.error("Missing data-movie-id on edit button");
-                     }
+    // --- Get Payment Form Input Elements ---
+    const cardNumberInput = document.getElementById('card-number');
+    const cardExpiryInput = document.getElementById('card-expiry');
+    const cardCvvInput = document.getElementById('card-cvv'); // CVV needed if you add validation later
+
+    // --- *** FIX: ADD PAYMENT FORM INPUT EVENT LISTENERS HERE *** ---
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', formatCardNumber);
+        // Optional: Add blur validation if needed
+        // cardNumberInput.addEventListener('blur', validateCardNumber);
+        console.log("Card number listener attached."); // Add log
+    } else {
+        console.warn("Card number input not found for listener attachment.");
+    }
+    if (cardExpiryInput) {
+        cardExpiryInput.addEventListener('input', formatExpiryDate);
+        // Optional: Add blur validation if needed
+        // cardExpiryInput.addEventListener('blur', validateExpiryDate);
+        console.log("Card expiry listener attached."); // Add log
+    } else {
+        console.warn("Card expiry input not found for listener attachment.");
+    }
+    // Optional: Add blur validation for CVV if needed
+    // if (cardCvvInput) {
+    //    cardCvvInput.addEventListener('blur', validateCvv);
+    // }
+    // --- *** END OF FIX *** ---
+
+    // --- Event Delegation for Dynamic Buttons (Admin Lists) ---
+    if (adminMovieListContainer) { // Check if container exists
+        adminMovieListContainer.addEventListener('click', (event) => {
+            const targetButton = event.target.closest('button'); // Find the clicked button
+            if (!targetButton) return; // Exit if click wasn't on or inside a button
+
+            if (targetButton.classList.contains('delete-movie-btn')) {
+                event.stopPropagation(); // Prevent card click if needed
+                const movieId = targetButton.dataset.movieId;
+                if (movieId) {
+                    deleteMovie(movieId); // Call your delete function
+                } else {
+                    console.error("Missing data-movie-id on delete button");
                 }
-            });
-        } else {
-            console.warn("Admin movie list container not found for event delegation.");
-        }
-    
-    
-        // Event Delegation for Admin Vendor List actions (Edit/Delete)
-        if (adminVendorListContainer) { // Check if container exists
-            adminVendorListContainer.addEventListener('click', (event) => {
-                const targetButton = event.target.closest('button'); // Find the clicked button
-                if (!targetButton) return; // Exit if click wasn't on or inside a button
-    
-                if (targetButton.classList.contains('delete-vendor-btn')) {
-                    const vendorId = targetButton.dataset.vendorId;
-                    if (vendorId) {
-                        deleteVendor(vendorId); // Call your delete function
-                    } else {
-                         console.error("Missing data-vendor-id on delete button");
-                    }
-                } else if (targetButton.classList.contains('edit-vendor-btn')) {
-                     const vendorId = targetButton.dataset.vendorId;
-                     if (vendorId) {
-                        showEditVendorForm(vendorId); // Call your edit function
-                     } else {
-                         console.error("Missing data-vendor-id on edit button");
-                     }
+            } else if (targetButton.classList.contains('edit-movie-btn')) {
+                 event.stopPropagation();
+                 const movieId = targetButton.dataset.movieId;
+                 if (movieId) {
+                    showEditForm(movieId); // Call your edit function
+                 } else {
+                     console.error("Missing data-movie-id on edit button");
+                 }
+            }
+        });
+    } else {
+        console.warn("Admin movie list container not found for event delegation.");
+    }
+
+
+    if (adminVendorListContainer) { // Check if container exists
+        adminVendorListContainer.addEventListener('click', (event) => {
+            const targetButton = event.target.closest('button'); // Find the clicked button
+            if (!targetButton) return; // Exit if click wasn't on or inside a button
+
+            if (targetButton.classList.contains('delete-vendor-btn')) {
+                const vendorId = targetButton.dataset.vendorId;
+                if (vendorId) {
+                    deleteVendor(vendorId); // Call your delete function
+                } else {
+                     console.error("Missing data-vendor-id on delete button");
                 }
-            });
-        } else {
-            console.warn("Admin vendor list container not found for event delegation.");
-        }
+            } else if (targetButton.classList.contains('edit-vendor-btn')) {
+                 const vendorId = targetButton.dataset.vendorId;
+                 if (vendorId) {
+                    showEditVendorForm(vendorId); // Call your edit function
+                 } else {
+                     console.error("Missing data-vendor-id on edit button");
+                 }
+            }
+        });
+    } else {
+        console.warn("Admin vendor list container not found for event delegation.");
+    }
 
     // --- Firebase Auth State Listener ---
     onAuthStateChanged(auth, async (user) => {
-        console.log("Auth State Changed. User:", user ? user.email : 'None');
+        console.log("Auth State Changed Callback Fired."); // Added log
         if (user) {
+            console.log("User detected:", user.email, user.uid); // Added log
             // User is signed in
             let userType = 'customer'; // Default
             let vendorName = null;
@@ -2673,9 +2802,7 @@ function initializeApp() {
                     console.log(`User role from Firestore for ${user.email}: ${userType}`);
 
                     // If vendor, fetch vendor details (like name) based on email match
-                    // Assumes vendor email in Auth matches email in 'vendors' collection
                     if (userType === 'vendor') {
-                        // Fetch vendor name from /vendors/{uid} collection
                         const vendorDetailsRef = doc(db, "vendors", user.uid); // Use UID
                         const vendorDetailsSnap = await getDoc(vendorDetailsRef);
                         if (vendorDetailsSnap.exists()) {
@@ -2683,18 +2810,14 @@ function initializeApp() {
                             console.log(`Vendor name found from /vendors: ${vendorName}`);
                         } else {
                              console.warn(`Vendor details document NOT found in /vendors/${user.uid} for vendor role user ${user.email}.`);
-                             // Decide how to handle: log out, default name, proceed without name?
-                             // For now, we proceed without a specific vendor name displayed.
                              vendorName = user.email; // Fallback display name
                         }
                     }
                 } else {
-                    // User exists in Auth but not in Firestore 'users' collection
                     console.warn(`User document NOT found in Firestore for UID: ${user.uid}, Email: ${user.email}. Defaulting to customer.`);
-                     // Optional: Create a default user document if missing
-                     // await setDoc(userDocRef, { email: user.email, role: 'customer', createdAt: serverTimestamp() });
                      userType = 'customer'; // Assign default role
                 }
+                 console.log("User role fetched:", userType); // Added log
 
                  // Update authState
                  authState = {
@@ -2709,13 +2832,13 @@ function initializeApp() {
 
 
             } catch (error) {
-                console.error("Error fetching user role:", error);
-                // Handle error fetching role - log out or default to customer?
+                console.error("Error fetching user role inside onAuthStateChanged:", error); // Added log
                 authState = { isLoggedIn: false, user: null }; // Log out on error
                 await signOut(auth); // Force sign out if role check fails critically
             }
 
         } else {
+             console.log("No user detected (Logged out state)."); // Added log
             // User is signed out
             authState = { isLoggedIn: false, user: null };
         }
@@ -2732,6 +2855,7 @@ function initializeApp() {
         }
 
         // Render the UI based on the final authState and loaded data
+        console.log("Calling renderUI from onAuthStateChanged..."); // Added log
         renderUI();
     });
 
