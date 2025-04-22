@@ -621,12 +621,13 @@ function renderUI() {
         hideElement(authView);
         showElement(appHeader);
         let userTypeDisplay = authState.user.type;
-        // Use user's vendor name if available (fetched during login)
         if (authState.user.type === 'vendor' && authState.user.name) {
             userTypeDisplay = `vendor (${authState.user.name})`;
         }
+        // Set text content FIRST
         loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${userTypeDisplay})`;
 
+        // Main view switching
         if (authState.user.type === 'admin') {
             hideElement(customerView);
             hideElement(vendorDashboardView);
@@ -651,7 +652,14 @@ function renderUI() {
         hideElement(vendorDashboardView);
         showElement(authView);
         showCustomerLoginForm();
+        // Clear text content on logout
+        if (userInfoSpan) {
+            userInfoSpan.textContent = '';
+        }
     }
+
+    // Call visibility update at the end, AFTER potential text changes
+    updateHeaderVisibility();
 }
 
 // --- Admin Content Rendering ---
@@ -1914,21 +1922,24 @@ function populateVendorDropdown(selectElementId) {
 // Takes movie object (with id) and viewType. Index is no longer needed.
 function createMovieCard(movie, _indexUnused, viewType) {
     const card = document.createElement('div');
-    card.className = 'movie-card flex flex-col';
-    card.dataset.movieId = movie.id; // Use Firestore ID
+    // Add viewType class for specific CSS targeting
+    card.className = `movie-card flex flex-col view-${viewType}`;
+    card.dataset.movieId = movie.id;
 
     const img = document.createElement('img');
-    img.src = movie.posterUrl || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; // Use posterUrl
+    img.src = movie.posterUrl || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image';
     img.alt = `${movie.title} Poster`;
     img.className = 'movie-poster';
     img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; };
 
     const content = document.createElement('div');
-    content.className = 'p-4 flex flex-col flex-grow';
+    content.className = 'p-3 flex flex-col flex-grow'; // Use slightly less padding: p-3
 
     const title = document.createElement('h3');
-    title.className = 'text-lg font-semibold mb-1 text-gray-800 flex items-center';
+    // Removed mb-1, added title class
+    title.className = 'movie-card-title font-semibold flex items-center mb-1';
     title.textContent = movie.title;
+    // Vendor badge logic remains the same
     if (movie.vendorName) {
         const vendorBadge = document.createElement('span');
         vendorBadge.className = 'vendor-badge';
@@ -1937,70 +1948,114 @@ function createMovieCard(movie, _indexUnused, viewType) {
     }
 
     const avgRatingDiv = document.createElement('div');
-    avgRatingDiv.className = 'stars-container text-sm mb-2';
-    // Calculate average rating using the movie object (which includes the ID)
+     // Removed text-sm, mb-2. Added specific class
+    avgRatingDiv.className = 'movie-card-rating stars-container';
     const { average, count } = calculateAverageRating(movie);
-    renderStars(avgRatingDiv, average, count, false); // Render non-interactive stars
+    renderStars(avgRatingDiv, average, count, false); // Rating stars remain visible
 
-    const details = document.createElement('p');
-    details.className = 'text-sm text-gray-600 mb-1';
-    details.innerHTML = ` <i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'} &bull; <i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min `;
+    // ***** START MODIFICATION *****
+    // Genre Element (Now VISIBLE)
+    const genreElement = document.createElement('p');
+    genreElement.className = 'movie-card-genre text-xs'; // Specific class, smaller text
+     genreElement.innerHTML = `<i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'}`;
 
+    // Wrapper for HIDDEN details
+    const detailsWrapper = document.createElement('div');
+    detailsWrapper.className = 'movie-card-details'; // Class to hide this wrapper
+
+    // Duration element (Goes inside hidden wrapper)
+    const durationElement = document.createElement('p');
+    durationElement.className = 'text-xs'; // Smaller text
+    durationElement.innerHTML = `<i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min`;
+
+    // Description (Goes inside hidden wrapper)
     const description = document.createElement('p');
-    description.className = 'text-sm text-gray-700 mb-3 flex-grow';
+    description.className = 'text-sm mt-1'; // Add margin top
     description.textContent = movie.description || 'No description available.';
 
+    // Showtimes (Goes inside hidden wrapper)
     const showtimes = document.createElement('p');
-    showtimes.className = 'text-sm text-blue-600 font-medium mt-auto';
-    // Display showtimes array nicely
+    showtimes.className = 'text-sm font-medium mt-2'; // Add margin top
     const showtimesText = Array.isArray(movie.showtimes) ? movie.showtimes.join(', ') : (movie.showtimes || 'N/A');
-    showtimes.innerHTML = ` <i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${showtimesText} `;
+    showtimes.innerHTML = `<i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${showtimesText}`;
 
+    // Append hidden details to the wrapper
+    detailsWrapper.appendChild(durationElement);
+    detailsWrapper.appendChild(description);
+    detailsWrapper.appendChild(showtimes);
+    // ***** END MODIFICATION *****
+
+    // Append elements to the main content div
     content.appendChild(title);
     content.appendChild(avgRatingDiv);
-    content.appendChild(details);
-    content.appendChild(description);
-    content.appendChild(showtimes);
+    content.appendChild(genreElement);    // Append VISIBLE genre here
+    content.appendChild(detailsWrapper); // Append HIDDEN wrapper here
+
     card.appendChild(img);
     card.appendChild(content);
 
+    // --- Keep Admin Controls and Click Logic ---
     if (viewType === 'admin') {
         const adminControls = document.createElement('div');
-        adminControls.className = 'p-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2';
-        
-        const editButton = document.createElement('button');
-        editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
-        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2 edit-movie-btn'; // Add class
-        editButton.dataset.movieId = movie.id; // Add data attribute for ID
-        // REMOVE: editButton.onclick = (e) => { e.stopPropagation(); showEditForm(movie.id); };
-        
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
-        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2 delete-movie-btn'; // Add class
-        deleteButton.dataset.movieId = movie.id; // Add data attribute for ID
-        // REMOVE: deleteButton.onclick = (e) => { e.stopPropagation(); deleteMovie(movie.id); };
-        
-        adminControls.appendChild(editButton);
-        adminControls.appendChild(deleteButton);
-        card.appendChild(adminControls);
+        adminControls.className = 'admin-controls p-2 border-t flex justify-end gap-2'; // Smaller padding
+        // ... Add buttons ...
+         const editButton = document.createElement('button');
+         editButton.innerHTML = '<i class="fas fa-edit"></i>'; // Icon only maybe?
+         editButton.className = 'btn btn-secondary btn-icon text-xs !p-1 edit-movie-btn'; // Smaller button
+         editButton.dataset.movieId = movie.id;
+         editButton.title = "Edit Movie"; // Tooltip
+
+         const deleteButton = document.createElement('button');
+         deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; // Icon only
+         deleteButton.className = 'btn btn-danger btn-icon text-xs !p-1 delete-movie-btn'; // Smaller button
+         deleteButton.dataset.movieId = movie.id;
+         deleteButton.title = "Delete Movie"; // Tooltip
+
+         adminControls.appendChild(editButton);
+         adminControls.appendChild(deleteButton);
+         card.appendChild(adminControls);
+
     } else if (viewType === 'customer' || viewType === 'preview') {
         card.classList.add('cursor-pointer');
-        card.onclick = () => openModal(movie.id); // Pass Firestore ID
         if (authState.isLoggedIn && authState.user?.type === 'admin') {
-            // Admin shouldn't book, maybe add a title attribute or different style
             card.title = "Admins cannot book movies from this view.";
-            card.style.cursor = 'not-allowed'; // Visual cue
+            card.style.cursor = 'not-allowed';
         } else {
-            // Only allow non-admins to open the booking modal
-            card.onclick = () => openModal(movie.id); // Pass Firestore ID
+            card.onclick = () => openModal(movie.id);
         }
-    } else if (viewType === 'vendor_dashboard') {
-        // No controls needed for vendor dashboard view
     }
+    // Vendor view needs no controls
 
     return card;
 }
 
+function updateHeaderVisibility() {
+    const userInfoSpan = document.getElementById('logged-in-user-info');
+    if (!userInfoSpan) {
+        // console.warn("User info span not found for visibility update.");
+        return; // Exit if element doesn't exist
+    }
+
+    const isCustomer = authState.isLoggedIn && authState.user?.type === 'customer';
+    const isMobileWidth = window.innerWidth <= 580; // Mobile breakpoint
+
+    // Log state for debugging
+    console.log(`Header Visibility Check: isCustomer=${isCustomer}, isMobileWidth=${isMobileWidth}`);
+
+    if (isCustomer && isMobileWidth) {
+        // --- Direct Style Manipulation ---
+        console.log("Hiding user info span via style.display.");
+        userInfoSpan.style.display = 'none';
+        // --- End Direct Style Manipulation ---
+        // userInfoSpan.classList.add('force-hide'); // Keep class logic removed or commented
+    } else {
+        // --- Direct Style Manipulation ---
+         console.log("Showing user info span via style.display.");
+        userInfoSpan.style.display = 'block'; // Or 'inline-block' if preferred
+        // --- End Direct Style Manipulation ---
+        // userInfoSpan.classList.remove('force-hide'); // Keep class logic removed or commented
+    }
+}
 
 // --- Movie List Rendering (Uses local 'movies' array) ---
 function renderMovies(container, viewType) {
@@ -2927,6 +2982,13 @@ function initializeApp() {
     qrZoomCloseBtn.addEventListener('click', closeQrZoomModal);
     qrZoomModal.addEventListener('click', (e) => { if (e.target === qrZoomModal) closeQrZoomModal(); });
 
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        // Debounce resize event to avoid excessive calls
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateHeaderVisibility, 150);
+    });
+
     // --- Get Payment Form Input Elements ---
     const cardNumberInput = document.getElementById('card-number');
     const cardExpiryInput = document.getElementById('card-expiry');
@@ -3078,6 +3140,13 @@ function initializeApp() {
             authState = { isLoggedIn: false, user: null };
         }
 
+        if (authState.isLoggedIn) {
+            await loadDataFromFirebase();
+       } else {
+            // Clear local data on logout
+            movies = []; vendors = []; allBookings = []; allRatings = [];
+       }
+
         // Load data AFTER auth state is determined (or clear data on logout)
         if (authState.isLoggedIn) {
              await loadDataFromFirebase(); // Load fresh data on login/refresh
@@ -3092,6 +3161,8 @@ function initializeApp() {
         // Render the UI based on the final authState and loaded data
         console.log("Calling renderUI from onAuthStateChanged..."); // Added log
         renderUI();
+
+        updateHeaderVisibility();
     });
 
     console.log("App Initialized. Waiting for Auth State...");

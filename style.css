@@ -1,15 +1,51 @@
-/* Base Styles */
-body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+/* Import Font (Ensure link is in HTML head) */
+/* @import url('https://fonts.googleapis.com/css2?family=Ranchers&display=swap'); */ /* Better to use <link> in HTML */
 
-/* Splash Screen Styles Removed */
-/* #splash-screen { ... } */
-/* #splash-screen.is-hidden { ... } */
-/* .splash-logo { ... } */
-/* @keyframes pulse { ... } */
+@media (max-width: 480px) { /* Stricter breakpoint for hiding */
 
-#admin-view, #customer-view, #auth-view, #app-header, #my-bookings-view, #vendor-dashboard-view, #payment-modal, #movie-details-modal, #qr-validation-modal { /* Add modals */
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    /* Force collapse for customer info */
+    #logged-in-user-info.user-is-customer {
+        max-width: 0; /* Collapse width */
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        overflow: hidden; /* Hide content */
+        opacity: 0; /* Fade out */
+        transition: max-width 0.3s ease, opacity 0.3s ease, padding 0.3s ease, margin 0.3s ease; /* Smooth transition (optional) */
+        /* display: none !important; */ /* Keep this commented out unless the above fails */
+    }
+
+    /* General adjustments for small screens */
+    #logged-in-user-info {
+         /* Reduce max-width for non-customers if needed */
+         /* max-width: 120px; */
+         font-size: 0.75rem; /* Ensure font size is small */
+    }
+    #app-header .container .gap-4 {
+        gap: 0.5rem; /* Reduce gap */
+    }
+    .logo-container {
+        margin-right: 0.5rem; /* Reduce logo margin */
+    }
+    .logo-text {
+        font-size: 20px; /* Slightly smaller logo text */
+    }
+    .logo-container svg {
+        height: 30px; /* Slightly smaller logo icon */
+    }
 }
+
+/* Base Styles - DARK MODE */
+body {
+    font-family: 'Inter', sans-serif; /* Keep Inter for UI text */
+    background-color: #252525; /* Dark background */
+    color: #e0e0e0; /* Light default text */
+    margin: 0;
+    padding: 0;
+}
+
+/* Helper to hide elements (no change needed) */
 .is-hidden {
     opacity: 0;
     visibility: hidden;
@@ -20,293 +56,371 @@ body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
     padding: 0 !important;
     border: none !important;
 }
-.movie-card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
-.movie-card:hover { transform: translateY(-5px); }
-.movie-poster { width: 100%; height: 300px; object-fit: cover; background-color: #e5e7eb; }
-.form-input, .form-select { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.75rem 1rem; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; background-color: white; }
-.form-input:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); outline: none; }
-.form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
-.btn { padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out; text-align: center; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid transparent; } /* Added border */
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-primary { background-color: #3b82f6; color: white; }
-.btn-primary:hover:not(:disabled) { background-color: #2563eb; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-.btn-secondary { background-color: #6b7280; color: white; }
-.btn-secondary:hover:not(:disabled) { background-color: #4b5563; }
-.btn-danger { background-color: #ef4444; color: white; }
-.btn-danger:hover:not(:disabled) { background-color: #dc2626; }
-.btn-success { background-color: #22c55e; color: white; } /* Added Success */
-.btn-success:hover:not(:disabled) { background-color: #16a34a; } /* Added Success Hover */
-.btn-link { background: none; border: none; color: #3b82f6; text-decoration: underline; cursor: pointer; padding: 0; font-weight: 500; }
-.btn-link:hover { color: #2563eb; }
-.btn-icon { padding: 0.5rem; margin-left: 0.5rem; } /* Adjusted */
-.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; } /* Added btn-sm */
 
-.auth-container { max-width: 450px; margin: 2rem auto; padding: 2rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-#app-header { background-color: white; padding: 0.75rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+/* App Header - DARK MODE */
+#app-header {
+    background-color: #1a1a1a; /* Slightly lighter than body */
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Darker shadow */
+    border-bottom: 1px solid #333333; /* Subtle border */
+    margin-bottom: 1.5rem;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+#app-header .user-info-text {
+     color: #b1b1b1; /* Use light silver for user info */
+}
+
+/* Rule to hide movie card details by default */
+.movie-card-details {
+    display: none;
+}
+
+/* Logo Styles */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+.logo-container svg {
+    height: 35px; /* Adjust size as needed */
+    width: auto;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+.ranchers-regular {
+  font-family: "Ranchers", sans-serif;
+  font-weight: 400; /* Ranchers only has 400 */
+  font-style: normal;
+}
+.logo-text {
+    font-size: 24px; /* Adjust size */
+    line-height: 1;
+    /* font-family: "Ranchers", sans-serif; Applied via class */
+}
+.logo-silver {
+    color: #b1b1b1;
+}
+.logo-seat {
+    color: #787878;
+}
+
+/* Containers - DARK MODE */
+.auth-container, .movie-card, .analytics-card, #admin-manage-movies .p-6, #admin-manage-vendors .p-6, #admin-vendor-list, .modal-content, #my-bookings-view > div:last-child, #admin-bookings-list, #admin-preview-customer-view {
+    background-color: #333333; border: 1px solid #444444; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2); color: #e0e0e0;
+}
+.auth-container { max-width: 450px; margin: 2rem auto; padding: 2rem; }
+.movie-card { overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
+/* Remove hover transform if details are hidden and click opens modal */
+/* .movie-card:hover { transform: translateY(-5px); } */
+.analytics-card { padding: 1.25rem; margin-bottom: 1.5rem; }
+
+/* Specific Container Padding/Margin (Keep existing or adjust) */
+.auth-container { max-width: 450px; margin: 2rem auto; padding: 2rem; }
+.movie-card { overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
+.movie-card:hover { transform: translateY(-5px); }
+.analytics-card { padding: 1.25rem; margin-bottom: 1.5rem; }
+
+.auth-container h2, .analytics-card h3, .admin-section h2, .admin-section h3, .modal-content h2, .movie-card h3 { color: #ffffff; }
+
+/* Movie Card Specifics - DARK MODE */
+.movie-poster {
+    display: block; /* Ensure image is block level */
+    width: 100%;
+    height: auto; /* Let aspect-ratio control height */
+    aspect-ratio: 1587 / 2245; /* Desired aspect ratio */
+    object-fit: cover; /* Cover the area */
+    background-color: #444444;
+    border-bottom: 1px solid #444444;
+}
+
+.movie-card {
+    overflow: hidden; /* Keep overflow hidden */
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    background-color: #333333; /* Ensure card has background */
+    border: 1px solid #444444;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+    color: #e0e0e0;
+    position: relative; /* Needed if absolute positioning was ever used inside */
+}
+
+.movie-card .p-4 { /* Content area of card */
+    padding: 0.75rem; /* Slightly reduced padding maybe needed */
+    background-color: #333333;
+    /* Flex settings to position title/rating */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allow content area to grow */
+}
+
+/* Ensure this rule is present and correct */
+.movie-card-details {
+    display: none !important; /* Add !important JUST FOR TESTING if needed, then try to remove it */
+}
+
+/* Styles for Title and Rating (which ARE visible) */
+ .movie-card h3 {
+    color: #ffffff;
+    font-size: 1rem; /* Adjust title size if needed for 3 columns */
+    line-height: 1.2;
+    margin-bottom: 0.25rem; /* Space below title */
+}
+.movie-card .stars-container {
+    margin-bottom: 0; /* Remove extra space below stars if details are hidden */
+}
+.movie-card .stars-container .ml-2 { /* Rating text */
+   font-size: 0.75rem; /* Make rating text smaller */
+   color: #aaaaaa;
+}
+
+
+/* Styles for the hidden details */
+.movie-card-details p {
+   /* Styles for when they are visible (e.g., inside modal) */
+   color: #cccccc;
+   font-size: 0.875rem;
+}
+.movie-card-details .text-blue-600 { /* Showtimes text */
+    color: #8bc0ef !important; /* Lighter blue */
+}
+
+/* Forms - DARK MODE */
+.form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #b1b1b1; }
+.form-input, .form-select { border: 1px solid #555555; border-radius: 0.375rem; padding: 0.75rem 1rem; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; background-color: #444444; color: #f0f0f0; }
+.form-input::placeholder { color: #888888; }
+.form-input:focus, .form-select:focus { border-color: #6fa8dc; box-shadow: 0 0 0 3px rgba(111, 168, 220, 0.3); background-color: #505050; outline: none; }
+.form-input:disabled, .form-select:disabled { background-color: #3a3a3a; opacity: 0.7; cursor: not-allowed; }
+textarea.form-input { min-height: 80px; }
+
+/* Buttons - DARK MODE */
+.btn { padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out; text-align: center; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid transparent; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #555 !important; color: #999 !important; border-color: #666 !important; box-shadow: none !important; }
+.btn-primary { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+.btn-primary:hover:not(:disabled) { background-color: #357abd; border-color: #357abd; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+.btn-secondary { background-color: #555555; color: #f0f0f0; border: 1px solid #666; }
+.btn-secondary:hover:not(:disabled) { background-color: #666666; border-color: #777; }
+.btn-danger { background-color: #e57373; color: white; border-color: #e57373; }
+.btn-danger:hover:not(:disabled) { background-color: #d32f2f; border-color: #d32f2f; }
+.btn-success { background-color: #66bb6a; color: white; border-color: #66bb6a; }
+.btn-success:hover:not(:disabled) { background-color: #4caf50; border-color: #4caf50; }
+.btn-link { background: none; border: none; color: #6fa8dc; text-decoration: underline; cursor: pointer; padding: 0; font-weight: 500; }
+.btn-link:hover:not(:disabled) { color: #8bc0ef; }
+.btn-icon { padding: 0.5rem; margin-left: 0.5rem; }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+/* Error Messages - DARK MODE */
+#customer-login-error, #register-error, #admin-login-error, #vendor-login-error, #payment-error, #date-error { color: #ff8a80; min-height: 1.25em; }
+.text-red-500 { color: #ff8a80 !important; }
+.text-green-600 { color: #a5d6a7 !important; }
+.text-blue-600 { color: #8bc0ef !important; }
+.text-purple-600 { color: #ce93d8 !important; }
+.text-gray-500 { color: #aaaaaa !important; }
+.text-gray-600 { color: #bbbbbb !important; }
+.text-gray-700 { color: #cccccc !important; }
+.text-gray-800 { color: #dddddd !important; }
+
+/* Stars - DARK MODE */
 .stars-container .fa-star, .stars-container .fa-regular.fa-star { color: #facc15; margin-right: 2px; transition: transform 0.1s ease-in-out; }
 .stars-container.interactive .fa-star:hover, .stars-container.interactive .fa-regular.fa-star:hover { transform: scale(1.2); }
 .stars-container:not(.interactive) { cursor: default; }
-.admin-nav-button { padding: 0.5rem 1rem; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-weight: 500; color: #6b7280; transition: color 0.2s ease, border-color 0.2s ease; }
-.admin-nav-button.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-.admin-section.is-hidden { display: none; } /* Keep display none for sections */
-.analytics-card { background-color: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-.occupancy-tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; color: white; }
-.occupancy-popular { background-color: #10b981; } .occupancy-normal { background-color: #f59e0b; } .occupancy-unpopular { background-color: #ef4444; }
+.stars-container .ml-2 { color: #aaaaaa; }
 
-#movie-details-modal, #payment-modal, #qr-validation-modal { /* Grouped modals */
-    z-index: 100;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-#movie-details-modal.is-hidden, #payment-modal.is-hidden, #qr-validation-modal.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
+/* Admin Navigation - DARK MODE */
+#admin-nav { border-bottom-color: #444444; }
+.admin-nav-button { padding: 0.5rem 1rem; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-weight: 500; color: #999999; transition: color 0.2s ease, border-color 0.2s ease; }
+.admin-nav-button.active { color: #6fa8dc; border-bottom-color: #6fa8dc; }
 
-.showtime-label { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
-.showtime-label:hover:not(.disabled) { background-color: #e5e7eb; }
-input[type="radio"].showtime-radio { display: none; } /* Keep hiding radio button */
-input[type="radio"]:checked + .showtime-label { background-color: #3b82f6; color: white; border-color: #3b82f6; }
-input[type="radio"]:disabled + .showtime-label, .showtime-label.disabled { background-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; opacity: 0.7; }
+/* Modals - DARK MODE */
+#movie-details-modal, #payment-modal, #qr-validation-modal, #booking-success-modal, #qr-zoom-modal { background-color: rgba(0, 0, 0, 0.8); z-index: 100; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.modal-content { background-color: #333333; color: #e0e0e0; border: 1px solid #444444; }
+.modal-content .border-b, .modal-content .border-t { border-color: #444444 !important; }
+.modal-content .bg-gray-50 { background-color: #2d2d2d !important; }
+.modal-content .bg-blue-50 { background-color: #3a4a5f !important; border-color: #5a7a9f !important; color: #e0e0e0; }
+.modal-content .bg-green-50 { background-color: #204d3a !important; }
+.modal-content .text-gray-500, .modal-content .text-gray-600, .modal-content .text-gray-700 { color: #aaaaaa !important; }
+.modal-content .text-gray-800, .modal-content .text-green-800 { color: #ffffff !important; }
+.modal-content button.text-gray-500, .modal-content button.text-green-700 { color: #bbbbbb !important; }
+.modal-content button.hover\:text-gray-800:hover, .modal-content button.hover\:text-green-900:hover { color: #ffffff !important; }
 
-.screen { width: 80%; height: 15px; background-color: #4a5568; margin: 15px auto 25px; border-radius: 3px; box-shadow: 0 3px 5px rgba(0,0,0,0.2); color: white; text-align: center; font-size: 0.7rem; line-height: 15px; font-weight: 500; letter-spacing: 1px; }
+/* Showtime Selection - DARK MODE */
+.showtime-label { padding: 0.5rem 1rem; border: 1px solid #555555; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; background-color: #444444; color: #e0e0e0; }
+.showtime-label:hover:not(.disabled) { background-color: #555555; }
+input[type="radio"].showtime-radio { display: none; }
+input[type="radio"]:checked + .showtime-label { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+input[type="radio"]:disabled + .showtime-label, .showtime-label.disabled { background-color: #3a3a3a; color: #777777; cursor: not-allowed; opacity: 0.7; border-color: #4a4a4a; }
+
+/* Seat Map - DARK MODE */
+.screen { width: 80%; height: 15px; background-color: #666666; margin: 15px auto 25px; border-radius: 3px; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4); color: #dddddd; text-align: center; font-size: 0.7rem; line-height: 15px; font-weight: 500; letter-spacing: 1px; }
 .seat-grid { display: flex; flex-direction: column; align-items: center; }
 .seat-row { display: flex; justify-content: center; margin-bottom: 5px; }
-.seat { width: 28px; height: 28px; margin: 3px; background-color: #cbd5e1; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #4a5568; font-size: 0.8rem; transition: background-color 0.2s ease, transform 0.1s ease; }
-.seat:hover:not(.unavailable):not(.selected) { background-color: #94a3b8; }
-.seat.selected { background-color: #3b82f6; color: white; transform: scale(1.1); }
-.seat.unavailable { background-color: #64748b; cursor: not-allowed; color: #e2e8f0; opacity: 0.7; }
+.seat { width: 28px; height: 28px; margin: 3px; background-color: #555555; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #aaaaaa; font-size: 0.8rem; transition: background-color 0.2s ease, transform 0.1s ease; }
+.seat i { transition: color 0.2s ease; }
+.seat:hover:not(.unavailable):not(.selected) { background-color: #ffffff; }
+.seat.selected { background-color: #4a90e2; color: #4a90e2; transform: scale(1.1); }
+.seat.selected i { color: #ffffff; }
+.seat.unavailable { background-color: #404040; cursor: not-allowed; color: #777777; opacity: 0.6; }
+.seat.unavailable i { color: #777777; }
 .seat-spacer { width: 28px; height: 28px; margin: 3px; }
 
-/* Error message minimum height */
-#customer-login-error, #register-error, #admin-login-error, #vendor-login-error, #payment-error, #date-error { min-height: 1.25em; /* approx one line height */ }
-#customer-login-error.is-hidden, #register-error.is-hidden, #admin-login-error.is-hidden, #vendor-login-error.is-hidden, #payment-error.is-hidden, #date-error.is-hidden { min-height: 0; }
-
-/* Booking List Styles */
-.booking-list-item { background-color: #fff; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 0.5rem; }
-.booking-main-info { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;}
-.booking-details { flex-grow: 1; }
-.booking-list-item strong { color: #1f2937; }
-.booking-list-item .seats { font-family: monospace; background-color: #e5e7eb; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; margin-left: 4px; }
-.booking-meta { font-size: 0.8rem; color: #6b7280; border-top: 1px dashed #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem; }
-.qr-code-container { width: 90px; /* Match JS */ height: 90px; /* Match JS */ flex-shrink: 0; border: 1px solid #eee; padding: 4px; background: white; }
+/* Booking List - DARK MODE */
+.booking-list-item { background-color: #3a3a3a; padding: 1rem; border: 1px solid #4a4a4a; border-radius: 0.375rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.5rem; }
+.booking-list-item .text-lg { color: #ffffff; }
+.booking-list-item strong { color: #cccccc; }
+.booking-list-item .seats { font-family: monospace; background-color: #555555; color: #e0e0e0; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.9em; margin-left: 4px; }
+.booking-meta { font-size: 0.8rem; color: #aaaaaa; border-top: 1px dashed #555555; padding-top: 0.5rem; margin-top: 0.5rem; }
+.booking-meta .text-red-600 { color: #ff8a80 !important; }
+.qr-code-container { width: 90px; height: 90px; flex-shrink: 0; border: 1px solid #555; padding: 4px; background: white; }
 .qr-code-container img { display: block; width: 100%; height: 100%; }
 
-/* Admin Booking List Styles */
-.admin-booking-group h3 { font-size: 1.25rem; font-weight:600; color: #374151; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; }
-.admin-booking-item { margin-bottom: 0.75rem; padding: 0.75rem; border-left: 4px solid #9ca3af; font-size: 0.9rem; background-color: #f9fafb; border-radius: 0 0.25rem 0.25rem 0; }
-.admin-booking-item span { display: flex; align-items: center; margin-bottom: 0.25rem; color: #374151; } /* Default text color */
-.admin-booking-item i { width: 1.25rem; text-align: center; margin-right: 0.5rem; color: #6b7280; }
+/* Admin Booking List - DARK MODE */
+.admin-booking-group h3 { color: #ffffff; border-bottom-color: #444444; }
+.admin-booking-item { margin-bottom: 0.75rem; padding: 0.75rem; border-left: 4px solid #666666; font-size: 0.9rem; background-color: #3a3a3a; border-radius: 0 0.25rem 0.25rem 0; }
+.admin-booking-item span { color: #cccccc; }
+.admin-booking-item i { color: #aaaaaa; }
 .status-label { font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 0.25rem; color: white; display: inline-block; }
-.status-used { background-color: #10b981; }
-.status-not-used { background-color: #f59e0b; }
-.status-error { background-color: #fee2e2; color: #991b1b; } /* Added error status */
-.status-ok { background-color: #dcfce7; color: #166534; } /* Added OK status */
+.status-used { background-color: #16a34a; color: white; }
+.status-not-used { background-color: #d97706; color: white; }
+.status-error { background-color: #dc2626; color: white; }
+.status-ok { background-color: #16a34a; color: white; }
 
+/* QR Scanner & Validation Modal - DARK MODE */
+#admin-qr-reader { border: 1px solid #555; background-color: #000; }
+#scan-status { color: #bbbbbb; }
+#qr-validation-modal .modal-body strong { color: #ffffff; }
+#validation-status { margin-top: 1rem; padding: 0.75rem; border-radius: 0.25rem; text-align: center; font-weight: 500; }
+#validation-status.status-ok { background-color: #204d3a; color: #dcfce7; }
+#validation-status.status-used { background-color: #634504; color: #fef08a; }
+#validation-status.status-error { background-color: #5f2120; color: #fecaca; }
 
-/* QR Scanner & Modal Styles */
-#admin-qr-reader { width: 100%; max-width: 400px; border: 1px solid #ccc; margin: 1rem auto; }
-#qr-validation-modal { z-index: 110; }
-#qr-validation-modal .modal-content { max-width: 500px; background: white; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
-#qr-validation-modal .modal-body p { margin-bottom: 0.5rem; }
-#qr-validation-modal .modal-body strong { color: #374151; }
-#validation-status { margin-top: 1rem; padding: 0.75rem; border-radius: 0.25rem; text-align: center; font-weight: 500; } /* Adjusted padding */
-#validation-status.status-ok { background-color: #dcfce7; color: #166534; }
-#validation-status.status-used { background-color: #ffedd5; color: #9a3412; } /* Adjusted color */
-#validation-status.status-error { background-color: #fee2e2; color: #991b1b; } /* Shared error style */
+/* Calendar - DARK MODE */
+#calendar-container { margin-top: 1rem; margin-bottom: 1rem; display: flex; justify-content: center; }
+.pika-single { border: 1px solid #444 !important; border-radius: 0.375rem !important; box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important; z-index: 150 !important; background-color: #333333 !important; color: #e0e0e0 !important; }
+.pika-lendar { width: auto; }
+.pika-label { color: #ffffff !important; background-color: #333333 !important; }
+.pika-table th { color: #aaaaaa !important; }
+.pika-button { background-color: #444444 !important; color: #e0e0e0 !important; }
+.pika-button:hover { background-color: #555555 !important; }
+.is-selected .pika-button { background-color: #4a90e2 !important; box-shadow: none !important; color: white !important; }
+.is-today .pika-button { color: #8bc0ef !important; font-weight: bold !important; }
+.is-disabled .pika-button { color: #777777 !important; opacity: 0.5 !important; background: none !important; cursor: not-allowed !important; }
+.pika-prev, .pika-next { color: #aaaaaa !important; }
+.pika-prev:hover, .pika-next:hover { background-color: #555555 !important; }
 
-/* Payment Modal Styles */
-#payment-modal .modal-content { max-width: 450px; }
-#payment-total-cost { font-size: 1.1rem; font-weight: 600; color: #1f2937; }
-/* #payment-form .grid { grid-template-columns: 1fr 1fr; gap: 1rem; } */ /* Replaced by Tailwind grid in HTML */
-/* #payment-form .cvv { grid-column: 1 / 2; } */
-/* #payment-form .expiry { grid-column: 2 / 3; } */
-
-/* Calendar Styles */
-#calendar-container { margin-top: 1rem; margin-bottom: 1rem; display: flex; justify-content: center; /* Centering Pikaday */ }
-/* Ensure Pikaday container styles don't conflict */
-.pika-single { border: 1px solid #d1d5db; border-radius: 0.375rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 120; /* Ensure calendar is above modal content */ background-color: white; }
-.pika-lendar { width: auto; } /* Adjust width if needed */
-.pika-button { background-color: #f3f4f6; }
-.pika-button:hover { background-color: #e5e7eb; }
-.is-selected .pika-button { background-color: #3b82f6; box-shadow: none; color: white; }
-.is-today .pika-button { color: #1d4ed8; font-weight: bold; }
-.is-disabled .pika-button { color: #9ca3af; opacity: 0.5; background: none; cursor: not-allowed; }
-
-/* Vendor Badge Style */
-.vendor-badge { display: inline-block; background-color: #e0e7ff; color: #4338ca; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem; vertical-align: middle; }
-
-/* Vendor Management List Style */
-.vendor-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; }
-.vendor-list-item:last-child { border-bottom: none; }
-
-/* QR Zoom Modal Styles */
-#qr-zoom-modal {
-    z-index: 150; /* Ensure it's above other modals if needed */
+/* Calendar Scaling & Centering */
+#calendar-container {
+    margin-top: 1rem; margin-bottom: 1rem; display: flex; justify-content: center;
 }
-#qr-zoom-modal.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+.pika-single {
+    border: 1px solid #444 !important; border-radius: 0.375rem !important; box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important; z-index: 150 !important; background-color: #333333 !important; color: #e0e0e0 !important;
+    width: auto;
+    max-width: 95vw; /* Use slightly more width on mobile if needed */
+    /* ***** INCREASE BASE FONT SIZE ***** */
+    font-size: 16px; /* Larger base font (adjust as needed) */
 }
-#qr-zoom-content img {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto; /* Maintain aspect ratio */
-    height: auto; /* Maintain aspect ratio */
-}
-
-/* Analytics Summary Box */
-.summary-box {
-    /* Styles for the grid container if needed */
-}
-
-.summary-card {
-    background-color: white;
-    border-radius: 0.5rem;
-    padding: 1rem; /* Reduced padding */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); /* Lighter shadow */
-    border: 1px solid #e5e7eb; /* Light border */
-    text-align: center; /* Center content */
-}
-
-.summary-card-title {
-    font-weight: 500;
-    color: #6b7280; /* Gray-500 */
-    font-size: 0.875rem; /* text-sm */
-    margin-bottom: 0.25rem;
-}
-
-.summary-card-value {
-    font-size: 1.75rem; /* text-2xl or adjust as needed */
-    font-weight: 600;
-    line-height: 1;
-}
-
-/* Revised Occupancy Labels (for weekly table) */
-.occupancy-label {
-    display: inline-block;
-    padding: 0.15rem 0.6rem;
-    border-radius: 9999px; /* pill shape */
-    font-size: 0.75rem; /* text-xs */
-    font-weight: 500;
-    text-align: center;
-    min-width: 70px; /* Ensure labels have some width */
-}
-
-.occupancy-empty { background-color: #f3f4f6; color: #6b7280; } /* gray-100 / gray-500 */
-.occupancy-low { background-color: #fff1f2; color: #e11d48; } /* rose-50 / rose-600 */
-.occupancy-moderate { background-color: #fef9c3; color: #ca8a04; } /* yellow-50 / yellow-600 */
-.occupancy-high { background-color: #f0fdf4; color: #16a34a; } /* green-50 / green-600 */
-
-
-/* Weekly Occupancy Table */
-#admin-weekly-occupancy-table {
-    /* Basic table styling */
-    border-collapse: collapse;
-}
-
-#admin-weekly-occupancy-table thead th {
-    font-weight: 600;
-    color: #4b5563; /* Gray-600 */
-    background-color: #f9fafb; /* Slightly off-white */
-}
-
-#admin-weekly-occupancy-table tbody tr:nth-child(even) {
-    background-color: #f9fafb; /* Zebra striping */
-}
-#admin-weekly-occupancy-table tbody tr:hover {
-    background-color: #f3f4f6; /* Hover effect */
-}
-
-#admin-weekly-occupancy-table td, #admin-weekly-occupancy-table th {
-    padding: 0.75rem 1rem; /* py-3 px-4 */
-    border-bottom: 1px solid #e5e7eb;
-}
-
-/* Ensure analytics card base style is suitable */
-.analytics-card {
-     background-color: white;
-     border-radius: 0.5rem;
-     padding: 1.25rem; /* Increased padding slightly */
-     box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-     border: 1px solid #e5e7eb;
-     margin-bottom: 1.5rem; /* Keep margin */
-}
-
-/* Daily Movie Performance Cards */
-#admin-daily-movie-performance {
-    /* Container styling if needed, but space-y-4 in HTML helps */
-     margin-bottom: 1.5rem; /* Add margin below the section */
-}
-
-#daily-movie-perf-list {
-    /* Grid styling is handled by Tailwind */
-}
-
-.daily-perf-card {
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1rem; /* Slightly less padding than main analytics cards */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* Space between elements */
-}
-
-.daily-perf-card .movie-title {
-    font-weight: 600;
-    color: #1f2937; /* gray-800 */
-    font-size: 1rem; /* text-base */
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Prevent long titles breaking layout */
-}
-
-.daily-perf-card .details {
-    font-size: 0.875rem; /* text-sm */
-    color: #4b5563; /* gray-600 */
-    display: flex;
-    justify-content: space-between; /* Align items horizontally */
-    flex-wrap: wrap; /* Allow wrapping on small screens */
-    gap: 0.5rem;
-}
-
-.daily-perf-card .details .seats {
-    font-weight: 500;
-}
-
-.daily-perf-card .details .percentage {
-    font-weight: 500;
-}
-
-/* Occupancy Bar */
-.occupancy-bar-container {
+.pika-lendar { width: auto; }
+.pika-table {
+    /* Font size inherited, maybe increase cell padding */
     width: 100%;
-    height: 8px; /* Slim bar */
-    background-color: #e5e7eb; /* gray-200 */
-    border-radius: 9999px; /* Rounded */
-    overflow: hidden; /* Clip the inner bar */
-    margin-top: 0.5rem; /* Space above the bar */
-    margin-bottom: 0.5rem; /* Space below the bar */
+    border-collapse: separate; /* Allows spacing */
+    border-spacing: 2px; /* Add small spacing */
+}
+.pika-table th {
+    font-size: 0.8em; /* Relative to base font size */
+    padding: 0.5em 0.25em; /* Adjust padding */
+}
+.pika-button {
+    background-color: #444444 !important; color: #e0e0e0 !important;
+    /* ***** ADJUST BUTTON PADDING/HEIGHT ***** */
+    padding: 0.5em 0.5em; /* Use em for proportional padding */
+    height: auto; /* Let padding determine height */
+    line-height: 1.2; /* Adjust line height */
+    font-size: 0.9em; /* Relative to base */
+    border-radius: 3px; /* Optional: slightly rounder buttons */
+}
+.pika-button:hover { background-color: #555555 !important; }
+.is-selected .pika-button { background-color: #4a90e2 !important; box-shadow: none !important; color: #ffffff !important; }
+.is-today .pika-button { color: #8bc0ef !important; font-weight: bold !important; border: 1px solid #8bc0ef !important; /* Add border to highlight today */ }
+.is-disabled .pika-button { color: #777777 !important; opacity: 0.5 !important; background: none !important; cursor: not-allowed !important; }
+.pika-prev, .pika-next {
+     color: #aaaaaa !important;
+     /* Optional: Slightly larger arrows */
+     /* font-size: 1.2em; */
+}
+.pika-prev:hover, .pika-next:hover { background-color: #555555 !important; }
+.pika-label {
+    font-size: 1.1em; /* Larger month/year label */
+    padding: 0.5em;
+    color: #ffffff !important; background-color: #333333 !important;
 }
 
-.occupancy-bar-fill {
-    height: 100%;
-    border-radius: 9999px; /* Rounded */
-    transition: width 0.5s ease-in-out; /* Smooth transition */
-    /* Background color will be set dynamically based on occupancy level */
-}
+/* Vendor List - DARK MODE */
+.vendor-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid #444444; }
+.vendor-list-item:last-child { border-bottom: none; }
+.vendor-list-item .font-medium { color: #ffffff; }
+.vendor-list-item .text-sm { color: #aaaaaa; }
 
-/* Match bar colors to label colors */
-.occupancy-bar-fill.occupancy-low { background-color: #e11d48; } /* rose-600 */
-.occupancy-bar-fill.occupancy-moderate { background-color: #ca8a04; } /* yellow-600 */
-.occupancy-bar-fill.occupancy-high { background-color: #16a34a; } /* green-600 */
-.occupancy-bar-fill.occupancy-empty { background-color: #d1d5db; } /* gray-300 - for empty */
+/* QR Zoom Modal - DARK MODE */
+#qr-zoom-modal { z-index: 150; background-color: rgba(0, 0, 0, 0.85); }
+#qr-zoom-modal .relative { background-color: #333; border: 1px solid #444; }
+#qr-zoom-content { background-color: white; padding: 0.5rem; }
+#qr-zoom-content img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; }
+#qr-zoom-close-btn { background-color: #b91c1c; color: white; }
 
-.daily-perf-card .performance-label-container {
-    text-align: right; /* Align label to the right */
-}
+/* Analytics Summary Cards - DARK MODE */
+.summary-card { background-color: #3a3a3a; border: 1px solid #4a4a4a; color: #ccc; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); text-align: center; }
+.summary-card-title { font-weight: 500; color: #aaa; font-size: 0.875rem; margin-bottom: 0.25rem; }
+.summary-card-value { font-size: 1.75rem; font-weight: 600; line-height: 1; color: #eee; }
+.summary-card-value.text-green-600 { color: #81c784 !important; }
+.summary-card-value.text-blue-600 { color: #64b5f6 !important; }
+.summary-card-value.text-purple-600 { color: #ba68c8 !important; }
+
+/* Analytics Tables - DARK MODE */
+#admin-weekly-occupancy-table { border-collapse: collapse; color: #ccc; }
+#admin-weekly-occupancy-table thead th { font-weight: 600; color: #eee; background-color: #3a3a3a; border-bottom: 1px solid #555; }
+#admin-weekly-occupancy-table tbody tr { border-bottom: 1px solid #444; }
+#admin-weekly-occupancy-table tbody tr:nth-child(even) { background-color: #2c2c2c; }
+#admin-weekly-occupancy-table tbody tr:hover { background-color: #404040; }
+#admin-weekly-occupancy-table td, #admin-weekly-occupancy-table th { padding: 0.75rem 1rem; }
+#admin-weekly-occupancy-table .text-gray-900 { color: #fff !important; }
+
+/* Occupancy Labels - DARK MODE */
+.occupancy-label { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; text-align: center; min-width: 70px; }
+.occupancy-empty { background-color: #4b5563; color: #d1d5db; }
+.occupancy-low { background-color: #7f1d1d; color: #fecaca; }
+.occupancy-moderate { background-color: #78350f; color: #fde68a; }
+.occupancy-high { background-color: #064e3b; color: #a7f3d0; }
+
+/* Daily Movie Performance Cards - DARK MODE */
+#admin-daily-movie-performance { margin-bottom: 1.5rem; }
+.daily-perf-card { background-color: #3a3a3a; border: 1px solid #4a4a4a; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 0.5rem; }
+.daily-perf-card .movie-title { font-weight: 600; color: #ffffff; font-size: 1rem; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.daily-perf-card .details { font-size: 0.875rem; color: #bbbbbb; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.daily-perf-card .details strong { color: #e0e0e0; }
+
+/* Occupancy Bar - DARK MODE */
+.occupancy-bar-container { width: 100%; height: 8px; background-color: #555555; border-radius: 9999px; overflow: hidden; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.occupancy-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
+.occupancy-bar-fill.occupancy-low { background-color: #fecaca; }
+.occupancy-bar-fill.occupancy-moderate { background-color: #fde68a; }
+.occupancy-bar-fill.occupancy-high { background-color: #a7f3d0; }
+.occupancy-bar-fill.occupancy-empty { background-color: #6b7280; }
+.daily-perf-card .performance-label-container { text-align: right; }
+
+/* Monthly Seats Card - DARK MODE */
+#monthly-seats-list .pb-1 { border-bottom-color: #444444 !important; }
+#monthly-seats-list .font-medium { color: #ffffff; }
+#monthly-seats-list .text-blue-600 { color: #8bc0ef !important; }
+
+/* Seat Legend (Corrected) */
+.seat-map-container .flex.justify-center.gap-4 { color: #aaaaaa; } /* Color for the text labels */
+i.seat-legend-available { color: #aaaaaa; } /* Color for the Available icon */
+i.seat-legend-selected { color: #4a90e2; } /* Color for the Selected icon */
+i.seat-legend-unavailable { color: #666666; } /* Color for the Unavailable icon */
+
+/* Ensure Pikaday isn't hidden by other high z-index elements */
+.pika-single { z-index: 150; } /* Higher than most modals except zoom */
+
+/* Final overrides if tailwind is stubborn */
+.bg-white { background-color: #333333 !important; } /* Example override */
+/* Add more specific overrides if needed */

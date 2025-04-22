@@ -8,7 +8,7 @@
     <!-- Import Firebase modules -->
     <script type="module" src="firebase.js"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Keep Tailwind for layout -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- QR Code Libraries -->
@@ -19,6 +19,12 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
+    <!-- ***** ADD RANCHERS FONT ***** -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ranchers&display=swap" rel="stylesheet">
+    <!-- ***** END FONT ADDITION ***** -->
+
     <!-- *** UPDATE EMAILJS LIBRARY to v4 *** -->
     <script type="text/javascript"
             src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
@@ -28,8 +34,6 @@
           // *** UPDATE EMAILJS INITIALIZATION SYNTAX for v4 ***
           emailjs.init({
             publicKey: "OQFnbNSELBj3GimNO" // Use your Public Key here
-            // You can add other options from the example here if needed,
-            // but start simple to ensure basic sending works.
           });
        })();
     </script>
@@ -38,22 +42,30 @@
     <link rel="stylesheet" href="style.css">
 
 </head>
-<body class="bg-gray-100">
+<!-- ***** REMOVED bg-gray-100 ***** -->
+<body>
 
-    <!-- App Header -->
     <div id="app-header" class="is-hidden">
-         <div class="container mx-auto flex justify-between items-center">
-             <span class="text-lg font-semibold text-gray-700">SilverSeat</span>
-             <div class="flex items-center gap-4">
-                 <span id="logged-in-user-info" class="text-sm text-gray-600"></span>
-                 <button id="logout-button" class="btn btn-secondary btn-sm !py-1 !px-3">Logout</button>
-             </div>
-         </div>
-    </div>
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- ***** NEW LOGO STRUCTURE ***** -->
+            <div class="logo-container">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40" zoomAndPan="magnify" viewBox="0 0 375 374.999991" height="40" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><clipPath id="1aedddb2a7"><path d="M 68 37.734375 L 241 37.734375 L 241 245 L 68 245 Z M 68 37.734375 " clip-rule="nonzero"/></clipPath><clipPath id="b32b17faaa"><path d="M 221 155 L 282.304688 155 L 282.304688 245 L 221 245 Z M 221 155 " clip-rule="nonzero"/></clipPath><clipPath id="01093815a0"><path d="M 27.304688 257 L 282.304688 257 L 282.304688 296 L 27.304688 296 Z M 27.304688 257 " clip-rule="nonzero"/></clipPath><clipPath id="36dcd1ffde"><path d="M 27.304688 155 L 88 155 L 88 245 L 27.304688 245 Z M 27.304688 155 " clip-rule="nonzero"/></clipPath><clipPath id="f94646473c"><path d="M 49 307 L 95 307 L 95 356.484375 L 49 356.484375 Z M 49 307 " clip-rule="nonzero"/></clipPath><clipPath id="c16f0ec937"><path d="M 212 308 L 257 308 L 257 356.484375 L 212 356.484375 Z M 212 308 " clip-rule="nonzero"/></clipPath><clipPath id="43c22f1865"><path d="M 253.117188 52 L 300 52 L 300 87 L 253.117188 87 Z M 253.117188 52 " clip-rule="nonzero"/></clipPath><clipPath id="73eaaedf31"><path d="M 310 52 L 356.617188 52 L 356.617188 87 L 310 87 Z M 310 52 " clip-rule="nonzero"/></clipPath><clipPath id="61607cf1ea"><path d="M 287 72 L 322 72 L 322 119.730469 L 287 119.730469 Z M 287 72 " clip-rule="nonzero"/></clipPath><clipPath id="b0b2594795"><path d="M 285 18.480469 L 320 18.480469 L 320 65 L 285 65 Z M 285 18.480469 " clip-rule="nonzero"/></clipPath></defs><g clip-path="url(#1aedddb2a7)"><path fill="#b1b1b1" d="M 240.886719 142.933594 L 240.886719 101.492188 C 240.886719 66.28125 212.34375 37.738281 177.132812 37.738281 L 132.503906 37.738281 C 97.292969 37.738281 68.746094 66.28125 68.746094 101.492188 L 68.746094 142.933594 C 87.875 142.933594 100.625 153.542969 100.625 171.625 L 100.625 244.945312 L 209.007812 244.945312 L 209.007812 171.625 C 209.007812 153.542969 221.761719 142.933594 240.886719 142.933594 Z M 240.886719 142.933594 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#b32b17faaa)"><path fill="#b1b1b1" d="M 266.390625 155.6875 C 275.191406 155.6875 282.328125 162.820312 282.328125 171.625 L 282.328125 244.945312 L 221.761719 244.945312 L 221.761719 171.625 C 221.761719 162.820312 228.898438 155.6875 237.699219 155.6875 Z M 266.390625 155.6875 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#01093815a0)"><path fill="#b1b1b1" d="M 282.328125 257.695312 L 27.304688 257.695312 L 27.304688 264.070312 C 27.304688 281.675781 41.578125 295.949219 59.183594 295.949219 L 250.449219 295.949219 C 268.058594 295.949219 282.328125 281.675781 282.328125 264.070312 Z M 282.328125 257.695312 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#36dcd1ffde)"><path fill="#b1b1b1" d="M 87.875 171.625 C 87.875 162.820312 80.738281 155.6875 71.933594 155.6875 L 43.246094 155.6875 C 34.441406 155.6875 27.304688 162.820312 27.304688 171.625 L 27.304688 244.945312 L 87.875 244.945312 Z M 87.875 171.625 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#f94646473c)"><path fill="#b1b1b1" d="M 49.621094 340.578125 L 49.621094 307.671875 C 52.699219 308.34375 55.902344 308.699219 59.183594 308.699219 L 94.25 308.699219 L 94.25 340.578125 C 94.25 349.378906 87.113281 356.515625 78.308594 356.515625 L 65.558594 356.515625 C 56.757812 356.515625 49.621094 349.378906 49.621094 340.578125 Z M 49.621094 340.578125 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#c16f0ec937)"><path fill="#b1b1b1" d="M 212.199219 340.578125 L 212.199219 308.699219 L 250.449219 308.699219 C 252.617188 308.699219 254.746094 308.546875 256.828125 308.246094 L 256.828125 340.578125 C 256.828125 349.378906 249.691406 356.515625 240.886719 356.515625 L 228.136719 356.515625 C 219.332031 356.515625 212.199219 349.378906 212.199219 340.578125 Z M 212.199219 340.578125 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#43c22f1865)"><path fill="#787878" d="M 297.007812 52.722656 L 253.117188 72.863281 L 299.433594 86.523438 L 297.007812 52.722656 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#73eaaedf31)"><path fill="#787878" d="M 311.878906 86.425781 L 356.488281 67.941406 L 310.714844 52.558594 L 311.878906 86.425781 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#61607cf1ea)"><path fill="#787878" d="M 287.453125 75.917969 L 308.40625 119.425781 L 321.199219 72.863281 L 287.453125 75.917969 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#b0b2594795)"><path fill="#787878" d="M 319.296875 62.875 L 300.304688 18.472656 L 285.445312 64.417969 L 319.296875 62.875 " fill-opacity="1" fill-rule="nonzero"/></g><path fill="#787878" d="M 309.519531 60.714844 C 304.496094 56.527344 297.027344 57.203125 292.839844 62.226562 C 288.648438 67.25 289.324219 74.71875 294.347656 78.90625 C 299.371094 83.097656 306.839844 82.421875 311.03125 77.398438 C 315.21875 72.375 314.542969 64.90625 309.519531 60.714844 " fill-opacity="1" fill-rule="nonzero"/></svg>
+                <span class="logo-text ranchers-regular">
+                    <span class="logo-silver">Silver</span><span class="logo-seat">Seat</span>
+                </span>
+            </div>
+            <!-- ***** END LOGO STRUCTURE ***** -->
+            <div class="flex items-center gap-4">
+                <span id="logged-in-user-info" class="text-sm user-info-text"></span>
+                <button id="logout-button" class="btn btn-secondary btn-sm !py-1 !px-3">Logout</button>
+            </div>
+        </div>
+   </div>
 
     <!-- QR Code Zoom Modal -->
     <div id="qr-zoom-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 is-hidden" style="z-index: 150;">
-        <div class="relative bg-white p-2 rounded shadow-lg">
+        <!-- ***** REMOVED bg-white ***** -->
+        <div class="relative p-2 rounded shadow-lg">
             <button id="qr-zoom-close-btn" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg leading-none font-bold z-10">×</button>
             <div id="qr-zoom-content" class="max-w-[80vw] max-h-[80vh]">
                 <!-- Zoomed QR Code Image will be placed here -->
@@ -62,12 +74,12 @@
     </div>
 
     <!-- Auth View -->
-    <div id="auth-view"> <!-- Should not be hidden initially if logged out -->
+    <div id="auth-view">
         <div class="auth-container">
 
             <!-- Customer Login Form -->
             <form id="customer-login-form" class="space-y-6">
-                <h2 class="text-2xl font-bold text-center text-gray-800">Customer Login</h2>
+                <h2 class="text-2xl font-bold text-center">Customer Login</h2>
                 <p id="customer-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
                 <div>
                     <label for="customer-email" class="form-label">Email:</label>
@@ -78,7 +90,7 @@
                     <input type="password" id="customer-password" class="form-input" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-full">Login</button>
-                <div class="text-center text-sm text-gray-600 space-x-2">
+                <div class="text-center text-sm space-x-2"> <!-- Removed text-gray-600 -->
                     <button type="button" id="show-register-button" class="btn-link">Register</button>
                     <span>|</span>
                     <button type="button" id="show-admin-login-button" class="btn-link">Admin</button>
@@ -89,7 +101,7 @@
 
             <!-- Customer Register Form -->
             <form id="customer-register-form" class="space-y-6 is-hidden">
-                <h2 class="text-2xl font-bold text-center text-gray-800">Register Account</h2>
+                <h2 class="text-2xl font-bold text-center">Register Account</h2>
                 <p id="register-error" class="text-red-500 text-sm text-center is-hidden"></p>
                 <div>
                     <label for="register-email" class="form-label">Email:</label>
@@ -122,7 +134,7 @@
 
             <!-- Admin Login Form -->
             <form id="admin-login-form" class="space-y-6 is-hidden">
-                <h2 class="text-2xl font-bold text-center text-gray-800">Admin Login</h2>
+                <h2 class="text-2xl font-bold text-center">Admin Login</h2>
                 <p id="admin-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
                 <div>
                     <label for="admin-email" class="form-label">Email:</label>
@@ -140,7 +152,7 @@
 
             <!-- Vendor Login Form -->
             <form id="vendor-login-form" class="space-y-6 is-hidden">
-                <h2 class="text-2xl font-bold text-center text-gray-800">Vendor Login</h2>
+                <h2 class="text-2xl font-bold text-center">Vendor Login</h2>
                 <p id="vendor-login-error" class="text-red-500 text-sm text-center is-hidden"></p>
                 <div>
                     <label for="vendor-email" class="form-label">Vendor Email:</label>
@@ -164,9 +176,9 @@
 
         <!-- ==== ADMIN VIEW ==== -->
         <div id="admin-view" class="is-hidden space-y-8">
-            <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Admin Panel</h1>
+            <h1 class="text-3xl font-bold border-b pb-2">Admin Panel</h1> <!-- Removed text-gray-800 -->
             <!-- Admin Navigation -->
-            <div id="admin-nav" class="mb-4 border-b border-gray-300">
+            <div id="admin-nav" class="mb-4 border-b"> <!-- Removed border-gray-300 -->
                 <button data-target="admin-manage-movies" class="admin-nav-button active">Manage Movies</button>
                 <button data-target="admin-analytics" class="admin-nav-button">Analytics</button>
                 <button data-target="admin-bookings-section" class="admin-nav-button">Customer Bookings</button>
@@ -177,8 +189,9 @@
             <!-- Admin Section: Manage Movies -->
             <div id="admin-manage-movies" class="admin-section">
                 <!-- Movie Form -->
-                <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700" id="form-title">Add New Movie</h2>
+                 <!-- ***** REMOVED bg-white ***** -->
+                <div class="p-6 border rounded-lg shadow-lg mb-8">
+                    <h2 class="text-2xl font-semibold mb-4" id="form-title">Add New Movie</h2> <!-- Removed text-gray-700 -->
                     <form id="movie-form" class="space-y-4">
                         <div>
                             <label for="title" class="form-label">Title:</label>
@@ -219,7 +232,7 @@
                 </div>
                 <!-- Movie List (Admin) -->
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Manage Movies</h2>
+                    <h2 class="text-2xl font-semibold mb-4">Manage Movies</h2> <!-- Removed text-gray-700 -->
                     <div id="admin-movie-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <p id="no-movies-admin" class="text-gray-500 col-span-full is-hidden">No movies added yet.</p>
                         <!-- Movie cards populated by JS -->
@@ -227,8 +240,9 @@
                 </div>
                 <!-- Customer Preview -->
                  <div class="mt-8">
-                     <h2 class="text-2xl font-semibold mb-4 text-gray-700">Live Customer View Preview</h2>
-                     <div id="admin-preview-customer-view" class="border rounded-lg p-6 bg-gray-50 shadow-inner">
+                     <h2 class="text-2xl font-semibold mb-4">Live Customer View Preview</h2> <!-- Removed text-gray-700 -->
+                      <!-- ***** REMOVED bg-gray-50 ***** -->
+                     <div id="admin-preview-customer-view" class="border rounded-lg p-6 shadow-inner">
                          <div id="customer-movie-list-preview" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                              <p id="no-movies-preview" class="text-gray-500 col-span-full is-hidden">No movies to preview.</p>
                              <!-- Preview cards populated by JS -->
@@ -238,92 +252,91 @@
             </div> <!-- End admin-manage-movies section -->
 
                <!-- Admin Section: Analytics (REVISED STRUCTURE) -->
-    <div id="admin-analytics" class="admin-section space-y-6"> <!-- Removed is-hidden if active by default -->
-        <h2 class="text-2xl font-semibold text-gray-700">Analytics Dashboard</h2>
+            <div id="admin-analytics" class="admin-section space-y-6">
+                <h2 class="text-2xl font-semibold">Analytics Dashboard</h2> <!-- Removed text-gray-700 -->
 
-        <!-- Summary Box -->
-        <div id="admin-summary-box" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="summary-card">
-                <h3 class="summary-card-title">Total Revenue</h3>
-                <p id="admin-total-revenue" class="summary-card-value text-green-600">0 EGP</p>
-            </div>
-            <div class="summary-card">
-                <h3 class="summary-card-title">Seats Booked Today</h3>
-                <p id="admin-seats-today" class="summary-card-value text-blue-600">0</p>
-            </div>
-            <div class="summary-card">
-                <h3 class="summary-card-title">Overall Daily Capacity</h3>
-                <p id="admin-capacity-today" class="summary-card-value text-purple-600">0%</p>
-                <p id="admin-capacity-detail" class="text-xs text-gray-500 mt-1">Based on scheduled showtimes today</p>
-            </div>
-        </div>
+                <!-- Summary Box -->
+                <div id="admin-summary-box" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="summary-card">
+                        <h3 class="summary-card-title">Total Revenue</h3>
+                        <p id="admin-total-revenue" class="summary-card-value text-green-600">0 EGP</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3 class="summary-card-title">Seats Booked Today</h3>
+                        <p id="admin-seats-today" class="summary-card-value text-blue-600">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3 class="summary-card-title">Overall Daily Capacity</h3>
+                        <p id="admin-capacity-today" class="summary-card-value text-purple-600">0%</p>
+                        <p id="admin-capacity-detail" class="text-xs text-gray-500 mt-1">Based on scheduled showtimes today</p>
+                    </div>
+                </div>
 
-        <!-- Daily Highlights -->
-        <div id="admin-daily-highlights" class="analytics-card">
-             <h3 class="text-lg font-semibold mb-3 text-gray-600">Today's Booking Highlights</h3>
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                 <div>
-                     <span class="font-medium text-gray-500 block">Most Booked Movie:</span>
-                     <span id="admin-most-booked-today" class="text-gray-800 font-semibold">--</span>
-                 </div>
-                  <div>
-                     <span class="font-medium text-gray-500 block">Least Booked Movie:</span>
-                     <span id="admin-least-booked-today" class="text-gray-800 font-semibold">--</span>
-                 </div>
-             </div>
-        </div>
+                <!-- Daily Highlights -->
+                <div id="admin-daily-highlights" class="analytics-card">
+                    <h3 class="text-lg font-semibold mb-3">Today's Booking Highlights</h3> <!-- Removed text-gray-600 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-500 block">Most Booked Movie:</span>
+                            <span id="admin-most-booked-today" class="font-semibold">--</span> <!-- Removed text-gray-800 -->
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-500 block">Least Booked Movie:</span>
+                            <span id="admin-least-booked-today" class="font-semibold">--</span> <!-- Removed text-gray-800 -->
+                        </div>
+                    </div>
+                </div>
 
-        <!-- *** NEW: Daily Movie Performance Section *** -->
-        <div id="admin-daily-movie-performance" class="space-y-4">
-            <h3 class="text-lg font-semibold text-gray-600">Today's Performance Per Movie</h3>
-            <div id="daily-movie-perf-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <!-- Daily movie performance cards populated by JS -->
-                 <p class="text-gray-500 md:col-span-2">Loading daily movie data...</p>
-            </div>
-        </div>
-        <!-- *** END NEW SECTION *** -->
+                <!-- *** NEW: Daily Movie Performance Section *** -->
+                <div id="admin-daily-movie-performance" class="space-y-4">
+                    <h3 class="text-lg font-semibold">Today's Performance Per Movie</h3> <!-- Removed text-gray-600 -->
+                    <div id="daily-movie-perf-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <p class="text-gray-500 md:col-span-2">Loading daily movie data...</p>
+                    </div>
+                </div>
+                <!-- *** END NEW SECTION *** -->
 
-        <!-- Weekly Occupancy Analysis -->
-        <div id="admin-weekly-occupancy" class="analytics-card">
-            <h3 class="text-lg font-semibold mb-3 text-gray-600">Weekly Movie Performance (Avg. Last 7 Days)</h3>
-            <div class="overflow-x-auto">
-                <table id="admin-weekly-occupancy-table" class="w-full text-sm text-left text-gray-600">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                        <tr>
-                            <th scope="col" class="px-4 py-2">Movie Title</th>
-                            <th scope="col" class="px-4 py-2 text-right">Avg. Seats Booked</th>
-                            <th scope="col" class="px-4 py-2 text-right">Avg. % Occupancy</th>
-                            <th scope="col" class="px-4 py-2 text-center">Performance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows populated by JS -->
-                        <tr class="bg-white border-b">
-                            <td colspan="4" class="px-4 py-3 text-center text-gray-500">Loading weekly data...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                <!-- Weekly Occupancy Analysis -->
+                <div id="admin-weekly-occupancy" class="analytics-card">
+                    <h3 class="text-lg font-semibold mb-3">Weekly Movie Performance (Avg. Last 7 Days)</h3> <!-- Removed text-gray-600 -->
+                    <div class="overflow-x-auto">
+                        <table id="admin-weekly-occupancy-table" class="w-full text-sm text-left"> <!-- Removed text-gray-600 -->
+                            <!-- ***** REMOVED bg-gray-100 ***** -->
+                            <thead class="text-xs uppercase"> <!-- Removed text-gray-700 -->
+                                <tr>
+                                    <th scope="col" class="px-4 py-2">Movie Title</th>
+                                    <th scope="col" class="px-4 py-2 text-right">Avg. Seats Booked</th>
+                                    <th scope="col" class="px-4 py-2 text-right">Avg. % Occupancy</th>
+                                    <th scope="col" class="px-4 py-2 text-center">Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rows populated by JS -->
+                                 <!-- ***** REMOVED bg-white ***** -->
+                                <tr class="border-b">
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500">Loading weekly data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-        <!-- Existing Sections (Keep if needed) -->
-        <div class="analytics-card">
-            <h3 class="text-lg font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
-            <div id="analytics-avg-ratings" class="space-y-2">
-                <p class="text-gray-500">No ratings data available.</p>
-                <!-- Ratings populated by JS -->
-            </div>
-        </div>
-
-        <!-- Monthly seats card will still be appended here by JS -->
-        <!-- Ensure the old #analytics-occupancy div is removed -->
-
-    </div> <!-- End admin-analytics section -->
+                <!-- Existing Sections (Keep if needed) -->
+                <div class="analytics-card">
+                    <h3 class="text-lg font-semibold mb-3">Average Movie Ratings</h3> <!-- Removed text-gray-600 -->
+                    <div id="analytics-avg-ratings" class="space-y-2">
+                        <p class="text-gray-500">No ratings data available.</p>
+                        <!-- Ratings populated by JS -->
+                    </div>
+                </div>
+                <!-- Monthly seats card will still be appended here by JS -->
+            </div> <!-- End admin-analytics section -->
 
             <!-- Admin Section: Bookings List -->
             <div id="admin-bookings-section" class="admin-section is-hidden space-y-6">
-                 <h2 class="text-2xl font-semibold text-gray-700">All Customer Bookings</h2>
-                 <div id="admin-bookings-list" class="space-y-4 bg-white p-6 rounded-lg shadow">
+                 <h2 class="text-2xl font-semibold">All Customer Bookings</h2> <!-- Removed text-gray-700 -->
+                  <!-- ***** REMOVED bg-white ***** -->
+                 <div id="admin-bookings-list" class="space-y-4 p-6 rounded-lg shadow">
                      <p class="text-gray-500">Loading bookings...</p>
                      <!-- Bookings populated by JS -->
                  </div>
@@ -331,20 +344,22 @@
 
             <!-- Admin Section: QR Scanner -->
              <div id="admin-qr-scanner-section" class="admin-section is-hidden space-y-6">
-                 <h2 class="text-2xl font-semibold text-gray-700">Scan Customer QR Code</h2>
-                 <div class="bg-white p-6 rounded-lg shadow text-center">
+                 <h2 class="text-2xl font-semibold">Scan Customer QR Code</h2> <!-- Removed text-gray-700 -->
+                  <!-- ***** REMOVED bg-white ***** -->
+                 <div class="p-6 rounded-lg shadow text-center">
                      <div id="admin-qr-reader" style="width: 100%; max-width: 400px; margin: 1rem auto; border: 1px solid #ccc;"></div>
-                     <p id="scan-status" class="mt-4 text-gray-600 text-sm">Click Start Scanning to activate camera.</p>
+                     <p id="scan-status" class="mt-4 text-sm">Click Start Scanning to activate camera.</p> <!-- Removed text-gray-600 -->
                      <button id="start-scan-btn" class="btn btn-primary mt-4">Start Scanning</button>
                  </div>
              </div> <!-- End admin-qr-scanner-section -->
 
             <!-- Admin Section: Manage Vendors -->
             <div id="admin-manage-vendors" class="admin-section is-hidden space-y-6">
-                 <h2 class="text-2xl font-semibold text-gray-700">Manage Vendors</h2>
+                 <h2 class="text-2xl font-semibold">Manage Vendors</h2> <!-- Removed text-gray-700 -->
                  <!-- Vendor Form -->
-                 <div class="p-6 border rounded-lg shadow-lg bg-white mb-8">
-                     <h3 class="text-xl font-semibold mb-4 text-gray-700" id="vendor-form-title">Add New Vendor</h3>
+                  <!-- ***** REMOVED bg-white ***** -->
+                 <div class="p-6 border rounded-lg shadow-lg mb-8">
+                     <h3 class="text-xl font-semibold mb-4" id="vendor-form-title">Add New Vendor</h3> <!-- Removed text-gray-700 -->
                      <form id="vendor-form" class="space-y-4">
                          <div>
                              <label for="vendor-name" class="form-label">Vendor Name:</label>
@@ -367,8 +382,9 @@
                  </div>
                  <!-- Vendor List -->
                  <div>
-                     <h3 class="text-xl font-semibold mb-4 text-gray-700">Registered Vendors</h3>
-                     <div id="admin-vendor-list" class="bg-white p-4 rounded-lg shadow">
+                     <h3 class="text-xl font-semibold mb-4">Registered Vendors</h3> <!-- Removed text-gray-700 -->
+                      <!-- ***** REMOVED bg-white ***** -->
+                     <div id="admin-vendor-list" class="p-4 rounded-lg shadow">
                          <p class="text-gray-500">No vendors registered yet.</p>
                          <!-- Vendors populated by JS -->
                      </div>
@@ -377,40 +393,41 @@
 
         </div> <!-- End admin-view -->
 
-        <!-- ==== CUSTOMER VIEW ==== -->
-        <div id="customer-view" class="is-hidden">
-            <div class="flex justify-between items-center mb-6 border-b pb-2">
-                <h1 class="text-3xl font-bold text-gray-800">Now Showing</h1>
-                <button id="toggle-my-bookings-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
-                    <i class="fas fa-ticket-alt mr-2"></i>My Bookings
-                </button>
-            </div>
-            <!-- Customer Movie List -->
-            <div id="customer-movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <p id="no-movies-customer" class="text-gray-500 col-span-full is-hidden">No movies currently showing.</p>
-                <!-- Movie cards populated by JS -->
-            </div>
-            <!-- My Bookings View -->
-            <div id="my-bookings-view" class="is-hidden space-y-4 mt-8">
-                 <div class="flex justify-between items-center mb-6 border-b pb-2">
-                     <h2 class="text-2xl font-bold text-gray-800">My Bookings</h2>
-                     <button id="back-to-movies-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
-                         <i class="fas fa-arrow-left mr-2"></i>Back to Movies
-                     </button>
-                 </div>
-                 <div id="my-bookings-list">
-                     <p class="text-gray-500">Loading your bookings...</p>
-                     <!-- User bookings populated by JS -->
-                 </div>
-            </div> <!-- End my-bookings-view -->
-        </div> <!-- End customer-view -->
+<!-- ==== CUSTOMER VIEW ==== -->
+<div id="customer-view" class="is-hidden">
+    <div class="flex justify-between items-center mb-6 border-b pb-2">
+        <h1 class="text-3xl font-bold">Now Showing</h1>
+        <button id="toggle-my-bookings-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+            <i class="fas fa-ticket-alt mr-2"></i>My Bookings
+        </button>
+    </div>
+<!-- Customer Movie List -->
+        <!-- ***** UPDATED GRID CLASSES FOR DESKTOP ***** -->
+        <div id="customer-movie-list" class="grid grid-cols-3 gap-3 md:gap-4 lg:grid-cols-4 lg:gap-5 xl:grid-cols-5 xl:gap-6">
+            <p id="no-movies-customer" class="col-span-full is-hidden">No movies currently showing.</p>
+            <!-- Movie cards populated by JS -->
+        </div>
+    <!-- My Bookings View -->
+    <div id="my-bookings-view" class="is-hidden space-y-4 mt-8">
+         <div class="flex justify-between items-center mb-6 border-b pb-2">
+             <h2 class="text-2xl font-bold">My Bookings</h2>
+             <button id="back-to-movies-btn" class="btn btn-secondary btn-sm !py-1 !px-3">
+                 <i class="fas fa-arrow-left mr-2"></i>Back to Movies
+             </button>
+         </div>
+         <div id="my-bookings-list">
+             <p>Loading your bookings...</p> <!-- Removed text-gray-500 -->
+             <!-- User bookings populated by JS -->
+         </div>
+    </div> <!-- End my-bookings-view -->
+</div> <!-- End customer-view -->
 
         <!-- ==== VENDOR DASHBOARD VIEW ==== -->
         <div id="vendor-dashboard-view" class="is-hidden space-y-8">
-            <h1 class="text-3xl font-bold text-gray-800 border-b pb-2">Vendor Dashboard</h1>
+            <h1 class="text-3xl font-bold border-b pb-2">Vendor Dashboard</h1> <!-- Removed text-gray-800 -->
              <!-- Vendor Movie List -->
              <div>
-                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Your Assigned Movies</h2>
+                 <h2 class="text-2xl font-semibold mb-4">Your Assigned Movies</h2> <!-- Removed text-gray-700 -->
                  <div id="vendor-movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                      <p id="no-vendor-movies" class="text-gray-500 col-span-full">You have no movies assigned.</p>
                      <!-- Vendor's movie cards populated by JS -->
@@ -418,20 +435,20 @@
              </div>
              <!-- Vendor Analytics Section -->
              <div id="vendor-analytics" class="space-y-6 mt-8">
-                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Your Movie Analytics</h2>
+                 <h2 class="text-2xl font-semibold mb-4">Your Movie Analytics</h2> <!-- Removed text-gray-700 -->
                   <div class="analytics-card">
-                      <h3 class="text-xl font-semibold mb-3 text-gray-600">Total Revenue (Your Movies)</h3>
+                      <h3 class="text-xl font-semibold mb-3">Total Revenue (Your Movies)</h3> <!-- Removed text-gray-600 -->
                       <p id="vendor-total-revenue" class="text-2xl font-bold text-green-600">0 EGP</p>
                   </div>
                  <div class="analytics-card">
-                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Average Movie Ratings</h3>
+                     <h3 class="text-xl font-semibold mb-3">Average Movie Ratings</h3> <!-- Removed text-gray-600 -->
                      <div id="vendor-analytics-avg-ratings" class="space-y-2">
                          <p class="text-gray-500">No ratings data for your movies.</p>
                          <!-- Vendor ratings populated by JS -->
                      </div>
                  </div>
                  <div class="analytics-card">
-                     <h3 class="text-xl font-semibold mb-3 text-gray-600">Showtime Occupancy</h3>
+                     <h3 class="text-xl font-semibold mb-3">Showtime Occupancy</h3> <!-- Removed text-gray-600 -->
                      <div id="vendor-analytics-occupancy" class="space-y-4">
                          <p class="text-gray-500">No booking data for your movies.</p>
                          <!-- Vendor occupancy populated by JS -->
@@ -446,11 +463,13 @@
     <!-- ==== MODALS ==== -->
 
     <!-- Movie Details Modal -->
-    <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200">
-                <h2 id="modal-movie-title" class="text-2xl font-semibold text-gray-800">Movie Title</h2>
-                <button id="modal-close-button" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
+    <div id="movie-details-modal" class="fixed inset-0 flex items-center justify-center p-4 is-hidden">
+        <!-- ***** REMOVED bg-white ***** -->
+        <div class="modal-content rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            <!-- ***** REMOVED border-gray-200 ***** -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 id="modal-movie-title" class="text-2xl font-semibold">Movie Title</h2> <!-- Removed text-gray-800 -->
+                <button id="modal-close-button" class="hover:text-gray-800 text-2xl">×</button> <!-- Removed text-gray-500 -->
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-6">
                 <div class="flex flex-col md:flex-row gap-6">
@@ -459,22 +478,22 @@
                     </div>
                     <div class="flex-grow space-y-3">
                         <div id="modal-avg-rating" class="stars-container text-lg"></div>
-                        <p class="text-sm text-gray-600">
-                            <strong class="text-gray-800">Genre:</strong> <span id="modal-movie-genre">Genre</span> •
-                            <strong class="text-gray-800">Duration:</strong> <span id="modal-movie-duration">0</span> min
+                        <p class="text-sm"> <!-- Removed text-gray-600 -->
+                            <strong>Genre:</strong> <span id="modal-movie-genre">Genre</span> • <!-- Removed text-gray-800 -->
+                            <strong>Duration:</strong> <span id="modal-movie-duration">0</span> min <!-- Removed text-gray-800 -->
                         </p>
-                        <p id="modal-movie-description" class="text-gray-700 text-base">Description goes here...</p>
+                        <p id="modal-movie-description" class="text-base">Description goes here...</p> <!-- Removed text-gray-700 -->
 
                         <!-- Calendar & Showtimes Area -->
                         <div class="pt-2">
-                            <label for="modal-datepicker" class="form-label text-lg font-semibold text-gray-700">Select Date:</label>
+                            <label for="modal-datepicker" class="form-label text-lg font-semibold">Select Date:</label> <!-- Removed text-gray-700 -->
                             <input type="text" id="modal-datepicker" class="form-input mb-2" placeholder="Choose a date..." readonly>
                             <p id="date-error" class="text-red-500 text-sm is-hidden mb-2"></p>
                             <div id="calendar-container"></div> <!-- Pikaday attaches here -->
                             <div id="modal-showtimes-container" class="is-hidden">
-                                <h3 class="text-lg font-semibold mb-2 text-gray-700 mt-4">Available Showtimes:</h3>
+                                <h3 class="text-lg font-semibold mb-2 mt-4">Available Showtimes:</h3> <!-- Removed text-gray-700 -->
                                 <fieldset id="modal-showtimes-list" class="flex flex-wrap gap-2">
-                                    <p class="text-gray-500 text-sm">Select a date first.</p>
+                                    <p class="text-sm">Select a date first.</p> <!-- Removed text-gray-500 -->
                                     <!-- Showtimes populated by JS -->
                                 </fieldset>
                             </div>
@@ -483,52 +502,59 @@
                 </div> <!-- End flex -->
 
                  <!-- Rating Section -->
+                 <!-- ***** REMOVED border-gray-200 ***** -->
                  <div id="modal-rating-section" class="pt-4 border-t mt-4 is-hidden">
-                     <h3 class="text-lg font-semibold mb-2 text-gray-700">Your Rating:</h3>
+                     <h3 class="text-lg font-semibold mb-2">Your Rating:</h3> <!-- Removed text-gray-700 -->
                      <div id="modal-stars" class="stars-container interactive flex text-2xl cursor-pointer">
                          <!-- Stars populated by JS -->
                      </div>
-                     <p id="modal-rating-message" class="text-sm text-gray-500 mt-1"></p>
+                     <p id="modal-rating-message" class="text-sm mt-1"></p> <!-- Removed text-gray-500 -->
                  </div>
 
                  <!-- Seat Map Section -->
-                 <div id="seat-map-container" class="is-hidden pt-4 border-t border-gray-200 mt-4">
-                     <h3 class="text-lg font-semibold mb-3 text-gray-700">Select Seats:</h3>
+                  <!-- ***** REMOVED border-gray-200 ***** -->
+                 <div id="seat-map-container" class="is-hidden pt-4 border-t mt-4">
+                     <h3 class="text-lg font-semibold mb-3">Select Seats:</h3> <!-- Removed text-gray-700 -->
                      <div class="screen">SCREEN</div>
                      <div id="seat-grid" class="seat-grid mb-4">
-                         <p class="text-gray-500 text-center">Select a showtime to load seats.</p>
+                         <p class="text-center">Select a showtime to load seats.</p> <!-- Removed text-gray-500 -->
                          <!-- Seats populated by JS -->
                      </div>
-                     <div class="flex justify-center gap-4 text-xs mb-4 text-gray-500">
-                         <span><i class="fas fa-chair text-lg align-middle text-gray-300 mr-1"></i> Available</span>
-                         <span><i class="fas fa-chair text-lg align-middle text-blue-500 mr-1"></i> Selected</span>
-                         <span><i class="fas fa-chair text-lg align-middle text-gray-500 opacity-70 mr-1"></i> Unavailable</span>
+                      <!-- ***** REMOVED text-gray-500 / -300 / -500 ***** -->
+                     <div class="flex justify-center gap-4 text-xs mb-4">
+                         <span><i class="fas fa-chair text-lg align-middle mr-1 seat-legend-available"></i> Available</span>
+                         <span><i class="fas fa-chair text-lg align-middle mr-1 seat-legend-selected"></i> Selected</span>
+                         <span><i class="fas fa-chair text-lg align-middle mr-1 seat-legend-unavailable opacity-70"></i> Unavailable</span>
                      </div>
-                     <p id="selected-seats-info" class="text-sm text-gray-600 text-center">Selected Seats: None</p>
+                     <p id="selected-seats-info" class="text-sm text-center">Selected Seats: None</p> <!-- Removed text-gray-600 -->
                  </div>
             </div> <!-- End modal body -->
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+            <div class="p-4 border-t flex justify-end">
                  <button id="confirm-selection-button" class="btn btn-primary" disabled>Proceed to Payment</button>
             </div>
         </div> <!-- End modal content -->
     </div> <!-- End movie-details-modal -->
 
     <!-- QR Validation Modal (Admin) -->
-    <div id="qr-validation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden">
-        <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b bg-gray-50">
-                <h2 class="text-xl font-semibold text-gray-800">Scan Result</h2>
-                <button id="validation-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
+    <div id="qr-validation-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
+         <!-- ***** REMOVED bg-white ***** -->
+        <div class="modal-content w-full max-w-md rounded-lg shadow-xl overflow-hidden">
+            <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-semibold">Scan Result</h2> <!-- Removed text-gray-800 -->
+                <button id="validation-modal-close-btn" class="hover:text-gray-800 text-2xl">×</button> <!-- Removed text-gray-500 -->
             </div>
             <div class="modal-body p-6 space-y-2">
                 <p><strong>Movie:</strong> <span id="validation-movie-title">--</span></p>
                 <p><strong>Showtime:</strong> <span id="validation-showtime">--</span></p>
                 <p><strong>Seats:</strong> <span id="validation-seats" class="font-mono">--</span></p>
                 <p><strong>Customer:</strong> <span id="validation-email">--</span></p>
-                <p><strong>Booking ID:</strong> <span id="validation-booking-id" class="text-xs text-gray-500">--</span></p>
+                <p><strong>Booking ID:</strong> <span id="validation-booking-id" class="text-xs">--</span></p> <!-- Removed text-gray-500 -->
                 <div id="validation-status" class="text-sm mt-4">Checking status...</div>
             </div>
-            <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
+             <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+            <div class="modal-footer p-4 border-t flex justify-end gap-3">
                 <button id="mark-used-btn" class="btn btn-success" disabled>
                     <i class="fas fa-check mr-2"></i>Mark as Used
                 </button>
@@ -538,15 +564,18 @@
     </div> <!-- End qr-validation-modal -->
 
      <!-- Fake Payment Modal -->
-     <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden">
-         <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
-             <div class="flex justify-between items-center p-4 border-b bg-gray-50">
-                 <h2 class="text-xl font-semibold text-gray-800">Confirm Booking & Payment</h2>
-                 <button id="payment-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl">×</button>
+     <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden">
+          <!-- ***** REMOVED bg-white ***** -->
+         <div class="modal-content w-full max-w-md rounded-lg shadow-xl overflow-hidden">
+              <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+             <div class="flex justify-between items-center p-4 border-b">
+                 <h2 class="text-xl font-semibold">Confirm Booking & Payment</h2> <!-- Removed text-gray-800 -->
+                 <button id="payment-modal-close-btn" class="hover:text-gray-800 text-2xl">×</button> <!-- Removed text-gray-500 -->
              </div>
              <div class="modal-body p-6">
-                 <p class="mb-4 text-gray-700">Please confirm your booking details and enter payment information.</p>
-                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                 <p class="mb-4">Please confirm your booking details and enter payment information.</p> <!-- Removed text-gray-700 -->
+                  <!-- ***** REMOVED bg-blue-50 / border-blue-200 ***** -->
+                 <div class="mb-4 p-3 border rounded">
                       <p><strong>Movie:</strong> <span id="payment-movie-title">--</span></p>
                       <p><strong>Date:</strong> <span id="payment-selected-date">--</span></p>
                       <p><strong>Showtime:</strong> <span id="payment-showtime">--</span></p>
@@ -576,7 +605,8 @@
                      <p id="payment-error" class="text-red-500 text-sm is-hidden"></p>
                  </form>
              </div>
-             <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
+              <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+             <div class="modal-footer p-4 border-t flex justify-end gap-3">
                  <button id="pay-now-btn" class="btn btn-primary">
                      <i class="fas fa-credit-card mr-2"></i>Pay Now
                  </button>
@@ -586,26 +616,30 @@
      </div> <!-- End payment-modal -->
 
      <!-- Booking Success Modal -->
-     <div id="booking-success-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 is-hidden" style="z-index: 120;"> <!-- Ensure z-index is high -->
-        <div class="modal-content w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b bg-green-50"> <!-- Green header -->
-                <h2 class="text-xl font-semibold text-green-800"> <i class="fas fa-check-circle mr-2"></i>Booking Successful!</h2>
-                <button id="success-modal-close-btn" class="text-green-700 hover:text-green-900 text-2xl">×</button>
+     <div id="booking-success-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 is-hidden" style="z-index: 120;">
+         <!-- ***** REMOVED bg-white ***** -->
+        <div class="modal-content w-full max-w-md rounded-lg shadow-xl overflow-hidden">
+             <!-- ***** REMOVED bg-green-50 / border-gray-200 ***** -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-semibold"> <i class="fas fa-check-circle mr-2"></i>Booking Successful!</h2> <!-- Removed text-green-800 -->
+                <button id="success-modal-close-btn" class="hover:text-green-900 text-2xl">×</button> <!-- Removed text-green-700 -->
             </div>
             <div class="modal-body p-6 space-y-3">
-                <p class="text-gray-700">Your booking details:</p>
-                <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm">
+                <p>Your booking details:</p> <!-- Removed text-gray-700 -->
+                 <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+                <div class="mb-4 p-3 border rounded text-sm">
                      <p><strong>Movie:</strong> <span id="success-movie-title">--</span></p>
                      <p><strong>Date:</strong> <span id="success-selected-date">--</span></p>
                      <p><strong>Showtime:</strong> <span id="success-showtime">--</span></p>
                      <p><strong>Seats:</strong> <span id="success-seats" class="font-mono">--</span></p>
                      <p class="mt-2"><strong>Total Cost:</strong> <span id="success-total-cost">0 EGP</span></p>
-                     <p class="mt-2 text-xs text-gray-500"><strong>Booking ID:</strong> <span id="success-booking-id">--</span></p>
+                     <p class="mt-2 text-xs"><strong>Booking ID:</strong> <span id="success-booking-id">--</span></p> <!-- Removed text-gray-500 -->
                 </div>
-                <p class="text-gray-600 text-sm">You can view this booking and your QR code under "My Bookings".</p>
+                <p class="text-sm">You can view this booking and your QR code under "My Bookings".</p> <!-- Removed text-gray-600 -->
             </div>
-            <div class="modal-footer p-4 bg-gray-50 border-t flex justify-end gap-3">
-                 <button id="success-modal-close-btn-secondary" class="btn btn-primary">OK</button> <!-- Use primary style for main action -->
+             <!-- ***** REMOVED bg-gray-50 / border-gray-200 ***** -->
+            <div class="modal-footer p-4 border-t flex justify-end gap-3">
+                 <button id="success-modal-close-btn-secondary" class="btn btn-primary">OK</button>
             </div>
         </div> <!-- End modal-content -->
     </div> <!-- End booking-success-modal -->
