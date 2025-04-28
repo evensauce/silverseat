@@ -38,23 +38,62 @@
 
 /* Base Styles - DARK MODE */
 body {
-    font-family: 'Inter', sans-serif; /* Keep Inter for UI text */
+    /* Removed the static background pattern here */
+    font-family: "Nunito Sans", sans-serif; /* Use Nunito Sans */
+    font-weight: 400; /* Default weight */
     background-color: #252525; /* Dark background */
     color: #e0e0e0; /* Light default text */
     margin: 0;
     padding: 0;
+    transition: background-image 0.3s ease-in-out; /* Optional: smooth transition */
 }
 
-/* Helper to hide elements (no change needed) */
+/* Apply background pattern ONLY when logged out (body doesn't have .logged-in class) */
+body:not(.logged-in) {
+    background: url('./svg/pattern.svg');
+    background-repeat: repeat;
+    background-size: 400px 400px;
+    background-attachment: fixed; /* Keep pattern fixed */
+    background-color: #252525; /* Ensure dark background is still default */
+}
+
+/* Style for body when user IS logged in */
+body.logged-in {
+    background-image: none; /* Remove the pattern */
+    background-color: #252525; /* Ensure dark background stays */
+}
+
+/* Centering Auth View */
+#auth-view {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+ }
+
+
+/* Helper to hide elements (Make sure this is exactly right) */
 .is-hidden {
     opacity: 0;
     visibility: hidden;
     height: 0;
     overflow: hidden;
     pointer-events: none;
+    /* Use !important carefully, but might be needed if other styles interfere */
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
+    /* Ensure display: none is NOT used here if you rely on transitions */
+    /* display: none !important; */
+}
+
+#auth-view.is-hidden,
+#customer-view.is-hidden,
+#admin-view.is-hidden,
+#vendor-dashboard-view.is-hidden {
+    display: none !important; /* Hide these specific containers completely when is-hidden is added */
 }
 
 /* App Header - DARK MODE */
@@ -80,7 +119,7 @@ body {
     display: flex;
     align-items: center;
 }
-.logo-container svg {
+.logo-container img {
     height: 35px; /* Adjust size as needed */
     width: auto;
     margin-right: 8px;
@@ -107,7 +146,7 @@ body {
 .auth-container, .movie-card, .analytics-card, #admin-manage-movies .p-6, #admin-manage-vendors .p-6, #admin-vendor-list, .modal-content, #my-bookings-view > div:last-child, #admin-bookings-list, #admin-preview-customer-view {
     background-color: #333333; border: 1px solid #444444; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2); color: #e0e0e0;
 }
-.auth-container { max-width: 450px; margin: 2rem auto; padding: 2rem; }
+.auth-container { max-width: 450px; margin: 2rem auto; padding: 3rem; }
 .movie-card { overflow: hidden; transition: transform 0.2s ease-in-out; display: flex; flex-direction: column; }
 /* Remove hover transform if details are hidden and click opens modal */
 /* .movie-card:hover { transform: translateY(-5px); } */

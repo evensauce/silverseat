@@ -55,11 +55,8 @@ const vendorFormTitle = document.getElementById('vendor-form-title');
 const vendorSubmitButton = document.getElementById('vendor-submit-button');
 const vendorCancelEditButton = document.getElementById('vendor-cancel-edit-button');
 const adminMovieListContainer = document.getElementById('admin-movie-list');
-const customerPreviewContainer = document.getElementById('customer-movie-list-preview');
 const noMoviesAdminMsg = document.getElementById('no-movies-admin');
-const noMoviesPreviewMsg = document.getElementById('no-movies-preview');
 const analyticsAvgRatingsContainer = document.getElementById('analytics-avg-ratings');
-const analyticsOccupancyContainer = document.getElementById('analytics-occupancy');
 const adminTotalRevenueElement = document.getElementById('admin-total-revenue');
 const customerView = document.getElementById('customer-view');
 const customerMovieListContainer = document.getElementById('customer-movie-list');
@@ -82,6 +79,8 @@ const modalAvgRatingContainer = document.getElementById('modal-avg-rating');
 const modalMovieGenre = document.getElementById('modal-movie-genre');
 const modalMovieDuration = document.getElementById('modal-movie-duration');
 const modalMovieDescription = document.getElementById('modal-movie-description');
+const modalVendorElement = document.getElementById('modal-movie-vendor');
+const modalVendorNameSpan = document.getElementById('modal-vendor-name');
 const modalDatepickerInput = document.getElementById('modal-datepicker');
 const dateErrorElement = document.getElementById('date-error');
 const calendarContainer = document.getElementById('calendar-container');
@@ -149,39 +148,26 @@ let otpExpiry = null;
 
 // --- Utility Functions ---
 function showElement(el) {
-    // Check if the element exists and has a classList property
     if (el && el.classList) {
+        // Only remove the class. Let CSS handle display.
         el.classList.remove('is-hidden');
-        // Optionally reset inline styles if you rely on the class to hide/show fully
-        // Or manage styles purely through the 'is-hidden' class in CSS
-        el.style.height = '';
-        el.style.opacity = '';
-        el.style.visibility = '';
-        el.style.pointerEvents = '';
-        el.style.margin = '';
-        el.style.padding = '';
-        el.style.border = '';
+        console.log(`showElement: Removed .is-hidden from #${el.id || 'element'}`); // Add log
     } else if (el === undefined || el === null) {
-        // Log a warning if the element is missing, helps debugging
-        // console.warn("showElement called with null or undefined element. ID might be incorrect or element not yet loaded.");
+        // console.warn("showElement called with null or undefined element.");
     } else {
-        // Log if it's some other unexpected type
         // console.warn("showElement called with an unexpected type:", el);
     }
 }
 
 function hideElement(el) {
-    // Check if the element exists and has a classList property
     if (el && el.classList) {
-        el.classList.add('is-hidden');
-         // Optionally add inline styles to ensure hiding if CSS isn't fully loaded/applied yet
-         // el.style.height = '0';
-         // el.style.overflow = 'hidden';
-         // el.style.margin = '0';
-         // el.style.padding = '0';
-         // el.style.border = 'none';
+        // Only add the class. Let CSS handle display.
+        if (!el.classList.contains('is-hidden')) { // Avoid redundant adds
+             el.classList.add('is-hidden');
+             console.log(`hideElement: Added .is-hidden to #${el.id || 'element'}`); // Add log
+        }
     } else if (el === undefined || el === null) {
-       // console.warn("hideElement called with null or undefined element. ID might be incorrect or element not yet loaded.");
+       // console.warn("hideElement called with null or undefined element.");
     } else {
        // console.warn("hideElement called with an unexpected type:", el);
     }
@@ -269,35 +255,42 @@ function calculateAverageRating(movie) { // movie object should contain the Fire
 // Render Stars (Modified to accept Firestore movie ID)
 function renderStars(container, averageRating, count = 0, interactive = false, userRating = null, movieId = null) {
     if (!container) return;
-    container.innerHTML = '';
+    container.innerHTML = ''; // Clear previous content
     container.classList.toggle('interactive', interactive);
     container.dataset.movieId = movieId || ''; // Use Firestore ID
-    const ratingValue = Math.round(averageRating);
-    const displayRating = interactive && userRating !== null ? userRating : ratingValue;
 
+    // Determine the rating to display: user's rating if interactive and available, otherwise the rounded average
+    const ratingValue = Math.round(averageRating); // Rounded average for non-interactive display base
+    const displayRating = interactive && userRating !== null ? userRating : ratingValue; // Use user's rating if interactive & exists
+
+    // Create star icons
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement('i');
-        star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star');
+        star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star'); // Use displayRating for solid/regular
         star.dataset.rating = i;
         if (interactive) {
             star.style.cursor = 'pointer';
-            star.onclick = () => handleStarClick(movieId, i); // Pass Firestore ID
+            star.onclick = () => handleStarClick(movieId, i);
             star.onmouseover = () => highlightStars(container, i);
+            // On mouseout, highlight based on the *actual* user rating if it exists, otherwise 0
             star.onmouseout = () => highlightStars(container, userRating || 0);
         }
         container.appendChild(star);
     }
 
+    // ***** CHANGE: Conditionally add the rating text based on 'interactive' flag *****
+    // Only add the text like "4.2 (5 ratings)" or "No ratings yet" if it's NOT the interactive section
     if (!interactive) {
         const ratingText = document.createElement('span');
-        ratingText.className = 'ml-2 text-sm text-gray-500';
-        if (averageRating > 0) {
+        ratingText.className = 'ml-2 text-sm text-gray-500'; // Class for the text part
+        if (averageRating > 0 && count > 0) { // Check count as well
             ratingText.textContent = `${averageRating.toFixed(1)} (${count} ${count === 1 ? 'rating' : 'ratings'})`;
         } else {
             ratingText.textContent = 'No ratings yet';
         }
-        container.appendChild(ratingText);
+        container.appendChild(ratingText); // Append the text span
     }
+    // If 'interactive' is true, no text span is added.
 }
 
 function generateSimpleOtp(length = 6) {
@@ -562,140 +555,215 @@ function highlightStars(container, rating) {
 
 // Handle Star Click (Modified to use Firestore)
 async function handleStarClick(movieId, rating) {
-    if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer' || !movieId) return;
-    const userId = authState.user.uid; // Use Firebase UID
-
-    // Check if user already rated this movie by querying Firestore
-    const q = query(collection(db, "ratings"), where("movieId", "==", movieId), where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-        console.log("User already rated this movie.");
-        // Potentially update UI to show existing rating clearly
-        return; // Already rated
+    // Initial checks
+    if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer' || !movieId) {
+        console.warn("User not logged in or not a customer, cannot rate.");
+        return;
     }
+    const userId = authState.user.uid;
+    const movie = movies.find(m => m.id === movieId); // Find movie locally for title
+
+    console.log(`Attempting to rate movie ${movieId} with rating ${rating} by user ${userId}`);
+
+    // Disable stars briefly to prevent double-clicks (optional but good UX)
+    if(modalStarsContainer) modalStarsContainer.style.pointerEvents = 'none';
 
     try {
-        // Add rating to Firestore 'ratings' collection
-        const ratingData = {
-            movieId: movieId,
-            userId: userId,
-            rating: rating,
-            createdAt: serverTimestamp() // Use server timestamp
-        };
-        const docRef = await addDoc(collection(db, "ratings"), ratingData);
-        console.log("Rating added with ID: ", docRef.id);
+        // Check if user already rated this movie by querying Firestore
+        const q = query(collection(db, "ratings"), where("movieId", "==", movieId), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
 
-        // Optimistically update local ratings cache
-        allRatings.push({ id: docRef.id, ...ratingData, createdAt: new Date() }); // Add temporary date
+        let isUpdate = false; // Flag to track if we are updating or adding
 
-        // Update UI
-        const movie = movies.find(m => m.id === movieId);
-        if (movie) {
-             const avgData = calculateAverageRating(movie);
-             renderStars(modalAvgRatingContainer, avgData.average, avgData.count); // Re-render avg rating in modal
+        if (!querySnapshot.empty) {
+            // ----- UPDATE Existing Rating -----
+            isUpdate = true;
+            const existingRatingDoc = querySnapshot.docs[0]; // Get the first (should be only) doc
+            const existingRatingRef = existingRatingDoc.ref;
+            const currentRating = existingRatingDoc.data().rating;
+
+            // Optional: If user clicks the same star again, maybe just update timestamp or do nothing?
+            // For now, we'll update even if the rating value is the same.
+            console.log(`Found existing rating (ID: ${existingRatingDoc.id}), updating rating from ${currentRating} to ${rating}.`);
+
+            await updateDoc(existingRatingRef, {
+                rating: rating,
+                lastUpdatedAt: serverTimestamp() // Add/Update a timestamp
+            });
+
+            // Update local cache
+            const index = allRatings.findIndex(r => r.id === existingRatingDoc.id);
+            if (index > -1) {
+                allRatings[index].rating = rating;
+                // Simulate timestamp update locally if needed immediately elsewhere
+                allRatings[index].lastUpdatedAt = new Date();
+            }
+             console.log("Rating updated successfully in Firestore and local cache.");
+
+        } else {
+            // ----- ADD New Rating -----
+            isUpdate = false;
+            console.log(`No existing rating found, adding new rating.`);
+            const ratingData = {
+                movieId: movieId,
+                userId: userId,
+                rating: rating,
+                createdAt: serverTimestamp(), // Use server timestamp for creation
+                lastUpdatedAt: serverTimestamp() // Also set initial update timestamp
+            };
+            const docRef = await addDoc(collection(db, "ratings"), ratingData);
+
+            // Add to local cache optimistically
+            allRatings.push({ id: docRef.id, ...ratingData, createdAt: new Date(), lastUpdatedAt: new Date() }); // Simulate timestamps locally
+            console.log("Rating added successfully to Firestore and local cache with ID:", docRef.id);
         }
-        renderStars(modalStarsContainer, 0, 0, false, rating, movieId); // Show the user's submitted rating (non-interactive)
-        modalRatingMessage.textContent = `You rated this movie ${rating} star${rating > 1 ? 's' : ''}.`;
-        modalStarsContainer.classList.remove('interactive');
-        modalStarsContainer.style.cursor = 'default';
 
-        // Refresh movie list if needed (to update average rating display)
-        renderCustomerContent(); // Or a more targeted update if possible
+        // ----- Common UI Update (After Add OR Update) -----
+        // 1. Re-calculate and render average rating (non-interactive)
+        if (movie) { // Check if movie data is available
+             const avgData = calculateAverageRating(movie);
+             renderStars(modalAvgRatingContainer, avgData.average, avgData.count, false); // Render average stars
+        }
+
+        // 2. Re-render the USER'S rating stars (now showing the new/updated rating, still interactive)
+        renderStars(modalStarsContainer, 0, 0, true, rating, movieId); // Force interactive, show current 'rating'
+
+        // 3. Update the rating message
+        modalRatingMessage.textContent = isUpdate
+            ? `Rating updated to ${rating} star${rating > 1 ? 's' : ''}.`
+            : `You rated this movie ${rating} star${rating > 1 ? 's' : ''}.`;
+
+        // 4. Ensure stars remain interactive visually (may be redundant if renderStars handles it, but safe)
+        modalStarsContainer.classList.add('interactive');
+        modalStarsContainer.style.cursor = 'pointer';
+
+        // Refresh main movie list if needed (to update average rating display on cards)
+        if (customerView && !customerView.classList.contains('is-hidden')) {
+             renderMovies(customerMovieListContainer, 'customer');
+        }
+        // Add similar refresh for admin/vendor views if necessary
 
     } catch (error) {
-        console.error("Error adding rating: ", error);
-        alert("Failed to submit rating. Please try again.");
-        // Optionally revert optimistic UI update here
+        console.error("Error adding/updating rating: ", error);
+        modalRatingMessage.textContent = "Failed to save rating. Please try again."; // Show error message
+        alert("Failed to save rating. Please try again.");
+        // Optionally re-render stars to previous state if needed
+    } finally {
+         // Re-enable stars after operation completes
+         if(modalStarsContainer) modalStarsContainer.style.pointerEvents = 'auto';
     }
 }
-
 // --- UI Rendering Functions ---
 function renderUI() {
-    // loadAllBookingsFromStorage(); loadUsedQrCodes(); // Replaced by loadDataFromFirebase() triggered by auth state change
+    console.log("--- renderUI called ---"); // Log start
+    console.log("Current authState:", JSON.stringify(authState)); // Log current state
+
     closeModal();
     closePaymentModal();
     closeValidationModal();
 
+    const bodyElement = document.body;
+    const userInfoSpan = document.getElementById('logged-in-user-info');
+
     if (authState.isLoggedIn && authState.user) {
+        // User is logged in
+        console.log("State: Logged In. Hiding auth, showing header.");
         hideElement(authView);
         showElement(appHeader);
+
         let userTypeDisplay = authState.user.type;
         if (authState.user.type === 'vendor' && authState.user.name) {
             userTypeDisplay = `vendor (${authState.user.name})`;
         }
-        // Set text content FIRST
-        loggedInUserInfo.textContent = `Logged in as: ${authState.user.email} (${userTypeDisplay})`;
+
+        if (userInfoSpan) {
+             userInfoSpan.textContent = `Logged in as: ${authState.user.email} (${userTypeDisplay})`;
+        } else {
+             console.warn("User info span not found in renderUI (logged in state).");
+        }
+
+        console.log("Adding 'logged-in' class to body.");
+        bodyElement.classList.add('logged-in');
 
         // Main view switching
+        console.log(`Determining view for user type: ${authState.user.type}`);
         if (authState.user.type === 'admin') {
+            console.log("Hiding customer/vendor, showing admin view.");
             hideElement(customerView);
             hideElement(vendorDashboardView);
             showElement(adminView);
             renderAdminContent();
         } else if (authState.user.type === 'vendor') {
+            console.log("Hiding customer/admin, showing vendor view.");
             hideElement(customerView);
             hideElement(adminView);
             showElement(vendorDashboardView);
             renderVendorDashboard();
         } else { // Customer
+            console.log("Hiding admin/vendor, showing customer view.");
             hideElement(adminView);
             hideElement(vendorDashboardView);
             showElement(customerView);
             renderCustomerContent();
         }
-    } else { // Logged out
+    } else {
+        // User is logged out
+        console.log("State: Logged Out. Showing auth, hiding header/main views.");
         hideElement(appHeader);
         hideElement(adminView);
         hideElement(customerView);
-        hideElement(myBookingsView);
+        hideElement(myBookingsView); // Ensure this is hidden too
         hideElement(vendorDashboardView);
-        showElement(authView);
-        showCustomerLoginForm();
-        // Clear text content on logout
+        showElement(authView); // Make sure auth view is shown
+        showCustomerLoginForm(); // Show the default login form within auth view
+
         if (userInfoSpan) {
             userInfoSpan.textContent = '';
         }
+
+        console.log("Removing 'logged-in' class from body.");
+        bodyElement.classList.remove('logged-in');
     }
 
     // Call visibility update at the end, AFTER potential text changes
     updateHeaderVisibility();
+    console.log("--- renderUI finished ---"); // Log end
 }
 
 // --- Admin Content Rendering ---
 function renderAdminContent() {
-     resetForm(); resetVendorForm(); stopQrScanner();
-     document.querySelectorAll('#admin-view > .admin-section').forEach(sec => hideElement(sec));
-     const activeSection = document.getElementById(currentAdminTab);
-     if(activeSection) {
-         showElement(activeSection);
-         adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === currentAdminTab); });
-         console.log("Showing admin section:", currentAdminTab);
-     } else {
-         console.error("Could not find admin section with ID:", currentAdminTab);
-         currentAdminTab = 'admin-manage-movies'; // Default fallback
-         showElement(adminManageMoviesSection);
-         adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === currentAdminTab); });
-     }
+    resetForm(); resetVendorForm(); stopQrScanner();
+    document.querySelectorAll('#admin-view > .admin-section').forEach(sec => hideElement(sec));
+    const activeSection = document.getElementById(currentAdminTab);
+    if(activeSection) {
+        showElement(activeSection);
+        adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === currentAdminTab); });
+        console.log("Showing admin section:", currentAdminTab);
+    } else {
+        console.error("Could not find admin section with ID:", currentAdminTab);
+        currentAdminTab = 'admin-manage-movies'; // Default fallback
+        showElement(adminManageMoviesSection);
+        adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === currentAdminTab); });
+    }
 
-     console.log("Rendering admin content for tab:", currentAdminTab);
-     if (currentAdminTab === 'admin-manage-movies') {
-         renderMovies(adminMovieListContainer, 'admin');
-         renderMovies(customerPreviewContainer, 'preview');
-         populateVendorDropdown('movie-vendor');
-     }
-     else if (currentAdminTab === 'admin-analytics') {
-         renderAnalyticsDashboard();
-     }
-     else if (currentAdminTab === 'admin-bookings-section') {
-         renderAdminBookingsList();
-     }
-     else if (currentAdminTab === 'admin-qr-scanner-section') {
-         if(scanStatusElement) scanStatusElement.textContent = "Click Start Scanning.";
-     }
-     else if (currentAdminTab === 'admin-manage-vendors') {
-         renderAdminVendorManagement();
-     }
+    console.log("Rendering admin content for tab:", currentAdminTab);
+    if (currentAdminTab === 'admin-manage-movies') {
+        renderMovies(adminMovieListContainer, 'admin');
+        // ***** REMOVED: renderMovies(customerPreviewContainer, 'preview'); *****
+        populateVendorDropdown('movie-vendor');
+    }
+    else if (currentAdminTab === 'admin-analytics') {
+        renderAnalyticsDashboard();
+    }
+    else if (currentAdminTab === 'admin-bookings-section') {
+        renderAdminBookingsList();
+    }
+    else if (currentAdminTab === 'admin-qr-scanner-section') {
+        if(scanStatusElement) scanStatusElement.textContent = "Click Start Scanning.";
+    }
+    else if (currentAdminTab === 'admin-manage-vendors') {
+        renderAdminVendorManagement();
+    }
 }
 
 // Render Admin Bookings List (Using Firestore data)
@@ -1886,7 +1954,6 @@ async function deleteVendor(vendorId) { // vendorId is Auth UID
             // If admin is viewing movies, refresh those lists too
              if (currentAdminTab === 'admin-manage-movies') {
                 renderMovies(adminMovieListContainer, 'admin');
-                renderMovies(customerPreviewContainer, 'preview');
              }
              alert(`Vendor "${vendorName}" data deleted successfully from Firestore.`);
 
@@ -1939,13 +2006,9 @@ function createMovieCard(movie, _indexUnused, viewType) {
     // Removed mb-1, added title class
     title.className = 'movie-card-title font-semibold flex items-center mb-1';
     title.textContent = movie.title;
-    // Vendor badge logic remains the same
-    if (movie.vendorName) {
-        const vendorBadge = document.createElement('span');
-        vendorBadge.className = 'vendor-badge';
-        vendorBadge.textContent = movie.vendorName;
-        title.appendChild(vendorBadge);
-    }
+
+    // ***** REMOVED VENDOR BADGE FROM TITLE LOGIC *****
+    // if (movie.vendorName) { ... } code block removed
 
     const avgRatingDiv = document.createElement('div');
      // Removed text-sm, mb-2. Added specific class
@@ -1972,6 +2035,7 @@ function createMovieCard(movie, _indexUnused, viewType) {
     const description = document.createElement('p');
     description.className = 'text-sm mt-1'; // Add margin top
     description.textContent = movie.description || 'No description available.';
+
 
     // Showtimes (Goes inside hidden wrapper)
     const showtimes = document.createElement('p');
@@ -2015,9 +2079,10 @@ function createMovieCard(movie, _indexUnused, viewType) {
          adminControls.appendChild(deleteButton);
          card.appendChild(adminControls);
 
-    } else if (viewType === 'customer' || viewType === 'preview') {
+    } else if (viewType === 'customer' || viewType === 'preview') { // Keep preview here for click logic if needed elsewhere
         card.classList.add('cursor-pointer');
-        if (authState.isLoggedIn && authState.user?.type === 'admin') {
+        // Prevent admin booking from customer view
+        if (viewType === 'customer' && authState.isLoggedIn && authState.user?.type === 'admin') {
             card.title = "Admins cannot book movies from this view.";
             card.style.cursor = 'not-allowed';
         } else {
@@ -2030,10 +2095,11 @@ function createMovieCard(movie, _indexUnused, viewType) {
 }
 
 function updateHeaderVisibility() {
-    const userInfoSpan = document.getElementById('logged-in-user-info');
+    // ***** CHANGE: Define userInfoSpan OUTSIDE the if/else *****
+    const userInfoSpan = document.getElementById('logged-in-user-info'); // Get element once
     if (!userInfoSpan) {
         // console.warn("User info span not found for visibility update.");
-        return; // Exit if element doesn't exist
+        return; // Exit if element doesn't exist early
     }
 
     const isCustomer = authState.isLoggedIn && authState.user?.type === 'customer';
@@ -2042,60 +2108,76 @@ function updateHeaderVisibility() {
     // Log state for debugging
     console.log(`Header Visibility Check: isCustomer=${isCustomer}, isMobileWidth=${isMobileWidth}`);
 
+    // ***** CHANGE: Use the already defined userInfoSpan variable *****
     if (isCustomer && isMobileWidth) {
         // --- Direct Style Manipulation ---
         console.log("Hiding user info span via style.display.");
         userInfoSpan.style.display = 'none';
         // --- End Direct Style Manipulation ---
-        // userInfoSpan.classList.add('force-hide'); // Keep class logic removed or commented
     } else {
         // --- Direct Style Manipulation ---
          console.log("Showing user info span via style.display.");
         userInfoSpan.style.display = 'block'; // Or 'inline-block' if preferred
         // --- End Direct Style Manipulation ---
-        // userInfoSpan.classList.remove('force-hide'); // Keep class logic removed or commented
     }
 }
 
 // --- Movie List Rendering (Uses local 'movies' array) ---
 function renderMovies(container, viewType) {
+    // ***** ADDED LOGGING *****
+    console.log(`>>> renderMovies called for viewType: ${viewType}. Container: #${container?.id || 'unknown'}`);
+    if (!container) {
+        console.error(`Error: Container element is null for renderMovies (viewType: ${viewType})`);
+        return;
+    }
     container.innerHTML = ''; // Clear previous content
     let noMoviesMsg;
-    if (viewType === 'admin') noMoviesMsg = noMoviesAdminMsg;
-    else if (viewType === 'preview') noMoviesMsg = noMoviesPreviewMsg;
-    else if (viewType === 'vendor_dashboard') noMoviesMsg = noVendorMoviesMsg; // This msg handling is done in renderVendorDashboard now
-    else noMoviesMsg = noMoviesCustomerMsg; // Customer view
 
-    let moviesToRender = movies; // Default to all movies
-
-    // If vendor dashboard, filter again (although renderVendorDashboard does this too)
-    if (viewType === 'vendor_dashboard' && authState.user?.type === 'vendor' && authState.user?.name) {
-         moviesToRender = movies.filter(m => m.vendorName === authState.user.name);
-         // Specific message handling is in renderVendorDashboard
+    if (viewType === 'admin') {
+        noMoviesMsg = noMoviesAdminMsg;
+    } else if (viewType === 'customer') {
+        noMoviesMsg = noMoviesCustomerMsg;
+    } else if (viewType === 'vendor_dashboard') {
+        noMoviesMsg = noVendorMoviesMsg;
     }
 
+    let moviesToRender = movies;
+
+    if (viewType === 'vendor_dashboard' && authState.user?.type === 'vendor' && authState.user?.name) {
+         moviesToRender = movies.filter(m => m.vendorName === authState.user.name);
+    }
+
+    console.log(`   - Found ${moviesToRender.length} movies to render for ${viewType}.`); // Log count
+
     if (moviesToRender.length === 0) {
-        if (noMoviesMsg && viewType !== 'vendor_dashboard') { // Only show message if not vendor view
+        if (noMoviesMsg && viewType !== 'vendor_dashboard') {
+            console.log(`   - Showing 'no movies' message for ${viewType}.`); // Log message display
             if (viewType === 'customer') {
                  noMoviesMsg.textContent = "No movies currently showing.";
              } else if (viewType === 'admin') {
                  noMoviesMsg.textContent = "No movies added yet.";
-             } else if (viewType === 'preview') {
-                 noMoviesMsg.textContent = "No movies to preview.";
              }
             showElement(noMoviesMsg);
         }
-        // For vendor view, the message is handled in renderVendorDashboard
-        return;
+        return; // Exit if no movies
     } else {
-         if (noMoviesMsg) hideElement(noMoviesMsg);
+         if (noMoviesMsg) {
+             console.log(`   - Hiding 'no movies' message for ${viewType}.`); // Log message hide
+             hideElement(noMoviesMsg);
+         }
     }
 
-    moviesToRender.forEach((movie) => {
-        // Create card using movie data (which includes the ID)
-        const card = createMovieCard(movie, null, viewType); // Index is not needed
-        container.appendChild(card);
+    moviesToRender.forEach((movie, index) => {
+        // ***** ADDED LOGGING *****
+        console.log(`   - Creating card for movie ${index + 1}: ${movie.title} (ID: ${movie.id})`);
+        try {
+            const card = createMovieCard(movie, null, viewType);
+            container.appendChild(card);
+        } catch (error) {
+            console.error(`Error creating movie card for ${movie.title} (ID: ${movie.id}):`, error);
+        }
     });
+    console.log(`<<< renderMovies finished for viewType: ${viewType}.`); // Log end
 }
 
 
@@ -2116,8 +2198,23 @@ async function openModal(movieId) { // Accepts Firestore ID
     modalMovieDuration.textContent = movie.duration || 'N/A';
     modalMovieDescription.textContent = movie.description || 'No description available.';
 
+    // ***** CORRECTED VENDOR DISPLAY LOGIC *****
+    // Use the variables defined in the DOM Elements section
+    if (modalVendorElement && modalVendorNameSpan) { // Check if modal elements exist
+        if (movie.vendorName) {
+            modalVendorNameSpan.textContent = movie.vendorName; // Set the name
+            showElement(modalVendorElement); // Show the paragraph containing the vendor info
+        } else {
+            hideElement(modalVendorElement); // Hide the paragraph if no vendor name
+        }
+    } else {
+        console.warn("Vendor display elements not found in modal.");
+    }
+    // ***** END VENDOR DISPLAY LOGIC *****
+
     // Calculate and render average rating
     const avgData = calculateAverageRating(movie);
+    // Pass the correct container for average rating display
     renderStars(modalAvgRatingContainer, avgData.average, avgData.count, false); // Non-interactive avg rating
 
     // Reset fields related to selection
@@ -2166,18 +2263,27 @@ async function openModal(movieId) { // Accepts Firestore ID
         // Check pre-loaded ratings
         const userRatingData = allRatings.find(r => r.movieId === movieId && r.userId === userId);
         const userCurrentRating = userRatingData ? userRatingData.rating : null;
-        const hasRated = userCurrentRating !== null;
+        const hasRated = userCurrentRating !== null; // This flag is now just for the initial message
 
-        renderStars(modalStarsContainer, 0, 0, !hasRated, userCurrentRating, movieId); // Pass Firestore ID
-        modalRatingMessage.textContent = hasRated ? `You rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}.` : 'Click stars to rate!';
-        modalStarsContainer.classList.toggle('interactive', !hasRated);
-        modalStarsContainer.style.cursor = hasRated ? 'default' : 'pointer';
+        // ***** CHANGE: Always render interactive stars for customers *****
+        // Render stars in the INTERACTIVE container (modalStarsContainer)
+        // The 'interactive' parameter is now hardcoded to 'true' for customers
+        renderStars(modalStarsContainer, 0, 0, true, userCurrentRating, movieId);
+
+        // Set the initial message based on whether a rating exists
+        modalRatingMessage.textContent = hasRated
+            ? `You previously rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}. Click to change.`
+            : 'Click stars to rate!';
+
+        // Ensure container is visually interactive
+        modalStarsContainer.classList.add('interactive');
+        modalStarsContainer.style.cursor = 'pointer';
     } else {
         hideElement(modalRatingSection);
     }
 
     showElement(movieDetailsModal);
-    document.body.classList.add('overflow-hidden');
+    document.body.classList.add('overflow-hidden'); // Keep this to prevent background scroll
 }
 
 function closeModal() {
