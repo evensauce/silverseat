@@ -851,77 +851,79 @@ function renderAdminBookingsList() {
 
 // Helper to create a booking list item (for admin or customer)
 function createBookingListItem(booking, viewType = 'customer') {
-     const itemDiv = document.createElement('div');
-     const isUsed = booking.qrCodeUsed || false; // Check Firestore field
-     const movie = movies.find(m => m.id === booking.movieId); // Get movie details if available
+    const itemDiv = document.createElement('div');
+    const isUsed = booking.qrCodeUsed || false; // Check Firestore field
+    const movie = movies.find(m => m.id === booking.movieId); // Get movie details if available
 
-     if (viewType === 'admin') {
-         itemDiv.className = 'admin-booking-item';
-         const statusLabelClass = isUsed ? 'status-used' : 'status-not-used';
-         const statusText = isUsed ? '✅ QR Code Used' : '🔄 QR Code Not Used';
-         const usedTimestamp = booking.qrUsedTimestamp ? formatDateReadable(booking.qrUsedTimestamp.toDate()) + ' ' + booking.qrUsedTimestamp.toDate().toLocaleTimeString() : 'N/A';
-         itemDiv.innerHTML = `
-             <span><i class="fas fa-user"></i>${booking.userEmail || 'N/A'}</span>
-             <span><i class="fas fa-calendar-alt"></i>${formatDateReadable(booking.selectedDate)}</span>
-             <span><i class="fas fa-clock"></i>${booking.showtime || 'N/A'}</span>
-             <span><i class="fas fa-chair"></i><span class="seats">${booking.seats?.sort()?.join(', ') || 'N/A'}</span></span>
-             <span><i class="fas fa-money-bill-wave"></i>${booking.totalAmount || 0} EGP</span>
-             <span><i class="fas fa-receipt"></i><span class="text-xs text-gray-500 ml-1">ID: ${booking.id}</span></span>
-             <div class="mt-2 flex justify-between items-center">
-                <span class="status-label ${statusLabelClass}">${statusText}</span>
-                ${isUsed ? `<span class="text-xs text-gray-500">Used: ${usedTimestamp}</span>` : ''}
-             </div>
-         `;
-     } else { // Customer view ('my-bookings')
-         itemDiv.className = 'booking-list-item';
-          // Include Firestore booking ID in QR data
-         const qrData = JSON.stringify({
-             bookingId: booking.id, // Use Firestore ID
-             movieTitle: movie?.title || booking.movieTitle || 'Unknown Movie',
-             showtime: booking.showtime,
-             seats: booking.seats,
-             userEmail: booking.userEmail
-             // DO NOT include payment details or user ID in QR
-         });
-         itemDiv.innerHTML = `
-             <div class="booking-main-info">
-                 <div class="booking-details">
-                     <p class="text-lg font-semibold mb-1">${movie?.title || booking.movieTitle || 'Unknown Movie'}</p>
-                     <p class="text-sm text-gray-600 mb-1"><strong>Date:</strong> ${formatDateReadable(booking.selectedDate)}</p>
-                     <p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime || 'N/A'}</p>
-                     <p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats?.sort()?.join(', ') || 'N/A'}</span></p>
-                 </div>
-                 <div id="qr-code-${booking.id}" class="qr-code-container cursor-pointer" title="Booking ID: ${booking.id}" onclick="window.openQrZoomModal(this)"></div>
-             </div>
-             <div class="booking-meta">
-                 <span>Booked: ${booking.timestamp ? new Date(booking.timestamp.toDate()).toLocaleString() : 'N/A'}</span> |
-                 <span>Cost: ${booking.totalAmount || 0} EGP</span> |
-                 <span class="text-xs text-gray-500">ID: ${booking.id}</span>
-                 ${isUsed ? '<span class="ml-2 text-red-600 font-semibold">[USED]</span>' : ''}
-             </div>
-         `;
-         // Generate QR code after appending
-         setTimeout(() => { // Defer QR generation slightly
-             try {
-                 const qrElement = document.getElementById(`qr-code-${booking.id}`);
-                 if (qrElement) {
-                     new QRCode(qrElement, {
-                         text: qrData,
-                         width: 90, height: 90,
-                         colorDark: "#000000", colorLight: "#ffffff",
-                         correctLevel: QRCode.CorrectLevel.M
-                     });
-                 }
-             } catch (e) {
-                 console.error("QR Code generation failed:", e);
-                 const qrElement = document.getElementById(`qr-code-${booking.id}`);
-                 if(qrElement) qrElement.innerText = "QR Error";
-             }
-         }, 0);
-     }
-     return itemDiv;
+    if (viewType === 'admin') {
+        itemDiv.className = 'admin-booking-item !pl-3 !pr-3 !pb-3 !pt-2'; // Added padding classes
+
+        const statusLabelClass = isUsed ? 'status-used' : 'status-not-used';
+        const statusText = isUsed ? '✅ QR Code Used' : '🔄 QR Code Not Used';
+        const usedTimestamp = booking.qrUsedTimestamp ? formatDateReadable(booking.qrUsedTimestamp.toDate()) + ' ' + booking.qrUsedTimestamp.toDate().toLocaleTimeString() : 'N/A';
+
+        // ***** CHANGE: Use paragraphs for better formatting *****
+        itemDiv.innerHTML = `
+           <p class="text-sm"><i class="fas fa-user w-4 mr-1 text-gray-400"></i> ${booking.userEmail || 'N/A'}</p>
+           <p class="text-sm"><i class="fas fa-calendar-alt w-4 mr-1 text-gray-400"></i> ${formatDateReadable(booking.selectedDate)}</p>
+           <p class="text-sm"><i class="fas fa-clock w-4 mr-1 text-gray-400"></i> ${booking.showtime || 'N/A'}</p>
+           <p class="text-sm"><i class="fas fa-chair w-4 mr-1 text-gray-400"></i> <span class="seats">${booking.seats?.sort()?.join(', ') || 'N/A'}</span></p>
+           <p class="text-sm"><i class="fas fa-money-bill-wave w-4 mr-1 text-gray-400"></i> ${booking.totalAmount || 0} EGP</p>
+           <p class="text-xs text-gray-500"><i class="fas fa-receipt w-4 mr-1 text-gray-400"></i> ID: ${booking.id}</p>
+            <div class="mt-2 flex justify-between items-center border-t border-gray-600 pt-2">
+               <span class="status-label ${statusLabelClass}">${statusText}</span>
+               ${isUsed ? `<span class="text-xs text-gray-500">Used: ${usedTimestamp}</span>` : ''}
+            </div>
+        `;
+        // ***** END CHANGE *****
+
+    } else { // Customer view ('my-bookings')
+        // ... customer view rendering remains the same ...
+        itemDiv.className = 'booking-list-item';
+        const qrData = JSON.stringify({
+            bookingId: booking.id,
+            movieTitle: movie?.title || booking.movieTitle || 'Unknown Movie',
+            showtime: booking.showtime,
+            seats: booking.seats,
+            userEmail: booking.userEmail
+        });
+        itemDiv.innerHTML = `
+            <div class="booking-main-info flex justify-between items-start">
+                <div class="booking-details flex-grow pr-4">
+                    <p class="text-lg font-semibold mb-1">${movie?.title || booking.movieTitle || 'Unknown Movie'}</p>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Date:</strong> ${formatDateReadable(booking.selectedDate)}</p>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime || 'N/A'}</p>
+                    <p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats?.sort()?.join(', ') || 'N/A'}</span></p>
+                </div>
+                <div id="qr-code-${booking.id}" class="qr-code-container cursor-pointer flex-shrink-0" title="Booking ID: ${booking.id}" onclick="window.openQrZoomModal(this)"></div>
+            </div>
+            <div class="booking-meta">
+                <span>Booked: ${booking.timestamp ? new Date(booking.timestamp.toDate()).toLocaleString() : 'N/A'}</span> |
+                <span>Cost: ${booking.totalAmount || 0} EGP</span> |
+                <span class="text-xs text-gray-500">ID: ${booking.id}</span>
+                ${isUsed ? '<span class="ml-2 text-red-600 font-semibold">[USED]</span>' : ''}
+            </div>
+        `;
+        setTimeout(() => {
+            try {
+                const qrElement = document.getElementById(`qr-code-${booking.id}`);
+                if (qrElement) {
+                    new QRCode(qrElement, {
+                        text: qrData,
+                        width: 90, height: 90,
+                        colorDark: "#000000", colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            } catch (e) {
+                console.error("QR Code generation failed:", e);
+                const qrElement = document.getElementById(`qr-code-${booking.id}`);
+                if(qrElement) qrElement.innerText = "QR Error";
+            }
+        }, 0);
+    }
+    return itemDiv;
 }
-
 
 // --- Customer Content Rendering ---
 function renderCustomerContent() {
@@ -3002,35 +3004,87 @@ function closeValidationModal() {
 
 function openQrZoomModal(qrElement) {
     if (!qrElement || !qrZoomModal || !qrZoomContent) return;
-    // Clone the img element or regenerate a larger QR code
+
+    // ***** DETERMINE SIZE BASED ON SCREEN WIDTH *****
+    const isMobileWidth = window.innerWidth <= 640; // Example breakpoint for mobile (adjust as needed, maybe 768?)
+    const qrSize = isMobileWidth ? 200 : 300; // Smaller size for mobile, larger for desktop
+    console.log(`Opening QR Zoom. Mobile: ${isMobileWidth}, QR Size: ${qrSize}px`);
+    // ***** END SIZE DETERMINATION *****
+
+    // Clear previous content
+    qrZoomContent.innerHTML = '';
+
+    // Try cloning first (more efficient if source is img)
     const existingImg = qrElement.querySelector('img');
     if (existingImg) {
-        qrZoomContent.innerHTML = ''; // Clear previous
         const zoomedImg = existingImg.cloneNode(true);
-        // Remove fixed width/height for natural scaling
-        zoomedImg.style.width = '300px'; // Set a larger base size
-        zoomedImg.style.height = '300px';
+        // Set size based on determination
+        zoomedImg.style.width = `${qrSize}px`;
+        zoomedImg.style.height = `${qrSize}px`;
         qrZoomContent.appendChild(zoomedImg);
-        showElement(qrZoomModal);
-    } else { // Fallback: Regenerate if img not found (e.g., if using canvas)
-         const qrData = qrElement.title; // Get data stored in title attribute
-         if(qrData){
-             qrZoomContent.innerHTML = ''; // Clear previous
-             try {
-                  new QRCode(qrZoomContent, {
-                      text: qrData,
-                      width: 300, // Larger size
-                      height: 300,
-                      colorDark : "#000000",
-                      colorLight : "#ffffff",
-                      correctLevel : QRCode.CorrectLevel.M
-                  });
-                  showElement(qrZoomModal);
-             } catch(e){
-                 console.error("Failed to generate zoomed QR code:", e);
-             }
-         }
+        showElement(qrZoomModal); // Show the modal
+    } else { // Customer view ('my-bookings')
+        itemDiv.className = 'booking-list-item';
+        const bookingId = booking.id; // Store booking ID for listener
+        const movie = movies.find(m => m.id === booking.movieId); // Get movie details
+
+        // Prepare QR Data (no change here)
+        const qrData = JSON.stringify({
+            bookingId: bookingId,
+            movieTitle: movie?.title || booking.movieTitle || 'Unknown Movie',
+            showtime: booking.showtime,
+            seats: booking.seats,
+            userEmail: booking.userEmail
+        });
+
+        itemDiv.innerHTML = `
+            <div class="booking-main-info flex justify-between items-start">
+                <div class="booking-details flex-grow pr-4">
+                    <p class="text-lg font-semibold mb-1">${movie?.title || booking.movieTitle || 'Unknown Movie'}</p>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Date:</strong> ${formatDateReadable(booking.selectedDate)}</p>
+                    <p class="text-sm text-gray-600 mb-1"><strong>Showtime:</strong> ${booking.showtime || 'N/A'}</p>
+                    <p class="text-sm text-gray-600"><strong>Seats:</strong> <span class="seats">${booking.seats?.sort()?.join(', ') || 'N/A'}</span></p>
+                </div>
+                <div id="qr-code-${bookingId}" class="qr-code-container cursor-pointer flex-shrink-0" title="Booking ID: ${bookingId}">
+                   <!-- QR Code will be generated here -->
+                </div>
+            </div>
+            <div class="booking-meta">
+                <span>Booked: ${booking.timestamp ? new Date(booking.timestamp.toDate()).toLocaleString() : 'N/A'}</span> |
+                <span>Cost: ${booking.totalAmount || 0} EGP</span> |
+                <span class="text-xs text-gray-500">ID: ${bookingId}</span>
+                ${isUsed ? '<span class="ml-2 text-red-600 font-semibold">[USED]</span>' : ''}
+            </div>
+        `;
+
+        // Generate QR code after appending
+        setTimeout(() => {
+            const qrElement = itemDiv.querySelector(`#qr-code-${bookingId}`); // Find element *after* innerHTML set
+            if (qrElement) {
+                try {
+                    new QRCode(qrElement, {
+                        text: qrData,
+                        width: 90, height: 90,
+                        colorDark: "#000000", colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                    // ***** CHANGE: Add Event Listener instead of inline onclick *****
+                    qrElement.addEventListener('click', () => {
+                        console.log(`QR container clicked for booking ${bookingId}`); // Log click
+                        window.openQrZoomModal(qrElement); // Call the existing function
+                    });
+                    // ***** END CHANGE *****
+
+                } catch (e) {
+                    console.error("QR Code generation failed:", e);
+                    if(qrElement) qrElement.innerText = "QR Error";
+                }
+            } else {
+                 console.error(`Could not find QR element #qr-code-${bookingId} after timeout.`);
+            }
+        }, 0);
     }
+    return itemDiv;
 }
 
 window.openQrZoomModal = openQrZoomModal;
@@ -3172,6 +3226,7 @@ function initializeApp() {
     //    cardCvvInput.addEventListener('blur', validateCvv);
     // }
     // --- *** END OF FIX *** ---
+    
 
     // --- Event Delegation for Dynamic Buttons (Admin Lists) ---
     if (adminMovieListContainer) { // Check if container exists
