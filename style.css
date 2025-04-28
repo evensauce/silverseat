@@ -16,6 +16,16 @@
         /* display: none !important; */ /* Keep this commented out unless the above fails */
     }
 
+
+    .movie-card .stars-container i.fa-star {
+        font-size: 0.8em; /* Adjust this value as needed (e.g., 0.75em, 12px) */
+        margin-right: 1px; /* Optionally reduce space between stars */
+    }
+
+    .movie-card .stars-container .rating-text {
+        display: none !important; /* Hide the rating text span on small screens within movie cards */
+    }
+
     /* General adjustments for small screens */
     #logged-in-user-info {
          /* Reduce max-width for non-customers if needed */
@@ -92,7 +102,12 @@ body.logged-in {
 #auth-view.is-hidden,
 #customer-view.is-hidden,
 #admin-view.is-hidden,
-#vendor-dashboard-view.is-hidden {
+#vendor-dashboard-view.is-hidden,
+#movie-details-modal.is-hidden, /* Add other modals as needed */
+#payment-modal.is-hidden,
+#qr-validation-modal.is-hidden,
+#booking-success-modal.is-hidden,
+#qr-zoom-modal.is-hidden { /* Add the QR Zoom modal */
     display: none !important; /* Hide these specific containers completely when is-hidden is added */
 }
 

@@ -149,9 +149,27 @@ let otpExpiry = null;
 // --- Utility Functions ---
 function showElement(el) {
     if (el && el.classList) {
-        // Only remove the class. Let CSS handle display.
+        const originallyHidden = el.classList.contains('is-hidden');
         el.classList.remove('is-hidden');
-        console.log(`showElement: Removed .is-hidden from #${el.id || 'element'}`); // Add log
+
+        // Explicitly set display based on known flex containers
+        // Add other flex container IDs here if needed
+        if (el.id === 'auth-view' ||
+            el.id === 'movie-details-modal' ||
+            el.id === 'payment-modal' ||
+            el.id === 'qr-validation-modal' ||
+            el.id === 'booking-success-modal' ||
+            el.id === 'qr-zoom-modal') {
+             el.style.display = 'flex'; // Restore flex display
+        } else {
+            // For other elements, reset display to let CSS/defaults take over
+            // This assumes non-flex elements use block, inline-block, etc. by default or via other classes
+             el.style.display = '';
+        }
+
+        if (originallyHidden) { // Only log if it was actually hidden
+             console.log(`showElement: Removed .is-hidden and set display for #${el.id || 'element'}`);
+        }
     } else if (el === undefined || el === null) {
         // console.warn("showElement called with null or undefined element.");
     } else {
@@ -259,38 +277,45 @@ function renderStars(container, averageRating, count = 0, interactive = false, u
     container.classList.toggle('interactive', interactive);
     container.dataset.movieId = movieId || ''; // Use Firestore ID
 
-    // Determine the rating to display: user's rating if interactive and available, otherwise the rounded average
-    const ratingValue = Math.round(averageRating); // Rounded average for non-interactive display base
-    const displayRating = interactive && userRating !== null ? userRating : ratingValue; // Use user's rating if interactive & exists
+    // Determine the rating to display
+    const ratingValue = Math.round(averageRating);
+    const displayRating = interactive && userRating !== null ? userRating : ratingValue;
+
+    // Apply flexbox for non-interactive stars if needed (like on cards)
+    if (!interactive) {
+        container.style.display = 'flex';        // Make the container a flex container
+        container.style.alignItems = 'center';  // Vertically align stars and text
+    } else {
+        container.style.display = ''; // Reset display if it was previously flex
+        container.style.alignItems = ''; // Reset alignment
+    }
 
     // Create star icons
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement('i');
-        star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star'); // Use displayRating for solid/regular
+        star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star');
         star.dataset.rating = i;
         if (interactive) {
             star.style.cursor = 'pointer';
             star.onclick = () => handleStarClick(movieId, i);
             star.onmouseover = () => highlightStars(container, i);
-            // On mouseout, highlight based on the *actual* user rating if it exists, otherwise 0
             star.onmouseout = () => highlightStars(container, userRating || 0);
         }
         container.appendChild(star);
     }
 
-    // ***** CHANGE: Conditionally add the rating text based on 'interactive' flag *****
-    // Only add the text like "4.2 (5 ratings)" or "No ratings yet" if it's NOT the interactive section
+    // Conditionally add the rating text span
     if (!interactive) {
         const ratingText = document.createElement('span');
-        ratingText.className = 'ml-2 text-sm text-gray-500'; // Class for the text part
-        if (averageRating > 0 && count > 0) { // Check count as well
-            ratingText.textContent = `${averageRating.toFixed(1)} (${count} ${count === 1 ? 'rating' : 'ratings'})`;
+        // ***** ADDED 'rating-text' class *****
+        ratingText.className = 'ml-1 text-xs text-gray-500 rating-text'; // Added specific class
+        if (averageRating > 0 && count > 0) {
+            ratingText.textContent = `${averageRating.toFixed(1)} (${count} rating${count > 1 ? 's' : ''})`;
         } else {
             ratingText.textContent = 'No ratings yet';
         }
-        container.appendChild(ratingText); // Append the text span
+        container.appendChild(ratingText);
     }
-    // If 'interactive' is true, no text span is added.
 }
 
 function generateSimpleOtp(length = 6) {
@@ -2095,31 +2120,49 @@ function createMovieCard(movie, _indexUnused, viewType) {
 }
 
 function updateHeaderVisibility() {
-    // ***** CHANGE: Define userInfoSpan OUTSIDE the if/else *****
-    const userInfoSpan = document.getElementById('logged-in-user-info'); // Get element once
-    if (!userInfoSpan) {
-        // console.warn("User info span not found for visibility update.");
-        return; // Exit if element doesn't exist early
-    }
-
+    // --- Handle User Info Span ---
+    const userInfoSpan = document.getElementById('logged-in-user-info');
     const isCustomer = authState.isLoggedIn && authState.user?.type === 'customer';
     const isMobileWidth = window.innerWidth <= 580; // Mobile breakpoint
 
-    // Log state for debugging
     console.log(`Header Visibility Check: isCustomer=${isCustomer}, isMobileWidth=${isMobileWidth}`);
 
-    // ***** CHANGE: Use the already defined userInfoSpan variable *****
-    if (isCustomer && isMobileWidth) {
-        // --- Direct Style Manipulation ---
-        console.log("Hiding user info span via style.display.");
-        userInfoSpan.style.display = 'none';
-        // --- End Direct Style Manipulation ---
+    if (userInfoSpan) { // Check if the element exists
+        if (isCustomer && isMobileWidth) {
+            // Hide user info span for customers on mobile
+            console.log("Hiding user info span via style.display.");
+            userInfoSpan.style.display = 'none';
+        } else {
+            // Show user info span otherwise
+             console.log("Showing user info span via style.display.");
+            userInfoSpan.style.display = 'block'; // Or 'inline-block'
+        }
     } else {
-        // --- Direct Style Manipulation ---
-         console.log("Showing user info span via style.display.");
-        userInfoSpan.style.display = 'block'; // Or 'inline-block' if preferred
-        // --- End Direct Style Manipulation ---
+        // console.warn("User info span not found for visibility update.");
     }
+
+    // --- Handle Movie Card Rating Text Visibility ---
+    console.log(`Card Rating Text Check: isMobileWidth=${isMobileWidth}`);
+    // Select ALL elements with the 'rating-text' class that are children of '.movie-card'
+    const cardRatingTexts = document.querySelectorAll('.movie-card .rating-text');
+
+    cardRatingTexts.forEach(textElement => {
+        if (isMobileWidth) {
+            // Hide rating text on mobile
+            if (textElement.style.display !== 'none') { // Avoid redundant style changes
+                console.log("Hiding card rating text via style.display.");
+                textElement.style.display = 'none';
+            }
+        } else {
+            // Show rating text on desktop
+            if (textElement.style.display === 'none') { // Avoid redundant style changes
+                console.log("Showing card rating text via style.display.");
+                 // Set display back to its default (likely inline or inline-block for a span)
+                 // Setting to '' lets the browser/CSS decide the default display.
+                textElement.style.display = '';
+            }
+        }
+    });
 }
 
 // --- Movie List Rendering (Uses local 'movies' array) ---
