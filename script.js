@@ -7,8 +7,7 @@ import {
 
 // --- Constants ---
 // Removed Local Storage Keys
-const ADMIN_EMAIL = 'admin@example.com'; // Kept for initial check, but ideally use Firebase role
-// const ADMIN_PASSWORD = 'password'; // Password check now happens via Firebase Auth
+const ADMIN_EMAIL = 'admin@example.com'; 
 const TOTAL_SEATS_PER_SCREENING = 5 * 8;
 const TICKET_PRICE_EGP = 90;
 const MAX_BOOKING_DAYS_AHEAD = 5;
@@ -129,13 +128,13 @@ const successTotalCost = document.getElementById('success-total-cost');
 const successBookingId = document.getElementById('success-booking-id');
 
 // --- State ---
-let movies = [];       // Holds movie data fetched from Firestore
-let vendors = [];      // Holds vendor data fetched from Firestore
-let allBookings = [];  // Holds booking data fetched from Firestore
-let allRatings = [];   // Holds rating data fetched from Firestore
-let authState = { isLoggedIn: false, user: null }; // Updated by onAuthStateChanged
-let editingMovieId = null;    // Store Firestore ID for editing movie
-let editingVendorId = null;   // Store Firestore ID for editing vendor
+let movies = [];       
+let vendors = [];      
+let allBookings = [];  
+let allRatings = [];   
+let authState = { isLoggedIn: false, user: null }; 
+let editingMovieId = null;    
+let editingVendorId = null;   
 let selectedSeats = [];
 let currentAdminTab = 'admin-manage-movies';
 let currentModalMovieId = null;
@@ -152,70 +151,69 @@ function showElement(el) {
         const originallyHidden = el.classList.contains('is-hidden');
         el.classList.remove('is-hidden');
 
-        // Explicitly set display based on known flex containers
-        // Add other flex container IDs here if needed
+        
+        
         if (el.id === 'auth-view' ||
             el.id === 'movie-details-modal' ||
             el.id === 'payment-modal' ||
             el.id === 'qr-validation-modal' ||
             el.id === 'booking-success-modal' ||
             el.id === 'qr-zoom-modal') {
-             el.style.display = 'flex'; // Restore flex display
+             el.style.display = 'flex'; 
         } else {
-            // For other elements, reset display to let CSS/defaults take over
-            // This assumes non-flex elements use block, inline-block, etc. by default or via other classes
+            
              el.style.display = '';
         }
 
-        if (originallyHidden) { // Only log if it was actually hidden
+        if (originallyHidden) { 
              console.log(`showElement: Removed .is-hidden and set display for #${el.id || 'element'}`);
         }
     } else if (el === undefined || el === null) {
-        // console.warn("showElement called with null or undefined element.");
+        
     } else {
-        // console.warn("showElement called with an unexpected type:", el);
+        
     }
 }
 
 function hideElement(el) {
     if (el && el.classList) {
-        // Only add the class. Let CSS handle display.
-        if (!el.classList.contains('is-hidden')) { // Avoid redundant adds
+        
+        if (!el.classList.contains('is-hidden')) { 
              el.classList.add('is-hidden');
-             console.log(`hideElement: Added .is-hidden to #${el.id || 'element'}`); // Add log
+             console.log(`hideElement: Added .is-hidden to #${el.id || 'element'}`); 
         }
     } else if (el === undefined || el === null) {
-       // console.warn("hideElement called with null or undefined element.");
+       
     } else {
-       // console.warn("hideElement called with an unexpected type:", el);
+       
     }
 }
 
 function displayError(element, message) {
-    // Check if the element exists
+    
     if (element) {
         element.textContent = message;
-        showElement(element); // Use the safer showElement
+        showElement(element); 
     } else {
-        // console.warn("displayError called with null or undefined element.");
-         // Optionally alert the user if an essential error display is missing
-         // alert("Error display element missing!");
+        
+         
+         
     }
 }
 
 function hideError(element) {
-    // Check if the element exists
+    
     if (element) {
         element.textContent = '';
-        hideElement(element); // Use the safer hideElement
+        hideElement(element); 
     } else {
-        // console.warn("hideError called with null or undefined element.");
+        
     }
 }
-// function generateId() { return '_' + Math.random().toString(36).substr(2, 9); } // Firestore generates IDs
+
 function formatDateReadable(date) {
     if (!date) return 'N/A';
-    // Handle both JS Date objects and Firebase Timestamps
+    
     const d = date instanceof Timestamp ? date.toDate() : new Date(date);
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
@@ -242,7 +240,7 @@ async function loadDataFromFirebase() {
         vendors = vendorsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log("Vendors loaded:", vendors.length);
 
-        // Load Bookings (can filter by user later if needed)
+        // Load Bookings 
         const bookingsSnapshot = await getDocs(collection(db, "bookings"));
         allBookings = bookingsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log("Bookings loaded:", allBookings.length);
@@ -259,9 +257,9 @@ async function loadDataFromFirebase() {
 }
 
 // --- Rating Functions ---
-function calculateAverageRating(movie) { // movie object should contain the Firestore movie ID (movie.id)
+function calculateAverageRating(movie) { 
     if (!movie || !movie.id) return { average: 0, count: 0 };
-    const relevantRatings = allRatings.filter(r => r.movieId === movie.id); // Filter pre-loaded ratings
+    const relevantRatings = allRatings.filter(r => r.movieId === movie.id);
     if (relevantRatings.length === 0) {
         return { average: 0, count: 0 };
     }
@@ -270,27 +268,27 @@ function calculateAverageRating(movie) { // movie object should contain the Fire
     return { average: average, count: relevantRatings.length };
 }
 
-// Render Stars (Modified to accept Firestore movie ID)
+// Render Stars 
 function renderStars(container, averageRating, count = 0, interactive = false, userRating = null, movieId = null) {
     if (!container) return;
-    container.innerHTML = ''; // Clear previous content
+    container.innerHTML = ''; 
     container.classList.toggle('interactive', interactive);
-    container.dataset.movieId = movieId || ''; // Use Firestore ID
+    container.dataset.movieId = movieId || ''; 
 
-    // Determine the rating to display
+    // chooses the rating to display
     const ratingValue = Math.round(averageRating);
     const displayRating = interactive && userRating !== null ? userRating : ratingValue;
 
-    // Apply flexbox for non-interactive stars if needed (like on cards)
+    
     if (!interactive) {
-        container.style.display = 'flex';        // Make the container a flex container
-        container.style.alignItems = 'center';  // Vertically align stars and text
+        container.style.display = 'flex';        
+        container.style.alignItems = 'center';  
     } else {
-        container.style.display = ''; // Reset display if it was previously flex
-        container.style.alignItems = ''; // Reset alignment
+        container.style.display = ''; 
+        container.style.alignItems = ''; 
     }
 
-    // Create star icons
+    // Create star icons for ratings
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement('i');
         star.classList.add(i <= displayRating ? 'fas' : 'fa-regular', 'fa-star');
@@ -304,11 +302,11 @@ function renderStars(container, averageRating, count = 0, interactive = false, u
         container.appendChild(star);
     }
 
-    // Conditionally add the rating text span
+    
     if (!interactive) {
         const ratingText = document.createElement('span');
-        // ***** ADDED 'rating-text' class *****
-        ratingText.className = 'ml-1 text-xs text-gray-500 rating-text'; // Added specific class
+        
+        ratingText.className = 'ml-1 text-xs text-gray-500 rating-text'; 
         if (averageRating > 0 && count > 0) {
             ratingText.textContent = `${averageRating.toFixed(1)} (${count} rating${count > 1 ? 's' : ''})`;
         } else {
@@ -319,7 +317,7 @@ function renderStars(container, averageRating, count = 0, interactive = false, u
 }
 
 function generateSimpleOtp(length = 6) {
-    // WARNING: Not cryptographically secure. For demo only.
+    
     let otp = '';
     const digits = '0123456789';
     for (let i = 0; i < length; i++) {
@@ -329,12 +327,12 @@ function generateSimpleOtp(length = 6) {
 }
 
 async function handleSendOtp() {
-    hideError(registerError); // Clear previous errors
+    hideError(registerError); 
     const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
     const confirmPassword = document.getElementById('register-confirm-password').value;
 
-    // Basic validation before sending OTP
+    // validation before sending OTP
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
         displayError(registerError, "Please enter a valid email address.");
         return;
@@ -348,225 +346,214 @@ async function handleSendOtp() {
          return;
      }
 
-    // REMOVED Firestore pre-check for existing email to avoid permission errors
-    // Firebase Auth will handle 'auth/email-already-in-use' during registration attempt.
+    
+    
 
-    // Generate OTP and set expiry (client-side - insecure)
-    generatedOtp = generateSimpleOtp(); // Assumes generateSimpleOtp() exists and works
+    // Generate OTP and set expiry 
+    generatedOtp = generateSimpleOtp();
     const now = new Date();
-    // Set expiry time (e.g., 15 minutes from now)
+    // Set expiry time 
     otpExpiry = new Date(now.getTime() + 15 * 60 * 1000);
-    // Format the expiry time for display in the email (e.g., "03:45 PM")
+    // Format the expiry time for display in the email 
     const expiryTimeFormatted = otpExpiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Log generated OTP for debugging purposes ONLY (Remove in production)
-    console.log(`Generated OTP: ${generatedOtp} for ${email}, expires at ${expiryTimeFormatted}`);
 
-    // Prepare the parameters for the EmailJS template
+    // parameters for the EmailJS template
     const templateParams = {
-        // *** FIX: Use 'email' key to match template variable {{email}} ***
+
         email: email,
-        passcode: generatedOtp, // This key must match {{passcode}} in your EmailJS template
-        time: expiryTimeFormatted // This key must match {{time}} in your EmailJS template
+        passcode: generatedOtp, // key must match {{passcode}} in EmailJS template
+        time: expiryTimeFormatted // key must match {{time}} in EmailJS template
     };
-    console.log("Sending templateParams:", templateParams); // Log parameters being sent
+    console.log("Sending templateParams:", templateParams); 
 
-    // Disable the "Send OTP" button to prevent multiple clicks while sending
+    
     sendOtpButton.disabled = true;
-    sendOtpButton.textContent = 'Sending OTP...'; // Provide visual feedback
+    sendOtpButton.textContent = 'Sending OTP...'; 
 
-    // Attempt to send the email using EmailJS
-    // Ensure 'service_6rtlp5w' and 'template_s0272m8' are correct
+    
+    
     emailjs.send('service_6rtlp5w', 'template_s0272m8', templateParams)
         .then(
             // Success Callback
             function(response) {
-               console.log('EmailJS SUCCESS!', response.status, response.text); // Log success details
-               displayError(registerError, ""); // Clear any previous error messages
-               alert(`OTP sent successfully to ${email}! Please check your inbox (and spam folder).`); // Inform the user
+               console.log('EmailJS SUCCESS!', response.status, response.text); 
+               displayError(registerError, ""); 
+               alert(`OTP sent successfully to ${email}! Please check your inbox (and spam folder).`); 
 
-               // Update the UI to show the OTP input field and the final registration button
-               showElement(otpSection);         // Make the OTP input area visible
-               hideElement(sendOtpButton);        // Hide the 'Send OTP' button
-               showElement(registerSubmitButton); // Show the 'Verify OTP & Register' button
+               
+               showElement(otpSection);         
+               hideElement(sendOtpButton);        
+               showElement(registerSubmitButton); 
 
-               // Re-enable the 'Send OTP' button (even though it's hidden now) as good practice
+               
                sendOtpButton.disabled = false;
                sendOtpButton.textContent = 'Send OTP';
            },
-            // Failure Callback
+            
             function(error) {
-               // Log the failure details - VERY IMPORTANT FOR DEBUGGING
-               console.error('EmailJS FAILED:', error); // Use console.error for better visibility
-               // Display a user-friendly error message on the form
-               // Check the error status code if available
+               
+               console.error('EmailJS FAILED:', error); 
+               
+               
                let errorMessage = "Failed to send OTP. Please check email or try again later.";
                if (error.status === 422) {
                     errorMessage = "Failed to send OTP. Please check EmailJS service/template configuration (422)."
                     console.error("EmailJS Error 422 suggests a problem with the Service or Template config (e.g., 'To' address field). Check EmailJS dashboard.");
                } else {
-                   console.error("EmailJS Error Status:", error.status); // Log other status codes
+                   console.error("EmailJS Error Status:", error.status); 
                }
                displayError(registerError, errorMessage);
 
-               // Re-enable the 'Send OTP' button on failure so the user can retry
+               
                sendOtpButton.disabled = false;
                sendOtpButton.textContent = 'Send OTP';
 
-               // Invalidate the generated OTP and expiry state since sending failed
+               
                generatedOtp = null;
                otpExpiry = null;
            }
-       ); // End of emailjs.send()
+       ); 
 }
 
 async function handleVerifyOtpAndRegister(event) {
-    event.preventDefault(); // Keep preventing default form submission
-    hideError(registerError); // Clear previous errors first
+    event.preventDefault(); 
+    hideError(registerError); 
 
-    // --- Retrieve current values from the form ---
+    
     const enteredOtp = otpInput.value.trim();
     const email = document.getElementById('register-email').value.trim(); // Get email again
     const password = document.getElementById('register-password').value; // Get password again
 
-    // --- Add Debugging Logs ---
+    // --- Debugging Logs ---
     console.log("--- Verifying OTP ---");
     console.log("Entered OTP:", enteredOtp, "(Type:", typeof enteredOtp + ")");
     console.log("Generated OTP in state:", generatedOtp, "(Type:", typeof generatedOtp + ")");
     console.log("OTP Expiry in state:", otpExpiry);
     console.log("Current Time:", new Date());
-    // Check expiry carefully, ensuring otpExpiry is a Date object
     let isExpired = false;
     if (otpExpiry instanceof Date) {
         isExpired = new Date() > otpExpiry;
     } else {
         console.warn("otpExpiry is not a valid Date object:", otpExpiry);
-        // Decide how to handle this - treat as expired?
-        isExpired = true; // Safer to treat as expired if state is invalid
+        isExpired = true; 
     }
     console.log("Is OTP Expired?", isExpired);
     console.log("Does entered OTP === generated OTP?", enteredOtp === generatedOtp);
-    // --- End Debugging Logs ---
 
     // --- OTP Validation ---
     if (!enteredOtp || enteredOtp.length !== 6) {
          console.log("Validation Fail: Invalid OTP length/format.");
          displayError(registerError, "Please enter the 6-digit OTP.");
-         // No need to reset button state here, let the user try again
-         return; // Stop execution
+         return;
     }
     if (!generatedOtp || !otpExpiry) {
         console.log("Validation Fail: generatedOtp or otpExpiry missing in state.");
         displayError(registerError, "OTP not generated or potentially expired. Please request a new one.");
-        // Optionally hide OTP section and show Send OTP button again if state is clearly lost
         hideElement(otpSection);
         hideElement(registerSubmitButton);
         showElement(sendOtpButton);
-        // Reset button state (though it's hidden now)
         registerSubmitButton.disabled = false;
         registerSubmitButton.textContent = 'Verify OTP & Register';
-        return; // Stop execution
+        return; 
     }
-     // Use the calculated 'isExpired' variable from logging
+     
      if (isExpired) {
          console.log("Validation Fail: OTP expired.");
          displayError(registerError, "OTP has expired. Please request a new one.");
-         generatedOtp = null; otpExpiry = null; otpInput.value = ''; // Clear expired OTP state and input
-         // Reset UI to request OTP again
+         generatedOtp = null; otpExpiry = null; otpInput.value = ''; 
+         
          hideElement(otpSection);
          hideElement(registerSubmitButton);
          showElement(sendOtpButton);
-         // Reset button state (though it's hidden now)
+         
          registerSubmitButton.disabled = false;
          registerSubmitButton.textContent = 'Verify OTP & Register';
-         return; // Stop execution
+         return; 
      }
-      // Use strict equality check (both type and value)
+      
       if (enteredOtp !== generatedOtp) {
           console.log("Validation Fail: Entered OTP does not match generated OTP.");
           displayError(registerError, "Invalid OTP entered. Please check and try again.");
-          // Do NOT clear generatedOtp here, allow retries until expiry
-          // No need to reset button state here, let the user try again
-          return; // Stop execution
+          
+          
+          return; 
       }
-    // --- End OTP Validation ---
+    
 
-    // If we reach here, OTP is valid and not expired
     console.log("OTP Verified Successfully! Proceeding to Firebase registration...");
 
-    // Disable button during Firebase registration process
     registerSubmitButton.disabled = true;
     registerSubmitButton.textContent = 'Registering...';
 
     // --- Firebase Registration ---
     try {
-        // Step 1: Create user in Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log("User registered in Firebase Auth:", user.uid, user.email);
 
-        // Step 2: Create corresponding user document in Firestore 'users' collection
-        // Using the user's UID as the document ID for easy lookup
+        
+        
         await setDoc(doc(db, "users", user.uid), {
-            email: user.email,       // Store email
-            role: 'customer',        // Assign default role
-            createdAt: serverTimestamp() // Add a server-side timestamp
+            email: user.email,       
+            role: 'customer',        
+            createdAt: serverTimestamp() 
         });
         console.log("User document created in Firestore for UID:", user.uid);
 
-        // --- Success Handling ---
-        // Clear sensitive OTP state now that registration is complete
+        
+        
         generatedOtp = null;
         otpExpiry = null;
 
-        // Reset the registration form completely
+        
         customerRegisterForm.reset();
 
-         // Reset the UI state: Hide OTP section, hide verify button, show send OTP button again
+         
          hideElement(otpSection);
          hideElement(registerSubmitButton);
-         showElement(sendOtpButton); // Make 'Send OTP' visible for potential next registration
+         showElement(sendOtpButton); 
 
-         // Re-enable the verify button and reset its text (even though it's hidden) for consistency
+         
          registerSubmitButton.disabled = false;
          registerSubmitButton.textContent = 'Verify OTP & Register';
 
-         // Notify user of success
+         
          alert("Registration successful! You are now logged in.");
-         // The onAuthStateChanged listener will automatically detect the new user,
-         // update the global authState, load data, and call renderUI() to show the customer view.
+         
+         
 
     } catch (error) {
-        // --- Firebase Error Handling ---
+        
         console.error("Firebase Registration Error after OTP Verification:", error);
-        console.error("Error Code:", error.code); // Log the specific Firebase error code
+        console.error("Error Code:", error.code); 
         console.error("Error Message:", error.message);
 
-        // Re-enable the verify button on error so the user can potentially try again
+        
         registerSubmitButton.disabled = false;
         registerSubmitButton.textContent = 'Verify OTP & Register';
 
-        // Provide specific user feedback based on the error code
+        
         if (error.code === 'auth/email-already-in-use') {
-            // This *should* have been caught by the check in handleSendOtp ideally,
-            // but handle defensively here as well.
+            
+            
             displayError(registerError, "This email address is already registered. Please login instead or use a different email.");
-             // Optionally hide OTP section and show login links again here
+             
              hideElement(otpSection);
              hideElement(registerSubmitButton);
-             showElement(sendOtpButton); // Or potentially switch to login form view
+             showElement(sendOtpButton); 
         } else if (error.code === 'auth/weak-password') {
              displayError(registerError, "The password is too weak. Please use a stronger password (at least 6 characters).");
-             // Keep the OTP section visible so they can retry with a new password after requesting a new OTP if needed.
+             
         } else {
-            // General error message for other Firebase issues
+            
             displayError(registerError, "Registration failed after OTP verification due to a server error. Please try again later.");
         }
-        // Note: If Auth succeeded but Firestore 'setDoc' failed, you might have an Auth user
-        // without a corresponding Firestore document. This usually requires manual cleanup
-        // or more robust server-side handling.
+        
+        
+        
     }
-    // --- End Firebase Registration ---
+    
 }
 
 function highlightStars(container, rating) {
@@ -578,110 +565,110 @@ function highlightStars(container, rating) {
     });
 }
 
-// Handle Star Click (Modified to use Firestore)
+
 async function handleStarClick(movieId, rating) {
-    // Initial checks
+    
     if (!authState.isLoggedIn || !authState.user || authState.user.type !== 'customer' || !movieId) {
         console.warn("User not logged in or not a customer, cannot rate.");
         return;
     }
     const userId = authState.user.uid;
-    const movie = movies.find(m => m.id === movieId); // Find movie locally for title
+    const movie = movies.find(m => m.id === movieId); 
 
     console.log(`Attempting to rate movie ${movieId} with rating ${rating} by user ${userId}`);
 
-    // Disable stars briefly to prevent double-clicks (optional but good UX)
+    
     if(modalStarsContainer) modalStarsContainer.style.pointerEvents = 'none';
 
     try {
-        // Check if user already rated this movie by querying Firestore
+        
         const q = query(collection(db, "ratings"), where("movieId", "==", movieId), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
 
-        let isUpdate = false; // Flag to track if we are updating or adding
+        let isUpdate = false; 
 
         if (!querySnapshot.empty) {
-            // ----- UPDATE Existing Rating -----
+            
             isUpdate = true;
-            const existingRatingDoc = querySnapshot.docs[0]; // Get the first (should be only) doc
+            const existingRatingDoc = querySnapshot.docs[0]; 
             const existingRatingRef = existingRatingDoc.ref;
             const currentRating = existingRatingDoc.data().rating;
 
-            // Optional: If user clicks the same star again, maybe just update timestamp or do nothing?
-            // For now, we'll update even if the rating value is the same.
+            
+            
             console.log(`Found existing rating (ID: ${existingRatingDoc.id}), updating rating from ${currentRating} to ${rating}.`);
 
             await updateDoc(existingRatingRef, {
                 rating: rating,
-                lastUpdatedAt: serverTimestamp() // Add/Update a timestamp
+                lastUpdatedAt: serverTimestamp() 
             });
 
-            // Update local cache
+            
             const index = allRatings.findIndex(r => r.id === existingRatingDoc.id);
             if (index > -1) {
                 allRatings[index].rating = rating;
-                // Simulate timestamp update locally if needed immediately elsewhere
+                
                 allRatings[index].lastUpdatedAt = new Date();
             }
              console.log("Rating updated successfully in Firestore and local cache.");
 
         } else {
-            // ----- ADD New Rating -----
+            
             isUpdate = false;
             console.log(`No existing rating found, adding new rating.`);
             const ratingData = {
                 movieId: movieId,
                 userId: userId,
                 rating: rating,
-                createdAt: serverTimestamp(), // Use server timestamp for creation
-                lastUpdatedAt: serverTimestamp() // Also set initial update timestamp
+                createdAt: serverTimestamp(), 
+                lastUpdatedAt: serverTimestamp() 
             };
             const docRef = await addDoc(collection(db, "ratings"), ratingData);
 
-            // Add to local cache optimistically
-            allRatings.push({ id: docRef.id, ...ratingData, createdAt: new Date(), lastUpdatedAt: new Date() }); // Simulate timestamps locally
+            
+            allRatings.push({ id: docRef.id, ...ratingData, createdAt: new Date(), lastUpdatedAt: new Date() }); 
             console.log("Rating added successfully to Firestore and local cache with ID:", docRef.id);
         }
 
-        // ----- Common UI Update (After Add OR Update) -----
-        // 1. Re-calculate and render average rating (non-interactive)
-        if (movie) { // Check if movie data is available
+        
+        
+        if (movie) { 
              const avgData = calculateAverageRating(movie);
              renderStars(modalAvgRatingContainer, avgData.average, avgData.count, false); // Render average stars
         }
 
-        // 2. Re-render the USER'S rating stars (now showing the new/updated rating, still interactive)
-        renderStars(modalStarsContainer, 0, 0, true, rating, movieId); // Force interactive, show current 'rating'
+        
+        renderStars(modalStarsContainer, 0, 0, true, rating, movieId); 
 
-        // 3. Update the rating message
+        
         modalRatingMessage.textContent = isUpdate
             ? `Rating updated to ${rating} star${rating > 1 ? 's' : ''}.`
             : `You rated this movie ${rating} star${rating > 1 ? 's' : ''}.`;
 
-        // 4. Ensure stars remain interactive visually (may be redundant if renderStars handles it, but safe)
+        
         modalStarsContainer.classList.add('interactive');
         modalStarsContainer.style.cursor = 'pointer';
 
-        // Refresh main movie list if needed (to update average rating display on cards)
+        
         if (customerView && !customerView.classList.contains('is-hidden')) {
              renderMovies(customerMovieListContainer, 'customer');
         }
-        // Add similar refresh for admin/vendor views if necessary
+        
 
     } catch (error) {
         console.error("Error adding/updating rating: ", error);
-        modalRatingMessage.textContent = "Failed to save rating. Please try again."; // Show error message
+        modalRatingMessage.textContent = "Failed to save rating. Please try again."; 
         alert("Failed to save rating. Please try again.");
-        // Optionally re-render stars to previous state if needed
+        
     } finally {
-         // Re-enable stars after operation completes
+         
          if(modalStarsContainer) modalStarsContainer.style.pointerEvents = 'auto';
     }
 }
 // --- UI Rendering Functions ---
 function renderUI() {
-    console.log("--- renderUI called ---"); // Log start
-    console.log("Current authState:", JSON.stringify(authState)); // Log current state
+    console.log("--- renderUI called ---"); 
+    console.log("Current authState:", JSON.stringify(authState)); 
 
     closeModal();
     closePaymentModal();
@@ -724,7 +711,7 @@ function renderUI() {
             hideElement(adminView);
             showElement(vendorDashboardView);
             renderVendorDashboard();
-        } else { // Customer
+        } else { 
             console.log("Hiding admin/vendor, showing customer view.");
             hideElement(adminView);
             hideElement(vendorDashboardView);
@@ -737,10 +724,10 @@ function renderUI() {
         hideElement(appHeader);
         hideElement(adminView);
         hideElement(customerView);
-        hideElement(myBookingsView); // Ensure this is hidden too
+        hideElement(myBookingsView); 
         hideElement(vendorDashboardView);
-        showElement(authView); // Make sure auth view is shown
-        showCustomerLoginForm(); // Show the default login form within auth view
+        showElement(authView); 
+        showCustomerLoginForm(); 
 
         if (userInfoSpan) {
             userInfoSpan.textContent = '';
@@ -750,9 +737,9 @@ function renderUI() {
         bodyElement.classList.remove('logged-in');
     }
 
-    // Call visibility update at the end, AFTER potential text changes
+    
     updateHeaderVisibility();
-    console.log("--- renderUI finished ---"); // Log end
+    console.log("--- renderUI finished ---"); 
 }
 
 // --- Admin Content Rendering ---
@@ -766,7 +753,7 @@ function renderAdminContent() {
         console.log("Showing admin section:", currentAdminTab);
     } else {
         console.error("Could not find admin section with ID:", currentAdminTab);
-        currentAdminTab = 'admin-manage-movies'; // Default fallback
+        currentAdminTab = 'admin-manage-movies'; 
         showElement(adminManageMoviesSection);
         adminNavButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.target === currentAdminTab); });
     }
@@ -774,7 +761,6 @@ function renderAdminContent() {
     console.log("Rendering admin content for tab:", currentAdminTab);
     if (currentAdminTab === 'admin-manage-movies') {
         renderMovies(adminMovieListContainer, 'admin');
-        // ***** REMOVED: renderMovies(customerPreviewContainer, 'preview'); *****
         populateVendorDropdown('movie-vendor');
     }
     else if (currentAdminTab === 'admin-analytics') {
@@ -791,7 +777,6 @@ function renderAdminContent() {
     }
 }
 
-// Render Admin Bookings List (Using Firestore data)
 function renderAdminBookingsList() {
     if (!adminBookingsListContainer) { console.error("Admin bookings list container not found!"); return; }
     adminBookingsListContainer.innerHTML = '';
@@ -802,11 +787,9 @@ function renderAdminBookingsList() {
         return;
     }
 
-    // --- Group bookings by movie title (optional, for better structure) ---
     const bookingsByMovie = allBookings.reduce((acc, booking) => {
-        // Find movie title from local movies array using movieId from booking
         const movie = movies.find(m => m.id === booking.movieId);
-        const title = movie ? movie.title : (booking.movieTitle || 'Unknown Movie'); // Fallback to stored title if movie deleted
+        const title = movie ? movie.title : (booking.movieTitle || 'Unknown Movie'); 
         if (!acc[title]) {
             acc[title] = [];
         }
@@ -817,9 +800,8 @@ function renderAdminBookingsList() {
     const sortedMovieTitles = Object.keys(bookingsByMovie).sort();
 
     if (sortedMovieTitles.length === 0 && allBookings.length > 0) {
-        // Render ungrouped if grouping fails but bookings exist
-        adminBookingsListContainer.innerHTML = ''; // Clear again
-        allBookings.sort((a, b) => (b.timestamp?.toDate?.() || 0) - (a.timestamp?.toDate?.() || 0)) // Sort by Firestore Timestamp
+        adminBookingsListContainer.innerHTML = ''; 
+        allBookings.sort((a, b) => (b.timestamp?.toDate?.() || 0) - (a.timestamp?.toDate?.() || 0)) 
             .forEach(booking => adminBookingsListContainer.appendChild(createBookingListItem(booking, 'admin')));
         return;
     } else if (sortedMovieTitles.length === 0) {
@@ -836,7 +818,7 @@ function renderAdminBookingsList() {
         groupDiv.appendChild(titleHeading);
 
         const bookingsForMovie = bookingsByMovie[movieTitle]
-                                    .sort((a, b) => (b.timestamp?.toDate?.() || 0) - (a.timestamp?.toDate?.() || 0)); // Sort by Firestore Timestamp
+                                    .sort((a, b) => (b.timestamp?.toDate?.() || 0) - (a.timestamp?.toDate?.() || 0)); 
 
         const listElement = document.createElement('div');
         listElement.className = 'space-y-3 pl-4';
@@ -849,20 +831,18 @@ function renderAdminBookingsList() {
     });
 }
 
-// Helper to create a booking list item (for admin or customer)
 function createBookingListItem(booking, viewType = 'customer') {
     const itemDiv = document.createElement('div');
-    const isUsed = booking.qrCodeUsed || false; // Check Firestore field
-    const movie = movies.find(m => m.id === booking.movieId); // Get movie details if available
+    const isUsed = booking.qrCodeUsed || false; 
+    const movie = movies.find(m => m.id === booking.movieId); 
 
     if (viewType === 'admin') {
-        itemDiv.className = 'admin-booking-item !pl-3 !pr-3 !pb-3 !pt-2'; // Added padding classes
+        itemDiv.className = 'admin-booking-item !pl-3 !pr-3 !pb-3 !pt-2';
 
         const statusLabelClass = isUsed ? 'status-used' : 'status-not-used';
         const statusText = isUsed ? '✅ QR Code Used' : '🔄 QR Code Not Used';
         const usedTimestamp = booking.qrUsedTimestamp ? formatDateReadable(booking.qrUsedTimestamp.toDate()) + ' ' + booking.qrUsedTimestamp.toDate().toLocaleTimeString() : 'N/A';
 
-        // ***** CHANGE: Use paragraphs for better formatting *****
         itemDiv.innerHTML = `
            <p class="text-sm"><i class="fas fa-user w-4 mr-1 text-gray-400"></i> ${booking.userEmail || 'N/A'}</p>
            <p class="text-sm"><i class="fas fa-calendar-alt w-4 mr-1 text-gray-400"></i> ${formatDateReadable(booking.selectedDate)}</p>
@@ -875,10 +855,9 @@ function createBookingListItem(booking, viewType = 'customer') {
                ${isUsed ? `<span class="text-xs text-gray-500">Used: ${usedTimestamp}</span>` : ''}
             </div>
         `;
-        // ***** END CHANGE *****
+     
 
-    } else { // Customer view ('my-bookings')
-        // ... customer view rendering remains the same ...
+    } else { 
         itemDiv.className = 'booking-list-item';
         const qrData = JSON.stringify({
             bookingId: booking.id,
@@ -937,23 +916,21 @@ function showCustomerMovieListView() {
     isShowingMyBookings = false;
     hideElement(myBookingsView);
     showElement(customerMovieListContainer);
-    renderMovies(customerMovieListContainer, 'customer'); // Uses local 'movies' array
+    renderMovies(customerMovieListContainer, 'customer'); 
     toggleMyBookingsBtn.innerHTML = '<i class="fas fa-ticket-alt mr-2"></i>My Bookings';
 }
 function showMyBookingsView() {
     isShowingMyBookings = true;
     hideElement(customerMovieListContainer);
-    renderMyBookings(); // Fetches and renders user's bookings
+    renderMyBookings(); // renders user's bookings
     showElement(myBookingsView);
     toggleMyBookingsBtn.innerHTML = '<i class="fas fa-film mr-2"></i>Now Showing';
 }
 
-// Render My Bookings (Fetch directly from Firestore on demand)
 
 async function renderMyBookings() {
-    myBookingsListContainer.innerHTML = '<p class="text-gray-500">Loading your bookings...</p>'; // Set loading state
+    myBookingsListContainer.innerHTML = '<p class="text-gray-500">Loading your bookings...</p>'; 
 
-    // 1. Check if user is logged in
     if (!authState.isLoggedIn || !authState.user || !authState.user.uid) {
         myBookingsListContainer.innerHTML = '<p class="text-red-500">Error: Login required to view bookings.</p>';
         return;
@@ -961,16 +938,14 @@ async function renderMyBookings() {
     const currentUserUid = authState.user.uid;
 
     try {
-        // 2. Query Firestore specifically for this user's bookings, ordered by time
         console.log(`Fetching bookings from Firestore for user: ${currentUserUid}`);
         const q = query(
             collection(db, "bookings"),
             where("userId", "==", currentUserUid),
-            orderBy("timestamp", "desc") // Order by newest first
+            orderBy("timestamp", "desc") 
         );
         const querySnapshot = await getDocs(q);
 
-        // 3. Process the results
         const userBookings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log(`Found ${userBookings.length} bookings for user.`);
 
@@ -979,15 +954,15 @@ async function renderMyBookings() {
             return;
         }
 
-        // 4. Render the fetched bookings
-        myBookingsListContainer.innerHTML = ''; // Clear loading/previous messages
+        
+        myBookingsListContainer.innerHTML = ''; 
         userBookings.forEach(booking => {
-            // createBookingListItem should still work as it takes a booking object
+            
             myBookingsListContainer.appendChild(createBookingListItem(booking, 'customer'));
         });
 
     } catch (error) {
-        // 5. Handle errors during fetch
+        
         console.error("Error fetching user bookings:", error);
         myBookingsListContainer.innerHTML = '<p class="text-red-600">Could not load your bookings. Please try again.</p>';
     }
@@ -999,7 +974,6 @@ function renderAnalyticsDashboard(targetVendorName = null) {
     const isVendor = targetVendorName !== null;
 
     // --- Get DOM Elements ---
-    // (Keep all the getElementById/querySelector calls as they are)
     const avgRatingsContainer = isVendor ? vendorAnalyticsAvgRatingsContainer : analyticsAvgRatingsContainer;
     const totalRevenueElement = isVendor ? vendorTotalRevenueElement : adminTotalRevenueElement;
     const analyticsSection = isVendor ? document.getElementById('vendor-analytics') : adminAnalyticsSection;
@@ -1011,14 +985,12 @@ function renderAnalyticsDashboard(targetVendorName = null) {
     const weeklyTableBody = !isVendor ? document.querySelector('#admin-weekly-occupancy-table tbody') : null;
     const dailyMoviePerfList = !isVendor ? document.getElementById('daily-movie-perf-list') : null;
 
-    // --- Basic Check & Clear/Loading States ---
+    // --- Check & Clear/Loading States ---
     if (!analyticsSection || !totalRevenueElement || !avgRatingsContainer) {
          console.error("Essential analytics containers not found for", isVendor ? "vendor" : "admin");
          return;
     }
-     // Check admin-specific elements (This check itself is fine)
      if (!isVendor && (!seatsTodayElement || !capacityTodayElement || !capacityDetailElement || !mostBookedElement || !leastBookedElement || !weeklyTableBody || !dailyMoviePerfList)) {
-         // Log which element might be null for detailed debugging if needed
          console.error("One or more specific admin analytics elements are missing.", {
              seatsTodayElement, capacityTodayElement, capacityDetailElement, mostBookedElement, leastBookedElement, weeklyTableBody, dailyMoviePerfList
          });
@@ -1036,24 +1008,20 @@ function renderAnalyticsDashboard(targetVendorName = null) {
         capacityDetailElement.textContent = 'Calculating...';
         mostBookedElement.textContent = '--';
         leastBookedElement.textContent = '--';
-        // *** FIX: Removed the duplicate line below ***
         weeklyTableBody.innerHTML = `<tr class="bg-white border-b"><td colspan="4" class="px-4 py-3 text-center text-gray-500">Loading weekly data...</td></tr>`;
         dailyMoviePerfList.innerHTML = '<p class="text-gray-500 md:col-span-2">Loading daily movie data...</p>';
-        // The second assignment to weeklyTableBody.innerHTML was removed here
     }
 
-    // Remove previous monthly card (still generated later)
     const oldMonthlyCard = analyticsSection.querySelector('#admin-monthly-seats-card');
     if (oldMonthlyCard) oldMonthlyCard.remove();
 
 
     // --- Filter Data ---
-    console.log("Analytics: Global data state:", { movies: movies.length, allBookings: allBookings.length }); // Log global counts
+    console.log("Analytics: Global data state:", { movies: movies.length, allBookings: allBookings.length }); 
     const relevantMovies = isVendor ? movies.filter(m => m.vendorName === targetVendorName) : movies;
     const relevantMovieIds = relevantMovies.map(m => m.id);
-    // Filter bookings for relevant movies only ONCE
     const relevantBookings = allBookings.filter(b => relevantMovieIds.includes(b.movieId));
-    console.log("Analytics: Filtered data:", { relevantMovies: relevantMovies.length, relevantBookings: relevantBookings.length }); // Log filtered counts
+    console.log("Analytics: Filtered data:", { relevantMovies: relevantMovies.length, relevantBookings: relevantBookings.length }); 
 
 
     // --- Handle No Movies Case ---
@@ -1070,14 +1038,14 @@ function renderAnalyticsDashboard(targetVendorName = null) {
             weeklyTableBody.innerHTML = `<tr class="bg-white border-b"><td colspan="4" class="px-4 py-3 text-center text-gray-500">No movie data for weekly analysis.</td></tr>`;
             dailyMoviePerfList.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies scheduled for daily analysis.</p>';
         }
-        appendMonthlySeatsCard(analyticsSection, {}, isVendor ? 'for your movies' : ''); // Pass empty data
-        return; // Exit if no movies
+        appendMonthlySeatsCard(analyticsSection, {}, isVendor ? 'for your movies' : ''); 
+        return; 
     }
 
     // --- Calculate Total Revenue ---
     const totalRevenue = relevantBookings.reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
     totalRevenueElement.textContent = `${totalRevenue.toFixed(2)} EGP`;
-    console.log("Analytics: Total Revenue Calculated:", totalRevenue); // Log revenue
+    console.log("Analytics: Total Revenue Calculated:", totalRevenue); 
 
     // --- Calculate and Render Avg Ratings ---
     console.log("Analytics: Calling renderAverageRatings...");
@@ -1108,27 +1076,26 @@ function renderAnalyticsDashboard(targetVendorName = null) {
 }
 
 function calculateAndRenderDailyMoviePerformance(movies, bookings, listContainer) {
-    listContainer.innerHTML = ''; // Clear loading message
+    listContainer.innerHTML = ''; 
     const todayStr = formatDateYYYYMMDD(new Date());
     let moviesWithShowtimesToday = 0;
 
-    // Sort movies alphabetically by title for consistent display order
+    
     const sortedMovies = [...movies].sort((a, b) => a.title.localeCompare(b.title));
 
     sortedMovies.forEach(movie => {
         const showtimesTodayCount = Array.isArray(movie.showtimes) ? movie.showtimes.length : 0;
 
-        // Skip movies with no showtimes scheduled at all today (or ever listed)
         if (showtimesTodayCount === 0) {
-            return; // Go to the next movie
+            return;
         }
 
-        moviesWithShowtimesToday++; // Count movies that *could* have bookings today
+        moviesWithShowtimesToday++;
 
         const totalPossibleSeatsToday = showtimesTodayCount * TOTAL_SEATS_PER_SCREENING;
         let seatsBookedToday = 0;
 
-        // Sum bookings for *this specific movie* today
+        // Sum bookings for this specific movie today
         bookings.forEach(booking => {
             if (booking.movieId === movie.id && booking.selectedDate === todayStr && Array.isArray(booking.seats)) {
                 seatsBookedToday += booking.seats.length;
@@ -1162,26 +1129,26 @@ function calculateAndRenderDailyMoviePerformance(movies, bookings, listContainer
     // Handle case where movies exist, but none have showtimes scheduled today
     if (moviesWithShowtimesToday === 0 && movies.length > 0) {
          listContainer.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies have scheduled showtimes for today.</p>';
-    } else if (movies.length === 0) { // Should be caught earlier, but double-check
+    } else if (movies.length === 0) {
         listContainer.innerHTML = '<p class="text-gray-500 md:col-span-2">No movies to analyze.</p>';
     }
 }
 
 // --- Helper function to render average ratings ---
 function renderAverageRatings(container, moviesToRate, isVendor) {
-    container.innerHTML = ''; // Clear loading state
+    container.innerHTML = ''; 
     let hasRatings = false;
     moviesToRate.forEach(movie => {
-        const { average, count } = calculateAverageRating(movie); // Pass movie object with ID
+        const { average, count } = calculateAverageRating(movie); 
         if (count > 0) hasRatings = true;
         const ratingDiv = document.createElement('div');
         ratingDiv.className = 'flex justify-between items-center text-sm pb-1 border-b border-gray-200 last:border-b-0';
         const titleSpan = document.createElement('span');
         titleSpan.textContent = movie.title;
-        titleSpan.className = 'font-medium text-gray-700 truncate pr-2'; // Added truncate
+        titleSpan.className = 'font-medium text-gray-700 truncate pr-2'; 
         const starsSpan = document.createElement('span');
-        starsSpan.className = 'stars-container flex items-center flex-shrink-0'; // Added shrink
-        renderStars(starsSpan, average, count, false); // Render non-interactive stars
+        starsSpan.className = 'stars-container flex items-center flex-shrink-0'; 
+        renderStars(starsSpan, average, count, false); 
         ratingDiv.appendChild(titleSpan);
         ratingDiv.appendChild(starsSpan);
         container.appendChild(ratingDiv);
@@ -1196,9 +1163,8 @@ function calculateAndRenderDailyMetrics(movies, bookings, seatsEl, capacityEl, c
     const todayStr = formatDateYYYYMMDD(new Date());
     let totalSeatsBookedToday = 0;
     let totalScheduledShowtimesToday = 0;
-    const dailyBookingsByMovie = {}; // { movieId: seatsBooked }
+    const dailyBookingsByMovie = {}; 
 
-    // Calculate total scheduled showtimes today across relevant movies
     movies.forEach(movie => {
         totalScheduledShowtimesToday += Array.isArray(movie.showtimes) ? movie.showtimes.length : 0;
     });
@@ -1242,13 +1208,10 @@ function calculateAndRenderDailyMetrics(movies, bookings, seatsEl, capacityEl, c
 
     for (const movieId in movieSeatsToday) {
         const seats = movieSeatsToday[movieId];
-        // Most booked
         if (seats > mostBookedSeats) {
             mostBookedSeats = seats;
             mostBookedMovieId = movieId;
         }
-        // Least booked (must have had at least one booking to qualify, otherwise all 0s are least)
-        // Correction: Find minimum among *all* movies today, including those with 0 bookings.
         if (seats < leastBookedSeats) {
             leastBookedSeats = seats;
             leastBookedMovieId = movieId;
@@ -1273,25 +1236,25 @@ function calculateAndRenderDailyMetrics(movies, bookings, seatsEl, capacityEl, c
 
 // --- Helper function for Weekly Metrics (Admin only) ---
 function calculateAndRenderWeeklyMetrics(movies, bookings, tableBody) {
-    tableBody.innerHTML = ''; // Clear loading/previous content
+    tableBody.innerHTML = ''; 
 
-    const weeklyOccupancyData = {}; // { movieId: { booked: totalSeats, screenings: totalScheduledScreenings } }
-    const pastWeekDates = getPastWeekDates(); // Get ['today', 'yesterday', ...] YYYY-MM-DD
+    const weeklyOccupancyData = {};
+    const pastWeekDates = getPastWeekDates(); 
 
-    // Initialize weekly data structure for all relevant movies
+    
     movies.forEach(movie => {
-        const scheduledScreeningsWeekly = (Array.isArray(movie.showtimes) ? movie.showtimes.length : 0) * 7; // Approx. total scheduled
+        const scheduledScreeningsWeekly = (Array.isArray(movie.showtimes) ? movie.showtimes.length : 0) * 7; 
         weeklyOccupancyData[movie.id] = {
             booked: 0,
-            screenings: scheduledScreeningsWeekly, // Store scheduled screenings
-            title: movie.title // Store title for easy access later
+            screenings: scheduledScreeningsWeekly, 
+            title: movie.title 
         };
     });
 
-    // Aggregate booked seats over the past week
+    
     bookings.forEach(booking => {
         if (pastWeekDates.includes(booking.selectedDate) && Array.isArray(booking.seats)) {
-            if (weeklyOccupancyData[booking.movieId]) { // Check if movie exists in our structure
+            if (weeklyOccupancyData[booking.movieId]) { 
                  weeklyOccupancyData[booking.movieId].booked += booking.seats.length;
             }
         }
@@ -1336,7 +1299,7 @@ function calculateMonthlyBookedSeats(bookings) {
                 const date = booking.timestamp instanceof Timestamp ? booking.timestamp.toDate() : new Date(booking.timestamp);
                 if (isNaN(date.getTime())) { throw new Error("Invalid Date"); }
                 const year = date.getFullYear();
-                const month = date.getMonth(); // 0-indexed
+                const month = date.getMonth(); 
                 const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
                 if (!acc[monthKey]) acc[monthKey] = 0;
                 acc[monthKey] += booking.seats.length;
@@ -1353,7 +1316,7 @@ function calculateMonthlyBookedSeats(bookings) {
 function appendMonthlySeatsCard(analyticsSection, monthlyData, contextSuffix) {
     const monthlySeatsContainer = document.createElement('div');
     monthlySeatsContainer.className = 'analytics-card';
-    monthlySeatsContainer.id = 'admin-monthly-seats-card'; // Keep ID for potential removal
+    monthlySeatsContainer.id = 'admin-monthly-seats-card'; 
     monthlySeatsContainer.innerHTML = `
         <h3 class="text-lg font-semibold mb-3 text-gray-600">Total Seats Booked Per Month</h3>
         <div class="space-y-2 text-sm" id="monthly-seats-list">
@@ -1387,11 +1350,10 @@ function appendMonthlySeatsCard(analyticsSection, monthlyData, contextSuffix) {
 // --- Vendor Dashboard Rendering ---
 function renderVendorDashboard() {
     if (!vendorMovieListContainer || !noVendorMoviesMsg || !vendorAnalyticsAvgRatingsContainer || !vendorAnalyticsOccupancyContainer) return;
-    vendorMovieListContainer.innerHTML = ''; // Clear previous movies
+    vendorMovieListContainer.innerHTML = ''; 
 
     if (!authState.isLoggedIn || authState.user.type !== 'vendor' || !authState.user.name) {
         noVendorMoviesMsg.textContent = 'Error: Invalid vendor session.'; showElement(noVendorMoviesMsg);
-        // Clear analytics too
          vendorAnalyticsAvgRatingsContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
          vendorAnalyticsOccupancyContainer.innerHTML = '<p class="text-gray-500">Login as vendor to see analytics.</p>';
          if(vendorTotalRevenueElement) vendorTotalRevenueElement.textContent = '0 EGP';
@@ -1399,7 +1361,6 @@ function renderVendorDashboard() {
     }
 
     const vendorName = authState.user.name;
-    // Filter locally loaded movies
     const vendorMovies = movies.filter(movie => movie.vendorName === vendorName);
 
     // Render Movie List for Vendor
@@ -1409,13 +1370,12 @@ function renderVendorDashboard() {
     } else {
         hideElement(noVendorMoviesMsg);
         vendorMovies.forEach((movie) => {
-            // Pass Firestore ID to createMovieCard
-            const card = createMovieCard(movie, null, 'vendor_dashboard'); // Index not needed if using ID
+            const card = createMovieCard(movie, null, 'vendor_dashboard');
             vendorMovieListContainer.appendChild(card);
         });
     }
 
-    // Render Vendor Analytics (passing vendor name)
+    // Render Vendor Analytics 
     renderAnalyticsDashboard(vendorName);
 }
 
@@ -1426,7 +1386,7 @@ function showCustomerRegisterForm() { hideElement(customerLoginForm); hideElemen
 function showAdminLoginForm() { hideElement(customerLoginForm); hideElement(customerRegisterForm); hideElement(vendorLoginForm); showElement(adminLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); hideError(vendorLoginError); }
 function showVendorLoginForm() { hideElement(customerLoginForm); hideElement(customerRegisterForm); hideElement(adminLoginForm); showElement(vendorLoginForm); hideError(customerLoginError); hideError(registerError); hideError(adminLoginError); hideError(vendorLoginError); vendorLoginForm.reset(); }
 
-// --- Auth Logic (Using Firebase Auth) ---
+// --- Auth Logic ---
 async function handleCustomerLogin(event) {
     event.preventDefault();
     hideError(customerLoginError);
@@ -1434,7 +1394,6 @@ async function handleCustomerLogin(event) {
     const password = document.getElementById('customer-password').value;
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        // Success: onAuthStateChanged listener will handle UI update
         customerLoginForm.reset();
     } catch (error) {
         console.error("Customer Login Error:", error);
@@ -1449,9 +1408,7 @@ async function handleAdminLogin(event) {
     const password = document.getElementById('admin-password').value;
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Role check will happen in onAuthStateChanged
         adminLoginForm.reset();
-        // No need to manually set state here, onAuthStateChanged handles it
     } catch (error) {
         console.error("Admin Login Error:", error);
         displayError(adminLoginError, "Invalid admin email or password.");
@@ -1470,28 +1427,28 @@ async function handleRegistration(event) {
     if (password.length < 6) { displayError(registerError, "Password must be at least 6 characters."); return; }
 
     try {
-        // Check if email already exists in 'users' (optional, Firebase Auth handles this too)
-        // const q = query(collection(db, "users"), where("email", "==", email));
-        // const existingUserSnap = await getDocs(q);
-        // if (!existingUserSnap.empty) {
-        //     displayError(registerError, "Email already registered.");
-        //     return;
-        // }
+        
+        
+        
+        
+        
+        
+        
 
-        // Create user in Firebase Auth
+        
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log("User registered in Auth:", user.uid);
 
-        // Create user document in Firestore 'users' collection
+        
         await setDoc(doc(db, "users", user.uid), {
             email: user.email,
-            role: 'customer', // Default role
+            role: 'customer', 
             createdAt: serverTimestamp()
         });
         console.log("User document created in Firestore for:", user.uid);
 
-        // Success: onAuthStateChanged handles UI update
+        
         customerRegisterForm.reset();
 
     } catch (error) {
@@ -1505,25 +1462,25 @@ async function handleRegistration(event) {
 }
 
 async function handleVendorLogin(event) {
-    console.log("Attempting Vendor Login..."); // ADD THIS LOG
+    console.log("Attempting Vendor Login..."); 
     event.preventDefault();
     hideError(vendorLoginError);
     const email = document.getElementById('vendor-email').value.trim();
     const password = document.getElementById('vendor-password').value;
     try {
-        // Attempt sign in
+        
         await signInWithEmailAndPassword(auth, email, password);
-        // !! IMPORTANT: If this line succeeds, Firebase Auth considers the user logged in.
-        // The rest depends on onAuthStateChanged correctly identifying the role.
-        console.log("Vendor signInWithEmailAndPassword successful (waiting for onAuthStateChanged)..."); // ADD THIS LOG
+        
+        
+        console.log("Vendor signInWithEmailAndPassword successful (waiting for onAuthStateChanged)..."); 
 
-        // We don't set local storage here; onAuthStateChanged handles confirmation
+        
         vendorLoginForm.reset();
     } catch (error) {
-        // This block runs if signInWithEmailAndPassword FAILS (wrong password, user not found etc.)
-        console.error("Vendor Login Firebase Auth Error:", error.code, error.message); // Log specific code
+        
+        console.error("Vendor Login Firebase Auth Error:", error.code, error.message); 
         displayError(vendorLoginError, "Invalid vendor email or password.");
-        // Clear potentially stale optimistic login data if login fails
+        
         localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
     }
 }
@@ -1531,11 +1488,11 @@ async function handleVendorLogin(event) {
 async function handleLogout() {
     try {
         await signOut(auth);
-        // Success: onAuthStateChanged handles UI update and state reset
+        
         currentAdminTab = 'admin-manage-movies';
         isShowingMyBookings = false;
         stopQrScanner();
-        // Clear local volatile state if necessary
+        
         movies = [];
         vendors = [];
         allBookings = [];
@@ -1547,35 +1504,32 @@ async function handleLogout() {
     }
 }
 
-// --- Movie Management (Admin - Using Firestore) ---
+// --- Movie Management ---
 function resetForm() {
     movieForm.reset();
-    editingMovieId = null; // Reset editing ID
+    editingMovieId = null; 
     formTitle.textContent = 'Add New Movie';
     submitButton.textContent = 'Add Movie';
     cancelEditButton.classList.add('hidden');
     if (movieVendorSelect) movieVendorSelect.value = "";
-    // No hidden index input needed anymore
 }
 
 async function handleMovieFormSubmit(event) {
     event.preventDefault();
     const isEditing = !!editingMovieId;
 
-    // Extract showtimes as an array
     const showtimesInput = document.getElementById('showtimes').value.trim();
     const showtimesArray = showtimesInput ? showtimesInput.split(',').map(s => s.trim()).filter(s => s) : [];
 
 
     const movieData = {
         title: document.getElementById('title').value.trim(),
-        posterUrl: document.getElementById('poster').value.trim(), // Changed field name to match Firestore example
+        posterUrl: document.getElementById('poster').value.trim(), 
         description: document.getElementById('description').value.trim(),
         genre: document.getElementById('genre').value.trim(),
         duration: parseInt(document.getElementById('duration').value, 10),
-        showtimes: showtimesArray, // Store as array
+        showtimes: showtimesArray, 
         vendorName: movieVendorSelect.value || null,
-        // 'ratings' array is not stored here anymore
     };
 
     if (!movieData.title || !movieData.posterUrl || !movieData.genre || showtimesArray.length === 0 || isNaN(movieData.duration) || movieData.duration <= 0) {
@@ -1585,26 +1539,26 @@ async function handleMovieFormSubmit(event) {
 
     try {
         if (isEditing) {
-            // Update existing document
+            
             const movieRef = doc(db, "movies", editingMovieId);
-            await updateDoc(movieRef, movieData); // Use updateDoc to merge
+            await updateDoc(movieRef, movieData); 
             console.log("Movie updated:", editingMovieId);
-            // Update local array
+            
             const index = movies.findIndex(m => m.id === editingMovieId);
             if (index > -1) {
-                movies[index] = { ...movies[index], ...movieData }; // Merge updates locally
+                movies[index] = { ...movies[index], ...movieData }; 
             }
 
         } else {
-            // Add new document
-            movieData.createdAt = serverTimestamp(); // Add timestamp for new movies
+            
+            movieData.createdAt = serverTimestamp(); 
             const docRef = await addDoc(collection(db, "movies"), movieData);
             console.log("Movie added with ID:", docRef.id);
-            // Add to local array optimistically (or reload)
-             movies.push({ id: docRef.id, ...movieData, createdAt: new Date() }); // Simulate timestamp locally
+            
+             movies.push({ id: docRef.id, ...movieData, createdAt: new Date() }); 
         }
-        // Refresh relevant admin views & reset form
-        renderAdminContent(); // Re-renders movies list
+        
+        renderAdminContent(); 
         resetForm();
 
     } catch (error) {
@@ -1613,24 +1567,23 @@ async function handleMovieFormSubmit(event) {
     }
 }
 
-// Show Edit Form (Using Firestore ID)
+// Show Edit Form 
 function showEditForm(movieId) {
     const movie = movies.find(m => m.id === movieId);
     if (!movie) {
         console.error("Movie not found for editing:", movieId);
-        resetForm(); // Reset if movie isn't found
+        resetForm(); // Reset if movie not found
         return;
     }
-    editingMovieId = movieId; // Set the ID being edited
+    editingMovieId = movieId; 
 
-    populateVendorDropdown('movie-vendor'); // Ensure dropdown is populated
+    populateVendorDropdown('movie-vendor');
 
     document.getElementById('title').value = movie.title || '';
-    document.getElementById('poster').value = movie.posterUrl || ''; // Use posterUrl
+    document.getElementById('poster').value = movie.posterUrl || ''; // posterUrl
     document.getElementById('description').value = movie.description || '';
     document.getElementById('genre').value = movie.genre || '';
     document.getElementById('duration').value = movie.duration || '';
-    // Join showtimes array back into a string for the input field
     document.getElementById('showtimes').value = Array.isArray(movie.showtimes) ? movie.showtimes.join(', ') : (movie.showtimes || '');
     movieVendorSelect.value = movie.vendorName || "";
 
@@ -1640,7 +1593,6 @@ function showEditForm(movieId) {
     movieForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Delete Movie (Using Firestore ID and deleting related data)
 async function deleteMovie(movieId) {
     const movie = movies.find(m => m.id === movieId);
     if (!movie) {
@@ -1652,13 +1604,13 @@ async function deleteMovie(movieId) {
     if (confirm(`Delete "${movieTitle}"? This permanently removes the movie, its ratings, and ALL associated customer bookings.`)) {
         console.log("Deleting movie:", movieId);
         try {
-            const batch = writeBatch(db); // Use a batch for atomic delete
+            const batch = writeBatch(db); 
 
-            // 1. Delete the movie document
+            
             const movieRef = doc(db, "movies", movieId);
             batch.delete(movieRef);
 
-            // 2. Query and delete related ratings
+            
             const ratingsQuery = query(collection(db, "ratings"), where("movieId", "==", movieId));
             const ratingsSnapshot = await getDocs(ratingsQuery);
             ratingsSnapshot.forEach(doc => {
@@ -1666,7 +1618,7 @@ async function deleteMovie(movieId) {
                 batch.delete(doc.ref);
             });
 
-            // 3. Query and delete related bookings
+            
             const bookingsQuery = query(collection(db, "bookings"), where("movieId", "==", movieId));
             const bookingsSnapshot = await getDocs(bookingsQuery);
             bookingsSnapshot.forEach(doc => {
@@ -1674,11 +1626,11 @@ async function deleteMovie(movieId) {
                  batch.delete(doc.ref);
             });
 
-            // Commit the batch
+            
             await batch.commit();
             console.log("Movie and related data deleted successfully.");
 
-            // Remove from local arrays
+            
             movies = movies.filter(m => m.id !== movieId);
             allRatings = allRatings.filter(r => r.movieId !== movieId);
             allBookings = allBookings.filter(b => b.movieId !== movieId);
@@ -1698,11 +1650,11 @@ async function deleteMovie(movieId) {
 // --- Vendor Management (Admin - Using Firestore) ---
 function renderAdminVendorManagement() {
     resetVendorForm();
-    renderVendorList(); // Uses local 'vendors' array loaded from Firebase
+    renderVendorList(); 
 }
 function renderVendorList() {
     if (!adminVendorListContainer) return;
-    adminVendorListContainer.innerHTML = ''; // Clear previous
+    adminVendorListContainer.innerHTML = ''; 
 
     if (vendors.length === 0) {
         adminVendorListContainer.innerHTML = '<p class="text-gray-500">No vendors registered yet.</p>';
@@ -1720,19 +1672,19 @@ function renderVendorList() {
         const controlsDiv = document.createElement('div');
         controlsDiv.className = 'flex-shrink-0 flex gap-2';
 
-        // Edit Button
+        
         const editButton = document.createElement('button');
-        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2 edit-vendor-btn'; // Add class
-        editButton.dataset.vendorId = vendor.id; // Add data attribute
+        editButton.className = 'btn btn-secondary btn-icon text-xs !py-1 !px-2 edit-vendor-btn'; 
+        editButton.dataset.vendorId = vendor.id; 
         editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
-        // REMOVE inline onclick logic
+        
 
-        // Delete Button
+        
         const deleteButton = document.createElement('button');
-        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2 delete-vendor-btn'; // Add class
-        deleteButton.dataset.vendorId = vendor.id; // Add data attribute
+        deleteButton.className = 'btn btn-danger btn-icon text-xs !py-1 !px-2 delete-vendor-btn'; 
+        deleteButton.dataset.vendorId = vendor.id; 
         deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
-        // REMOVE inline onclick logic
+        
 
         controlsDiv.appendChild(editButton);
         controlsDiv.appendChild(deleteButton);
@@ -1744,241 +1696,239 @@ function renderVendorList() {
 
 function resetVendorForm() {
     vendorForm.reset();
-    editingVendorId = null; // Reset editing ID
+    editingVendorId = null; 
     vendorFormTitle.textContent = 'Add New Vendor';
     vendorSubmitButton.textContent = 'Add Vendor';
     vendorCancelEditButton.classList.add('hidden');
 
-    // Re-enable potentially disabled fields
+    
     const emailInput = document.getElementById('new-vendor-email');
     const passwordInput = document.getElementById('new-vendor-password');
     if (emailInput) emailInput.disabled = false;
     if (passwordInput) {
          passwordInput.disabled = false;
-         passwordInput.placeholder = ''; // Reset placeholder
+         passwordInput.placeholder = ''; 
     }
 }
 
 async function handleVendorFormSubmit(event) {
-    event.preventDefault(); // Prevent default form submission
-    const isEditing = !!editingVendorId; // True if editingVendorId has a value
+    event.preventDefault(); 
+    const isEditing = !!editingVendorId; 
 
-    // Get form values
+    
     const vendorName = document.getElementById('vendor-name').value.trim();
     const vendorEmail = document.getElementById('new-vendor-email').value.trim();
     const vendorPassword = document.getElementById('new-vendor-password').value.trim();
 
-    // --- Validation ---
+    
     if (!vendorName) {
         alert("Vendor Name is required.");
         return;
     }
-    // Email is always required, check format
+    
     if (!vendorEmail || !/^\S+@\S+\.\S+$/.test(vendorEmail)) {
         alert("Please enter a valid email address.");
         return;
     }
-    // Password required only when *adding* a new vendor
+    
     if (!isEditing && !vendorPassword) {
         alert("Password is required when adding a new vendor.");
         return;
     }
-    // Password length check only when adding
+    
     if (!isEditing && vendorPassword.length < 6) {
         alert("Password must be at least 6 characters.");
         return;
     }
 
-    // Disable submit button during processing
     vendorSubmitButton.disabled = true;
     vendorSubmitButton.textContent = isEditing ? 'Saving...' : 'Adding...';
 
-    // --- Handle Editing (Name Only) ---
     if (isEditing) {
         console.log("Attempting to edit vendor name for UID:", editingVendorId);
-        const vendorRef = doc(db, "vendors", editingVendorId); // Document ref using UID
+        const vendorRef = doc(db, "vendors", editingVendorId);
 
         try {
-            // Update only the name field in the /vendors/{uid} document
+            
             await updateDoc(vendorRef, { name: vendorName });
             console.log("Vendor name updated successfully for UID:", editingVendorId);
 
-            // Update local 'vendors' array
+            
             const index = vendors.findIndex(v => v.id === editingVendorId);
             if (index > -1) {
-                vendors[index].name = vendorName; // Update name locally
+                vendors[index].name = vendorName; 
             } else {
                 console.warn("Vendor not found in local array after successful update, might need refresh.");
-                // Optionally force reload data here if needed, but usually renderVendorList is enough
-                 await loadDataFromFirebase(); // Force reload if inconsistency detected
+                
+                 await loadDataFromFirebase(); 
             }
 
-            // Refresh UI elements
-            renderVendorList(); // Refresh the list displayed to the admin
-            resetVendorForm(); // Clear and reset the form
-            populateVendorDropdown('movie-vendor'); // Update dropdowns in movie form
+            
+            renderVendorList(); 
+            resetVendorForm(); 
+            populateVendorDropdown('movie-vendor'); 
 
         } catch (error) {
             console.error("Error updating vendor name in Firestore:", error);
             alert(`Failed to update vendor name. Please check console for details. Error: ${error.message}`);
         } finally {
-            // Re-enable button regardless of success/error
+            
             vendorSubmitButton.disabled = false;
-            // Text content was set by resetVendorForm() if successful, otherwise reset here
-             if (!vendorSubmitButton.textContent.includes('Add')) { // Avoid resetting if form reset already happened
+            
+             if (!vendorSubmitButton.textContent.includes('Add')) { 
                  vendorSubmitButton.textContent = 'Save Name Change';
              }
         }
-        return; // Stop execution after handling edit
+        return; 
     }
 
     // --- Handle Adding New Vendor ---
     console.log("Attempting to add new vendor:", vendorName, vendorEmail);
     try {
-        // 1. Create user in Firebase Authentication
+        
         const userCredential = await createUserWithEmailAndPassword(auth, vendorEmail, vendorPassword);
         const user = userCredential.user;
         console.log("Vendor Auth user created:", user.uid, user.email);
 
-        // 2. Create user role document in /users/{uid} collection
+        
         const userDocRef = doc(db, "users", user.uid);
         await setDoc(userDocRef, {
             email: user.email,
-            role: 'vendor', // Assign vendor role
+            role: 'vendor', 
             createdAt: serverTimestamp()
         });
         console.log("Vendor role document created in /users/", user.uid);
 
-        // 3. Create vendor details document in /vendors/{uid} collection (using UID as ID)
+        
         const vendorDocRef = doc(db, "vendors", user.uid);
         const vendorData = {
             name: vendorName,
-            email: user.email, // Use email from Auth user for consistency
-            userId: user.uid, // Explicitly link to Auth UID
-            // DO NOT store password here - it's managed by Firebase Auth
+            email: user.email, 
+            userId: user.uid, 
+            
             createdAt: serverTimestamp()
         };
         await setDoc(vendorDocRef, vendorData);
         console.log("Vendor details document created in /vendors/", user.uid);
 
-        // Add new vendor to the local 'vendors' array (use UID as the main ID)
-        vendors.push({ id: user.uid, ...vendorData, createdAt: new Date() }); // Simulate timestamp locally
+        
+        vendors.push({ id: user.uid, ...vendorData, createdAt: new Date() }); 
 
-        // Refresh UI elements
-        renderVendorList(); // Refresh the list displayed to the admin
-        resetVendorForm(); // Clear and reset the form
-        populateVendorDropdown('movie-vendor'); // Update dropdowns in movie form
-        alert(`Vendor "${vendorName}" added successfully!`); // Success feedback
+        
+        renderVendorList(); 
+        resetVendorForm(); 
+        populateVendorDropdown('movie-vendor'); 
+        alert(`Vendor "${vendorName}" added successfully!`); 
 
     } catch (error) {
         console.error("Error adding vendor:", error);
-        // Provide specific feedback based on error code
+        
         if (error.code === 'auth/email-already-in-use') {
             alert("Error: This email is already registered. Please use a different email.");
         } else if (error.code === 'auth/weak-password') {
              alert("Error: Password is too weak. It must be at least 6 characters.");
         } else {
-            // General error message
+            
             alert(`Failed to add vendor. Please check the console. Error: ${error.message}`);
         }
-        // IMPORTANT: If Auth creation succeeded but Firestore failed,
-        // the admin might need to manually delete the Auth user from the Firebase Console.
-        // No easy rollback client-side.
+        
+        
+        
     } finally {
-         // Re-enable button regardless of success/error
+         
         vendorSubmitButton.disabled = false;
-         // Text content was set by resetVendorForm() if successful, otherwise reset here
-         if (!vendorSubmitButton.textContent.includes('Add')) { // Avoid resetting if form reset already happened
+         
+         if (!vendorSubmitButton.textContent.includes('Add')) { 
              vendorSubmitButton.textContent = 'Add Vendor';
          }
     }
 }
 
-// Show Edit Vendor Form (Using Firestore ID)
-function showEditVendorForm(vendorId) { // vendorId is now the Auth UID
-    const vendor = vendors.find(v => v.id === vendorId); // Find by UID
+
+function showEditVendorForm(vendorId) { 
+    const vendor = vendors.find(v => v.id === vendorId); 
     if (!vendor) {
         console.error("Vendor not found for editing:", vendorId);
         resetVendorForm();
         return;
     }
-    editingVendorId = vendorId; // Store the UID being edited
+    editingVendorId = vendorId; 
 
     document.getElementById('vendor-name').value = vendor.name;
     document.getElementById('new-vendor-email').value = vendor.email;
-    document.getElementById('new-vendor-password').value = ''; // Clear password field
+    document.getElementById('new-vendor-password').value = ''; 
 
-    // --- Disable email and password editing ---
+    
     document.getElementById('new-vendor-email').disabled = true;
     document.getElementById('new-vendor-password').disabled = true;
     document.getElementById('new-vendor-password').placeholder = 'Cannot edit password here';
 
 
-    vendorFormTitle.textContent = 'Edit Vendor Name'; // Clarify what can be edited
+    vendorFormTitle.textContent = 'Edit Vendor Name'; 
     vendorSubmitButton.textContent = 'Save Name Change';
     vendorCancelEditButton.classList.remove('hidden');
     vendorForm.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Delete Vendor (Using Firestore ID and unassigning movies)
-async function deleteVendor(vendorId) { // vendorId is Auth UID
-    const vendor = vendors.find(v => v.id === vendorId); // Find locally first
+
+async function deleteVendor(vendorId) { 
+    const vendor = vendors.find(v => v.id === vendorId); 
     if (!vendor) {
         console.error("Vendor not found in local state for deletion:", vendorId);
          alert("Could not find vendor data to delete. Please refresh.");
         return;
     }
     const vendorName = vendor.name;
-    const vendorEmail = vendor.email; // For confirmation message
+    const vendorEmail = vendor.email; 
 
-    // Confirmation dialog
+    
     if (confirm(`Delete vendor "${vendorName}" (${vendorEmail})?\n\nThis removes vendor details and role from Firestore, and unassigns their movies.\n\nNOTE: The underlying login (Firebase Auth user) for ${vendorEmail} must be deleted manually in the Firebase Console.`)) {
         console.log("Proceeding with deletion of Firestore data for vendor UID:", vendorId, "Name:", vendorName);
         try {
-            const batch = writeBatch(db); // Use a batch for atomic operations
+            const batch = writeBatch(db); 
 
-            // 1. Reference and schedule deletion of the vendor document from /vendors/{uid}
+            
             const vendorDetailsRef = doc(db, "vendors", vendorId);
             batch.delete(vendorDetailsRef);
             console.log("Scheduled deletion for /vendors/", vendorId);
 
-            // 2. Reference and schedule deletion of the user role document from /users/{uid}
+            
             const userRoleRef = doc(db, "users", vendorId);
             batch.delete(userRoleRef);
             console.log("Scheduled deletion for /users/", vendorId);
 
-            // 3. Query movies currently assigned to this vendor's *name*
-            //    Note: If vendor name was changed previously, this might miss movies.
-            //    A more robust approach might involve querying by vendorId if stored on movies,
-            //    but current structure uses vendorName.
+            
+            
+            
+            
             console.log(`Querying movies with vendorName: "${vendorName}"`);
             const moviesQuery = query(collection(db, "movies"), where("vendorName", "==", vendorName));
-            const moviesSnapshot = await getDocs(moviesQuery); // Execute the query
+            const moviesSnapshot = await getDocs(moviesQuery); 
 
-            // 4. Schedule updates for assigned movies to set vendorName to null
+            
             moviesSnapshot.forEach(movieDoc => {
                 console.log(`Scheduling update to unassign vendor from movie: ${movieDoc.id} (${movieDoc.data().title})`);
                 batch.update(movieDoc.ref, { vendorName: null });
             });
             console.log(`Found ${moviesSnapshot.size} movies to unassign.`);
 
-            // Commit all scheduled operations in the batch
+            
             await batch.commit();
             console.log("Firestore batch commit successful. Vendor documents deleted and movies unassigned.");
 
-            // Update local state arrays *after* successful commit
-            vendors = vendors.filter(v => v.id !== vendorId); // Remove vendor from local array
+            
+            vendors = vendors.filter(v => v.id !== vendorId); 
             movies.forEach(movie => {
                 if (movie.vendorName === vendorName) {
-                    movie.vendorName = null; // Update local movie cache
+                    movie.vendorName = null; 
                 }
             });
 
-            // Refresh relevant UI sections
-            renderVendorList(); // Update the displayed vendor list
-            resetVendorForm(); // Reset the form in case it was in edit mode for the deleted vendor
-            populateVendorDropdown('movie-vendor'); // Update dropdown in movie form
-            // If admin is viewing movies, refresh those lists too
+            
+            renderVendorList(); 
+            resetVendorForm(); 
+            populateVendorDropdown('movie-vendor'); 
+            
              if (currentAdminTab === 'admin-manage-movies') {
                 renderMovies(adminMovieListContainer, 'admin');
              }
@@ -1997,7 +1947,7 @@ async function deleteVendor(vendorId) { // vendorId is Auth UID
 function populateVendorDropdown(selectElementId) {
     const select = document.getElementById(selectElementId);
     if (!select) return;
-    const currentVal = select.value; // Preserve selection if possible
+    const currentVal = select.value; 
     select.innerHTML = '<option value="">-- None --</option>';
     vendors.forEach(vendor => {
         const option = document.createElement('option');
@@ -2005,18 +1955,18 @@ function populateVendorDropdown(selectElementId) {
         option.textContent = vendor.name;
         select.appendChild(option);
     });
-    // Try to restore previous selection if it still exists
+    
     if (vendors.some(v => v.name === currentVal)) {
          select.value = currentVal;
     }
 }
 
 
-// --- Movie Card Creation (Using Firestore data) ---
-// Takes movie object (with id) and viewType. Index is no longer needed.
+// --- Movie Card Creation ---
+
 function createMovieCard(movie, _indexUnused, viewType) {
     const card = document.createElement('div');
-    // Add viewType class for specific CSS targeting
+    
     card.className = `movie-card flex flex-col view-${viewType}`;
     card.dataset.movieId = movie.id;
 
@@ -2027,88 +1977,88 @@ function createMovieCard(movie, _indexUnused, viewType) {
     img.onerror = function() { this.onerror=null; this.src='https://placehold.co/400x600/cccccc/ffffff?text=Image+Error'; };
 
     const content = document.createElement('div');
-    content.className = 'p-3 flex flex-col flex-grow'; // Use slightly less padding: p-3
+    content.className = 'p-3 flex flex-col flex-grow'; 
 
     const title = document.createElement('h3');
-    // Removed mb-1, added title class
+    
     title.className = 'movie-card-title font-semibold flex items-center mb-1';
     title.textContent = movie.title;
 
-    // ***** REMOVED VENDOR BADGE FROM TITLE LOGIC *****
-    // if (movie.vendorName) { ... } code block removed
+    
+    
 
     const avgRatingDiv = document.createElement('div');
-     // Removed text-sm, mb-2. Added specific class
+     
     avgRatingDiv.className = 'movie-card-rating stars-container';
     const { average, count } = calculateAverageRating(movie);
-    renderStars(avgRatingDiv, average, count, false); // Rating stars remain visible
+    renderStars(avgRatingDiv, average, count, false); 
 
-    // ***** START MODIFICATION *****
-    // Genre Element (Now VISIBLE)
+    
+    
     const genreElement = document.createElement('p');
-    genreElement.className = 'movie-card-genre text-xs'; // Specific class, smaller text
+    genreElement.className = 'movie-card-genre text-xs'; 
      genreElement.innerHTML = `<i class="fas fa-tag mr-1 opacity-75"></i> ${movie.genre || 'N/A'}`;
 
-    // Wrapper for HIDDEN details
+    
     const detailsWrapper = document.createElement('div');
-    detailsWrapper.className = 'movie-card-details'; // Class to hide this wrapper
+    detailsWrapper.className = 'movie-card-details'; 
 
-    // Duration element (Goes inside hidden wrapper)
+    
     const durationElement = document.createElement('p');
-    durationElement.className = 'text-xs'; // Smaller text
+    durationElement.className = 'text-xs'; 
     durationElement.innerHTML = `<i class="fas fa-clock mr-1 opacity-75"></i> ${movie.duration || 'N/A'} min`;
 
-    // Description (Goes inside hidden wrapper)
+    
     const description = document.createElement('p');
-    description.className = 'text-sm mt-1'; // Add margin top
+    description.className = 'text-sm mt-1'; 
     description.textContent = movie.description || 'No description available.';
 
 
-    // Showtimes (Goes inside hidden wrapper)
+    
     const showtimes = document.createElement('p');
-    showtimes.className = 'text-sm font-medium mt-2'; // Add margin top
+    showtimes.className = 'text-sm font-medium mt-2'; 
     const showtimesText = Array.isArray(movie.showtimes) ? movie.showtimes.join(', ') : (movie.showtimes || 'N/A');
     showtimes.innerHTML = `<i class="fas fa-calendar-alt mr-1 opacity-75"></i> Showtimes: ${showtimesText}`;
 
-    // Append hidden details to the wrapper
+    
     detailsWrapper.appendChild(durationElement);
     detailsWrapper.appendChild(description);
     detailsWrapper.appendChild(showtimes);
-    // ***** END MODIFICATION *****
+    
 
-    // Append elements to the main content div
+    
     content.appendChild(title);
     content.appendChild(avgRatingDiv);
-    content.appendChild(genreElement);    // Append VISIBLE genre here
-    content.appendChild(detailsWrapper); // Append HIDDEN wrapper here
+    content.appendChild(genreElement);    
+    content.appendChild(detailsWrapper); 
 
     card.appendChild(img);
     card.appendChild(content);
 
-    // --- Keep Admin Controls and Click Logic ---
+    
     if (viewType === 'admin') {
         const adminControls = document.createElement('div');
-        adminControls.className = 'admin-controls p-2 border-t flex justify-end gap-2'; // Smaller padding
-        // ... Add buttons ...
+        adminControls.className = 'admin-controls p-2 border-t flex justify-end gap-2'; 
+        
          const editButton = document.createElement('button');
-         editButton.innerHTML = '<i class="fas fa-edit"></i>'; // Icon only maybe?
-         editButton.className = 'btn btn-secondary btn-icon text-xs !p-1 edit-movie-btn'; // Smaller button
+         editButton.innerHTML = '<i class="fas fa-edit"></i>'; 
+         editButton.className = 'btn btn-secondary btn-icon text-xs !p-1 edit-movie-btn'; 
          editButton.dataset.movieId = movie.id;
-         editButton.title = "Edit Movie"; // Tooltip
+         editButton.title = "Edit Movie"; 
 
          const deleteButton = document.createElement('button');
-         deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; // Icon only
-         deleteButton.className = 'btn btn-danger btn-icon text-xs !p-1 delete-movie-btn'; // Smaller button
+         deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; 
+         deleteButton.className = 'btn btn-danger btn-icon text-xs !p-1 delete-movie-btn'; 
          deleteButton.dataset.movieId = movie.id;
-         deleteButton.title = "Delete Movie"; // Tooltip
+         deleteButton.title = "Delete Movie"; 
 
          adminControls.appendChild(editButton);
          adminControls.appendChild(deleteButton);
          card.appendChild(adminControls);
 
-    } else if (viewType === 'customer' || viewType === 'preview') { // Keep preview here for click logic if needed elsewhere
+    } else if (viewType === 'customer' || viewType === 'preview') { 
         card.classList.add('cursor-pointer');
-        // Prevent admin booking from customer view
+        
         if (viewType === 'customer' && authState.isLoggedIn && authState.user?.type === 'admin') {
             card.title = "Admins cannot book movies from this view.";
             card.style.cursor = 'not-allowed';
@@ -2116,66 +2066,66 @@ function createMovieCard(movie, _indexUnused, viewType) {
             card.onclick = () => openModal(movie.id);
         }
     }
-    // Vendor view needs no controls
+    
 
     return card;
 }
 
 function updateHeaderVisibility() {
-    // --- Handle User Info Span ---
+    
     const userInfoSpan = document.getElementById('logged-in-user-info');
     const isCustomer = authState.isLoggedIn && authState.user?.type === 'customer';
-    const isMobileWidth = window.innerWidth <= 580; // Mobile breakpoint
+    const isMobileWidth = window.innerWidth <= 580; 
 
     console.log(`Header Visibility Check: isCustomer=${isCustomer}, isMobileWidth=${isMobileWidth}`);
 
-    if (userInfoSpan) { // Check if the element exists
+    if (userInfoSpan) { 
         if (isCustomer && isMobileWidth) {
-            // Hide user info span for customers on mobile
+            
             console.log("Hiding user info span via style.display.");
             userInfoSpan.style.display = 'none';
         } else {
-            // Show user info span otherwise
+            
              console.log("Showing user info span via style.display.");
-            userInfoSpan.style.display = 'block'; // Or 'inline-block'
+            userInfoSpan.style.display = 'block'; 
         }
     } else {
-        // console.warn("User info span not found for visibility update.");
+        
     }
 
-    // --- Handle Movie Card Rating Text Visibility ---
+    
     console.log(`Card Rating Text Check: isMobileWidth=${isMobileWidth}`);
-    // Select ALL elements with the 'rating-text' class that are children of '.movie-card'
+    
     const cardRatingTexts = document.querySelectorAll('.movie-card .rating-text');
 
     cardRatingTexts.forEach(textElement => {
         if (isMobileWidth) {
-            // Hide rating text on mobile
-            if (textElement.style.display !== 'none') { // Avoid redundant style changes
+            
+            if (textElement.style.display !== 'none') { 
                 console.log("Hiding card rating text via style.display.");
                 textElement.style.display = 'none';
             }
         } else {
-            // Show rating text on desktop
-            if (textElement.style.display === 'none') { // Avoid redundant style changes
+            
+            if (textElement.style.display === 'none') { 
                 console.log("Showing card rating text via style.display.");
-                 // Set display back to its default (likely inline or inline-block for a span)
-                 // Setting to '' lets the browser/CSS decide the default display.
+                 
+                 
                 textElement.style.display = '';
             }
         }
     });
 }
 
-// --- Movie List Rendering (Uses local 'movies' array) ---
+// --- Movie List Rendering---
 function renderMovies(container, viewType) {
-    // ***** ADDED LOGGING *****
+    
     console.log(`>>> renderMovies called for viewType: ${viewType}. Container: #${container?.id || 'unknown'}`);
     if (!container) {
         console.error(`Error: Container element is null for renderMovies (viewType: ${viewType})`);
         return;
     }
-    container.innerHTML = ''; // Clear previous content
+    container.innerHTML = ''; 
     let noMoviesMsg;
 
     if (viewType === 'admin') {
@@ -2192,11 +2142,11 @@ function renderMovies(container, viewType) {
          moviesToRender = movies.filter(m => m.vendorName === authState.user.name);
     }
 
-    console.log(`   - Found ${moviesToRender.length} movies to render for ${viewType}.`); // Log count
+    console.log(`   - Found ${moviesToRender.length} movies to render for ${viewType}.`); 
 
     if (moviesToRender.length === 0) {
         if (noMoviesMsg && viewType !== 'vendor_dashboard') {
-            console.log(`   - Showing 'no movies' message for ${viewType}.`); // Log message display
+            console.log(`   - Showing 'no movies' message for ${viewType}.`); 
             if (viewType === 'customer') {
                  noMoviesMsg.textContent = "No movies currently showing.";
              } else if (viewType === 'admin') {
@@ -2204,16 +2154,16 @@ function renderMovies(container, viewType) {
              }
             showElement(noMoviesMsg);
         }
-        return; // Exit if no movies
+        return; 
     } else {
          if (noMoviesMsg) {
-             console.log(`   - Hiding 'no movies' message for ${viewType}.`); // Log message hide
+             console.log(`   - Hiding 'no movies' message for ${viewType}.`); 
              hideElement(noMoviesMsg);
          }
     }
 
     moviesToRender.forEach((movie, index) => {
-        // ***** ADDED LOGGING *****
+        
         console.log(`   - Creating card for movie ${index + 1}: ${movie.title} (ID: ${movie.id})`);
         try {
             const card = createMovieCard(movie, null, viewType);
@@ -2222,19 +2172,19 @@ function renderMovies(container, viewType) {
             console.error(`Error creating movie card for ${movie.title} (ID: ${movie.id}):`, error);
         }
     });
-    console.log(`<<< renderMovies finished for viewType: ${viewType}.`); // Log end
+    console.log(`<<< renderMovies finished for viewType: ${viewType}.`); 
 }
 
 
-// --- Movie Details Modal Logic (Integrate Calendar, Use Firestore ID) ---
-async function openModal(movieId) { // Accepts Firestore ID
+// --- Movie Details Modal Logic ---
+async function openModal(movieId) { 
     const movie = movies.find(m => m.id === movieId);
     if (!movie) {
         console.error("Movie not found for modal:", movieId);
         return;
     }
-    currentModalMovieId = movieId; // Store Firestore ID
-    currentSelectedDate = null; // Reset date on open
+    currentModalMovieId = movieId; 
+    currentSelectedDate = null; 
 
     modalMovieTitle.textContent = movie.title || 'Movie Details';
     modalMoviePoster.src = movie.posterUrl || 'https://placehold.co/400x600/cccccc/ffffff?text=No+Image'; // Use posterUrl
@@ -2243,26 +2193,26 @@ async function openModal(movieId) { // Accepts Firestore ID
     modalMovieDuration.textContent = movie.duration || 'N/A';
     modalMovieDescription.textContent = movie.description || 'No description available.';
 
-    // ***** CORRECTED VENDOR DISPLAY LOGIC *****
-    // Use the variables defined in the DOM Elements section
-    if (modalVendorElement && modalVendorNameSpan) { // Check if modal elements exist
+    
+    
+    if (modalVendorElement && modalVendorNameSpan) { 
         if (movie.vendorName) {
-            modalVendorNameSpan.textContent = movie.vendorName; // Set the name
-            showElement(modalVendorElement); // Show the paragraph containing the vendor info
+            modalVendorNameSpan.textContent = movie.vendorName; 
+            showElement(modalVendorElement); 
         } else {
-            hideElement(modalVendorElement); // Hide the paragraph if no vendor name
+            hideElement(modalVendorElement); 
         }
     } else {
         console.warn("Vendor display elements not found in modal.");
     }
-    // ***** END VENDOR DISPLAY LOGIC *****
+    
 
-    // Calculate and render average rating
+    
     const avgData = calculateAverageRating(movie);
-    // Pass the correct container for average rating display
-    renderStars(modalAvgRatingContainer, avgData.average, avgData.count, false); // Non-interactive avg rating
+    
+    renderStars(modalAvgRatingContainer, avgData.average, avgData.count, false); 
 
-    // Reset fields related to selection
+    
     modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">Select a date first.</p>';
     hideElement(modalShowtimesContainer);
     hideElement(seatMapContainer);
@@ -2270,11 +2220,11 @@ async function openModal(movieId) { // Accepts Firestore ID
     selectedSeats = [];
     updateSelectedSeatsInfo();
     confirmSelectionButton.disabled = true;
-    confirmSelectionButton.textContent = 'Proceed to Payment'; // Reset button text
+    confirmSelectionButton.textContent = 'Proceed to Payment'; 
 
-    // Initialize/Reset Pikaday
-    if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } // Destroy previous if exists
-    modalDatepickerInput.value = ''; // Clear input
+    
+    if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } 
+    modalDatepickerInput.value = ''; 
     hideError(dateErrorElement);
 
     const today = new Date();
@@ -2283,44 +2233,44 @@ async function openModal(movieId) { // Accepts Firestore ID
 
      pikadayInstance = new Pikaday({
          field: modalDatepickerInput,
-         bound: false, // Allow calendar to float
-         container: calendarContainer, // Optional: attach to specific container
+         bound: false, 
+         container: calendarContainer, 
          minDate: today,
          maxDate: maxDate,
          toString(date, format) { return formatDateReadable(date); },
          onSelect: function(date) {
              console.log("Date selected:", date);
              hideError(dateErrorElement);
-             currentSelectedDate = new Date(date); // Store the selected date object
-             modalDatepickerInput.value = formatDateReadable(date); // Update input field display
+             currentSelectedDate = new Date(date); 
+             modalDatepickerInput.value = formatDateReadable(date); 
              renderAndValidateShowtimes(movie, currentSelectedDate);
              showElement(modalShowtimesContainer);
-             hideElement(seatMapContainer); // Hide seats until showtime selected
-             selectedSeats = []; // Reset seats
-             updateSelectedSeatsInfo(); // Update button state etc.
+             hideElement(seatMapContainer); 
+             selectedSeats = []; 
+             updateSelectedSeatsInfo(); 
          }
      });
 
-    // Rating section logic (check if user already rated this movie)
+    
     if (authState.isLoggedIn && authState.user.type === 'customer') {
         showElement(modalRatingSection);
         const userId = authState.user.uid;
-        // Check pre-loaded ratings
+        
         const userRatingData = allRatings.find(r => r.movieId === movieId && r.userId === userId);
         const userCurrentRating = userRatingData ? userRatingData.rating : null;
-        const hasRated = userCurrentRating !== null; // This flag is now just for the initial message
+        const hasRated = userCurrentRating !== null; 
 
-        // ***** CHANGE: Always render interactive stars for customers *****
-        // Render stars in the INTERACTIVE container (modalStarsContainer)
-        // The 'interactive' parameter is now hardcoded to 'true' for customers
+        
+        
+        
         renderStars(modalStarsContainer, 0, 0, true, userCurrentRating, movieId);
 
-        // Set the initial message based on whether a rating exists
+        
         modalRatingMessage.textContent = hasRated
             ? `You previously rated this ${userCurrentRating} star${userCurrentRating > 1 ? 's' : ''}. Click to change.`
             : 'Click stars to rate!';
 
-        // Ensure container is visually interactive
+        
         modalStarsContainer.classList.add('interactive');
         modalStarsContainer.style.cursor = 'pointer';
     } else {
@@ -2328,7 +2278,7 @@ async function openModal(movieId) { // Accepts Firestore ID
     }
 
     showElement(movieDetailsModal);
-    document.body.classList.add('overflow-hidden'); // Keep this to prevent background scroll
+    document.body.classList.add('overflow-hidden'); 
 }
 
 function closeModal() {
@@ -2336,34 +2286,34 @@ function closeModal() {
     document.body.classList.remove('overflow-hidden');
     currentModalMovieId = null;
     currentSelectedDate = null;
-    if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } // Destroy calendar on close
+    if (pikadayInstance) { pikadayInstance.destroy(); pikadayInstance = null; } 
 }
 
-// --- Utility Functions (Add if not present) ---
+
 function getPastWeekDates(today = new Date()) {
     const dates = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);
-        dates.push(formatDateYYYYMMDD(date)); // Store as YYYY-MM-DD
+        dates.push(formatDateYYYYMMDD(date)); 
     }
-    return dates; // Returns [today, yesterday, day_before, ...]
+    return dates; 
 }
 
-// Revised Occupancy Label Function
+
 function getOccupancyLabel(percentage) {
     if (percentage === null || isNaN(percentage)) return { text: 'N/A', class: 'occupancy-empty' };
     if (percentage === 0) return { text: 'Empty', class: 'occupancy-empty' };
     if (percentage < 25) return { text: 'Low', class: 'occupancy-low' };
     if (percentage <= 60) return { text: 'Moderate', class: 'occupancy-moderate' };
-    // if (percentage > 60)
+    
     return { text: 'High', class: 'occupancy-high' };
 }
 
-// Render and Validate Showtimes based on selected date
+
 function renderAndValidateShowtimes(movie, selectedDate) {
-    modalShowtimesList.innerHTML = ''; // Clear previous
-    // Use showtimes array from movie object
+    modalShowtimesList.innerHTML = ''; 
+    
     const showtimes = Array.isArray(movie.showtimes) ? movie.showtimes : [];
 
     if (showtimes.length === 0) {
@@ -2379,7 +2329,7 @@ function renderAndValidateShowtimes(movie, selectedDate) {
     let hasAvailableShowtimes = false;
 
     showtimes.forEach((time, i) => {
-        const radioId = `showtime-${movie.id}-${i}`; // Use Firestore ID
+        const radioId = `showtime-${movie.id}-${i}`; 
         const radio = document.createElement('input');
         radio.type = 'radio'; radio.id = radioId; radio.name = `movie-${movie.id}-showtime`; radio.value = time; radio.className = 'showtime-radio';
         const label = document.createElement('label');
@@ -2387,14 +2337,14 @@ function renderAndValidateShowtimes(movie, selectedDate) {
 
         let isPast = false;
         if (isToday) {
-            // Basic time parsing (assumes HH:MM AM/PM format)
+            
              const timeParts = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
              if (timeParts) {
                  let hours = parseInt(timeParts[1], 10);
                  const minutes = parseInt(timeParts[2], 10);
                  const ampm = timeParts[3].toUpperCase();
                  if (ampm === 'PM' && hours < 12) hours += 12;
-                 if (ampm === 'AM' && hours === 12) hours = 0; // Midnight case
+                 if (ampm === 'AM' && hours === 12) hours = 0; 
 
                  const showtimeDate = new Date(selectedDate);
                  showtimeDate.setHours(hours, minutes, 0, 0);
@@ -2402,7 +2352,7 @@ function renderAndValidateShowtimes(movie, selectedDate) {
                  if (showtimeDate < now) { isPast = true; }
              } else {
                  console.warn("Could not parse showtime:", time);
-                 // Decide how to handle unparseable times - treat as valid?
+                 
              }
         }
 
@@ -2411,7 +2361,7 @@ function renderAndValidateShowtimes(movie, selectedDate) {
             label.classList.add('disabled');
             label.title = "This showtime has already passed.";
         } else {
-            radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time, currentSelectedDate); // Pass date
+            radio.onchange = () => handleShowtimeSelection(currentModalMovieId, time, currentSelectedDate); 
             hasAvailableShowtimes = true;
         }
 
@@ -2421,12 +2371,12 @@ function renderAndValidateShowtimes(movie, selectedDate) {
 
      if (!hasAvailableShowtimes && showtimes.length > 0) {
           modalShowtimesList.innerHTML = '<p class="text-orange-600 text-sm">All showtimes for today have passed.</p>';
-     } else if (showtimes.length === 0) { // Should be caught earlier, but double-check
+     } else if (showtimes.length === 0) { 
          modalShowtimesList.innerHTML = '<p class="text-gray-500 text-sm">No showtimes available for this movie.</p>';
      }
 }
 
-// Handle Showtime Selection -> Render Seat Map
+// Handle Showtime Selection 
 async function handleShowtimeSelection(movieId, selectedTime, selectedDate) {
     console.log(`Showtime selected: ${selectedTime} on ${formatDateYYYYMMDD(selectedDate)} for movie ${movieId}`);
     await renderSeatMap(movieId, selectedTime, selectedDate, 5, 8); // Make async
@@ -2435,7 +2385,6 @@ async function handleShowtimeSelection(movieId, selectedTime, selectedDate) {
     updateSelectedSeatsInfo();
 }
 
-// Render Seat Map (Fetch booked seats from Firestore)
 async function renderSeatMap(movieId, showtime, date, rows, cols) {
     seatGrid.innerHTML = '<p class="text-gray-500 text-center">Loading seats...</p>'; // Loading state
     if (!movieId || !showtime || !date) {
@@ -2451,7 +2400,7 @@ async function renderSeatMap(movieId, showtime, date, rows, cols) {
         const q = query(collection(db, "bookings"),
             where("movieId", "==", movieId),
             where("showtime", "==", showtime),
-            where("selectedDate", "==", dateStr) // Ensure selectedDate is stored as YYYY-MM-DD string
+            where("selectedDate", "==", dateStr) 
         );
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(doc => {
@@ -2460,7 +2409,7 @@ async function renderSeatMap(movieId, showtime, date, rows, cols) {
                 bookedSeatIds.push(...bookingData.seats);
             }
         });
-        bookedSeatIds = [...new Set(bookedSeatIds)]; // Ensure uniqueness
+        bookedSeatIds = [...new Set(bookedSeatIds)]; 
         console.log(`Rendering seat map for ${movieId} at ${showtime} on ${dateStr}. Booked:`, bookedSeatIds);
 
     } catch (error) {
@@ -2469,14 +2418,14 @@ async function renderSeatMap(movieId, showtime, date, rows, cols) {
         return;
     }
 
-    // Render the grid
-    seatGrid.innerHTML = ''; // Clear loading/previous
+    
+    seatGrid.innerHTML = ''; 
     for (let r = 0; r < rows; r++) {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'seat-row';
         const rowLetter = String.fromCharCode(65 + r);
         for (let c = 0; c < cols; c++) {
-            // Add aisle spacers
+            
             if (c === 2 || c === 6) {
                 const spacer = document.createElement('div');
                 spacer.className = 'seat-spacer';
@@ -2539,19 +2488,19 @@ function openPaymentModal() {
         return;
     }
 
-    const movie = movies.find(m => m.id === currentModalMovieId); // Find by Firestore ID
+    const movie = movies.find(m => m.id === currentModalMovieId); 
     const showtime = selectedShowtimeRadio.value;
     const totalCost = selectedSeats.length * TICKET_PRICE_EGP;
 
-    // Populate payment modal details
+    
     paymentMovieTitle.textContent = movie?.title || 'N/A';
     paymentSelectedDate.textContent = formatDateReadable(currentSelectedDate);
     paymentShowtime.textContent = showtime;
     paymentSeats.textContent = selectedSeats.sort().join(', ');
     paymentTotalCost.textContent = `${totalCost} EGP`;
 
-    hideError(paymentErrorElement); // Clear previous errors
-    paymentForm.reset(); // Clear form fields
+    hideError(paymentErrorElement); 
+    paymentForm.reset(); 
     showElement(paymentModal);
 }
 
@@ -2562,39 +2511,39 @@ function closePaymentModal() {
 // Handle Payment and Create Booking in Firestore
 async function handlePaymentFormSubmit(event) {
     event.preventDefault();
-    hideError(paymentErrorElement); // Clear previous errors
+    hideError(paymentErrorElement); 
 
-    // --- Gather raw input values ---
+    
     const cardName = document.getElementById('cardholder-name').value.trim();
     const cardNumberRaw = document.getElementById('card-number').value;
     const cardCvv = document.getElementById('card-cvv').value.trim();
     const cardExpiryRaw = document.getElementById('card-expiry').value.trim();
 
-    // --- FORM VALIDATION ---
+    
     let isValid = true;
     let errorMsg = '';
 
-    // 1. Cardholder Name
+    
     if (!cardName) {
         errorMsg = 'Cardholder Name is required.';
         isValid = false;
     }
 
-    // 2. Card Number (Basic length check after removing spaces)
-    const cardNumberDigits = cardNumberRaw.replace(/\s/g, ''); // Remove spaces for validation
+    
+    const cardNumberDigits = cardNumberRaw.replace(/\s/g, ''); 
     if (isValid && (!cardNumberDigits || cardNumberDigits.length !== 16)) {
        errorMsg = 'Card Number must be 16 digits.';
        isValid = false;
     }
-    // Optional: Add Luhn algorithm check here for better validation if needed
+    
 
-    // 3. CVV (Length check)
+    
     if (isValid && (!cardCvv || !/^\d{3,4}$/.test(cardCvv))) {
        errorMsg = 'CVV must be 3 or 4 digits.';
        isValid = false;
     }
 
-    // 4. Expiry Date (Format and Logic check)
+    
     if (isValid) {
        if (!cardExpiryRaw || !/^\d{2}\/\d{2}$/.test(cardExpiryRaw)) {
            errorMsg = 'Expiry Date must be in MM/YY format.';
@@ -2602,7 +2551,7 @@ async function handlePaymentFormSubmit(event) {
        } else {
            const [monthStr, yearStr] = cardExpiryRaw.split('/');
            const month = parseInt(monthStr, 10);
-           const year = parseInt(`20${yearStr}`, 10); // Assume 20xx
+           const year = parseInt(`20${yearStr}`, 10); 
 
            if (month < 1 || month > 12) {
                errorMsg = 'Invalid Expiry Month.';
@@ -2610,10 +2559,10 @@ async function handlePaymentFormSubmit(event) {
            } else {
                const now = new Date();
                const currentYear = now.getFullYear();
-               const currentMonth = now.getMonth() + 1; // JS months are 0-indexed
+               const currentMonth = now.getMonth() + 1; 
 
-               // Check if year is in the past OR
-               // if year is current year but month is in the past
+               
+               
                if (year < currentYear || (year === currentYear && month < currentMonth)) {
                    errorMsg = 'Card has expired.';
                    isValid = false;
@@ -2622,21 +2571,21 @@ async function handlePaymentFormSubmit(event) {
        }
     }
 
-    // If validation failed, display error and stop
+    
     if (!isValid) {
         displayError(paymentErrorElement, errorMsg);
-        return; // Stop processing
+        return; 
     }
-    // --- END FORM VALIDATION ---
+    
 
 
-    // If validation passes, proceed with processing
-    payNowBtn.disabled = true; // Disable button during processing
+    
+    payNowBtn.disabled = true; 
     payNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
 
-    // --- Gather data for booking (rest of the function) ---
+    
     const selectedShowtimeRadio = modalShowtimesList.querySelector('input[type="radio"]:checked');
-    // Check essential booking data again (belt and suspenders)
+    
     if (!currentModalMovieId || !currentSelectedDate || selectedSeats.length === 0 || !selectedShowtimeRadio || !authState.isLoggedIn || !authState.user?.uid) {
         displayError(paymentErrorElement, "Booking information incomplete or invalid session.");
         payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
@@ -2650,7 +2599,7 @@ async function handlePaymentFormSubmit(event) {
     const userEmail = authState.user.email;
     const selectedDateStr = formatDateYYYYMMDD(currentSelectedDate);
 
-    // --- Check Seat Availability AGAIN (Race Condition Check) ---
+    
     try {
         const q = query(collection(db, "bookings"),
             where("movieId", "==", currentModalMovieId),
@@ -2671,7 +2620,7 @@ async function handlePaymentFormSubmit(event) {
         if (conflicts.length > 0) {
             displayError(paymentErrorElement, `Seats unavailable: ${conflicts.join(', ')}. Please select different seats.`);
              payNowBtn.disabled = false; payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
-             await renderSeatMap(currentModalMovieId, showtime, currentSelectedDate, 5, 8); // Re-render
+             await renderSeatMap(currentModalMovieId, showtime, currentSelectedDate, 5, 8); 
             return;
         }
 
@@ -2688,74 +2637,74 @@ async function handlePaymentFormSubmit(event) {
         userId: userUid,
         userEmail: userEmail,
         movieId: currentModalMovieId,
-        movieTitle: movie?.title || 'Unknown Movie', // Store for convenience
-        selectedDate: selectedDateStr, // Store as YYYY-MM-DD string
+        movieTitle: movie?.title || 'Unknown Movie', 
+        selectedDate: selectedDateStr, 
         showtime: showtime,
-        seats: [...selectedSeats].sort(), // Store sorted array
-        paymentInfo: { // Store only non-sensitive info
+        seats: [...selectedSeats].sort(), 
+        paymentInfo: { 
             cardName: cardName,
-            last4: cardNumberDigits.slice(-4), // Use the digit-only string here
-            expiry: cardExpiryRaw // Store the raw MM/YY string
-            // DO NOT store full card number or CVV
+            last4: cardNumberDigits.slice(-4), 
+            expiry: cardExpiryRaw 
+            
         },
         totalAmount: totalAmount,
-        timestamp: serverTimestamp(), // Use Firestore server timestamp
-        qrCodeUsed: false, // Initialize as not used
-        qrUsedTimestamp: null // Initialize as null
+        timestamp: serverTimestamp(), 
+        qrCodeUsed: false, 
+        qrUsedTimestamp: null 
     };
 
     try {
         const docRef = await addDoc(collection(db, "bookings"), newBookingData);
-        const newBookingId = docRef.id; // Get the newly created booking ID
+        const newBookingId = docRef.id; 
         console.log("Booking added with ID:", newBookingId);
     
-        // Add the new booking to the local cache immediately
-        // Ensure timestamp is handled appropriately if needed immediately elsewhere
-        allBookings.push({ id: newBookingId, ...newBookingData, timestamp: Timestamp.now() }); // Use Firestore Timestamp for consistency
+        
+        
+        allBookings.push({ id: newBookingId, ...newBookingData, timestamp: Timestamp.now() }); 
     
-        // --- Success: Show Custom Modal ---
-        // Populate the success modal
+        
+        
         if(successMovieTitle) successMovieTitle.textContent = newBookingData.movieTitle;
-        // Format date string back to readable format for modal display
-        const dateForModal = newBookingData.selectedDate ? new Date(newBookingData.selectedDate.replace(/-/g, '/')) : null; // Handle potential null date
+        
+        const dateForModal = newBookingData.selectedDate ? new Date(newBookingData.selectedDate.replace(/-/g, '/')) : null; 
         if(successSelectedDate && dateForModal) successSelectedDate.textContent = formatDateReadable(dateForModal); else if (successSelectedDate) successSelectedDate.textContent = 'N/A';
         if(successShowtime) successShowtime.textContent = newBookingData.showtime;
         if(successSeats) successSeats.textContent = newBookingData.seats.join(', ');
         if(successTotalCost) successTotalCost.textContent = `${newBookingData.totalAmount} EGP`;
-        if(successBookingId) successBookingId.textContent = newBookingId; // Display the ID
+        if(successBookingId) successBookingId.textContent = newBookingId; 
     
-        closePaymentModal(); // Close payment modal first
-        closeModal(); // Close movie details modal
-        if (bookingSuccessModal) { // Check if modal exists
-            showElement(bookingSuccessModal); // Show the success modal
-        } else { // Fallback alert if modal element is missing
+        closePaymentModal(); 
+        closeModal(); 
+        if (bookingSuccessModal) { 
+            showElement(bookingSuccessModal); 
+        } else { 
             alert(`Booking Successful!\nMovie: ${newBookingData.movieTitle}\nDate: ${formatDateReadable(dateForModal)}\nTime: ${newBookingData.showtime}\nSeats: ${newBookingData.seats.join(', ')}\nAmount: ${newBookingData.totalAmount} EGP\nBooking ID: ${newBookingId}`);
         }
-        // --- End Success Modal Handling ---
+        
     
     
-        // Refresh relevant views using the updated local allBookings array
-        if (isShowingMyBookings) { await renderMyBookings(); } // Refresh if already on bookings view
+        
+        if (isShowingMyBookings) { await renderMyBookings(); } 
 
         if (adminView && !adminView.classList.contains('is-hidden')) {
             if (currentAdminTab === 'admin-bookings-section') {
-                renderAdminBookingsList(); // Uses updated allBookings
+                renderAdminBookingsList(); 
             }
-            // Re-render analytics completely to reflect new booking
+            
             if (currentAdminTab === 'admin-analytics') {
-                renderAnalyticsDashboard(); // Uses updated allBookings
+                renderAnalyticsDashboard(); 
             }
         }
-        // Refresh vendor dashboard if the booked movie belongs to the logged-in vendor
+        
         if (vendorDashboardView && !vendorDashboardView.classList.contains('is-hidden') && movie?.vendorName === authState.user?.name) {
-             renderVendorDashboard(); // Also uses updated allBookings/movies for analytics
+             renderVendorDashboard(); 
         }
-        // No full page reload needed - UI updates based on state change + local data update
+        
 
     } catch (error) {
-        console.error("Error creating booking:", error); // Log booking creation error
-        displayError(paymentErrorElement, "Failed to save booking after payment validation. Please try again."); // Specific error
-    } finally { // Make sure button is re-enabled even on success/error
+        console.error("Error creating booking:", error); 
+        displayError(paymentErrorElement, "Failed to save booking after payment validation. Please try again."); 
+    } finally { 
         payNowBtn.disabled = false;
         payNowBtn.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Pay Now';
     }
@@ -2763,7 +2712,7 @@ async function handlePaymentFormSubmit(event) {
 
 // --- Admin Tab Switching ---
 function handleAdminTabClick(event) {
-    const targetId = event.currentTarget.dataset.target; // Use currentTarget
+    const targetId = event.currentTarget.dataset.target; 
     const validTargets = ['admin-manage-movies', 'admin-analytics', 'admin-bookings-section', 'admin-qr-scanner-section', 'admin-manage-vendors'];
     if (!targetId || targetId === currentAdminTab || !validTargets.includes(targetId)) {
         return;
@@ -2772,12 +2721,12 @@ function handleAdminTabClick(event) {
     adminNavButtons.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.target === targetId);
     });
-    renderAdminContent(); // Re-render content for the selected tab
+    renderAdminContent(); 
 }
 
 // --- QR Code Scanner Logic ---
 function startQrScanner() {
-    if (html5QrCodeScanner?.getState() === 2) { // 2 is SCANNING state
+    if (html5QrCodeScanner?.getState() === 2) { 
          console.log("Scanner already running.");
          return;
      }
@@ -2786,14 +2735,14 @@ function startQrScanner() {
      scanStatusElement.textContent = "Initializing Camera...";
      startScanBtn.disabled = true;
      startScanBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Starting...';
-     adminQrReaderElement.innerHTML = ""; // Clear previous scanner UI
+     adminQrReaderElement.innerHTML = ""; 
 
      if (!html5QrCodeScanner) {
-         html5QrCodeScanner = new Html5Qrcode("admin-qr-reader"); // Use the element ID
+         html5QrCodeScanner = new Html5Qrcode("admin-qr-reader"); 
      }
 
      const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
-        let minEdgePercentage = 0.7; // 70%
+        let minEdgePercentage = 0.7; 
         let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
         let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
         return { width: qrboxSize, height: qrboxSize };
@@ -2803,45 +2752,45 @@ function startQrScanner() {
      const config = {
          fps: 10,
          qrbox: qrboxFunction,
-         // supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] // Use constants if available
+         
      };
 
-     // Request camera permissions and start scanning
+     
      html5QrCodeScanner.start(
-         { facingMode: "environment" }, // Use rear camera
+         { facingMode: "environment" }, 
          config,
-         onScanSuccess, // Success callback
+         onScanSuccess, 
          (errorMessage) => {
-             // console.warn(`QR Code no match: ${errorMessage}`); // Optional: log failures
-         } // Failure callback (ignore non-matches)
+             
+         } 
      ).then(() => {
          scanStatusElement.textContent = "Scanning... Point camera at QR code.";
          startScanBtn.textContent = "Stop Scanning";
          startScanBtn.disabled = false;
-         startScanBtn.onclick = stopQrScanner; // Change button action
+         startScanBtn.onclick = stopQrScanner; 
          console.log("QR Scanner started successfully.");
      }).catch(err => {
          console.error("Error starting QR scanner:", err);
          scanStatusElement.textContent = `Error: Could not start scanner (${err})`;
          startScanBtn.textContent = "Start Scanning";
          startScanBtn.disabled = false;
-         startScanBtn.onclick = startQrScanner; // Revert button action
+         startScanBtn.onclick = startQrScanner; 
      });
 }
 
 async function stopQrScanner() {
-     if (html5QrCodeScanner && html5QrCodeScanner.getState() === 2) { // Check if scanning
+     if (html5QrCodeScanner && html5QrCodeScanner.getState() === 2) { 
          try {
              await html5QrCodeScanner.stop();
              console.log("QR Scanner stopped successfully.");
              scanStatusElement.textContent = "Scanner stopped. Click Start Scanning to scan again.";
              startScanBtn.textContent = "Start Scanning";
              startScanBtn.onclick = startQrScanner;
-             adminQrReaderElement.innerHTML = ""; // Clear scanner UI
+             adminQrReaderElement.innerHTML = ""; 
          } catch (err) {
              console.error("Error stopping QR scanner:", err);
              scanStatusElement.textContent = "Error stopping scanner.";
-             // Attempt to reset button anyway
+             
              startScanBtn.textContent = "Start Scanning";
              startScanBtn.onclick = startQrScanner;
          }
@@ -2853,21 +2802,21 @@ async function stopQrScanner() {
      }
  }
 
-// QR Scan Success -> Validate against Firestore
+// QR Scan Success 
 async function onScanSuccess(decodedText, decodedResult) {
     console.log(`Code matched = ${decodedText}`, decodedResult);
-    stopQrScanner(); // Stop scanning immediately
+    stopQrScanner(); 
     scanStatusElement.textContent = `Scan successful! Validating...`;
 
     let bookingData;
     try {
         bookingData = JSON.parse(decodedText);
-        // Basic validation of parsed structure
+        
         if (!bookingData || !bookingData.bookingId || !bookingData.movieTitle || !bookingData.showtime || !Array.isArray(bookingData.seats) || !bookingData.userEmail) {
             throw new Error("Invalid QR code data structure.");
         }
-        // **Crucially, bookingData.bookingId MUST be the Firestore Document ID**
-        await handleValidScan(bookingData.bookingId); // Pass only the ID for fetching
+        
+        await handleValidScan(bookingData.bookingId); 
 
     } catch (e) {
         console.error("Error parsing or validating QR code data:", e);
@@ -2876,8 +2825,8 @@ async function onScanSuccess(decodedText, decodedResult) {
     }
 }
 
-// Handle Valid Scan (Fetch from Firestore and Check Status)
-async function handleValidScan(bookingId) { // Accepts Firestore booking ID
+
+async function handleValidScan(bookingId) { 
     if (!bookingId) {
         console.error("No booking ID received for validation.");
         scanStatusElement.textContent = "Error: Missing Booking ID in QR Code.";
@@ -2892,11 +2841,11 @@ async function handleValidScan(bookingId) { // Accepts Firestore booking ID
         if (!bookingSnap.exists()) {
             console.error("Booking document not found in Firestore:", bookingId);
             validationStatusElement.textContent = "Booking not found in database.";
-            validationStatusElement.className = 'status-error'; // Use a general error style
+            validationStatusElement.className = 'status-error'; 
             markUsedBtn.disabled = true;
-             showElement(qrValidationModal); // Show modal even if not found, to indicate result
-             qrValidationModal.dataset.bookingId = ''; // Clear ID if not found
-             // Clear other fields
+             showElement(qrValidationModal); 
+             qrValidationModal.dataset.bookingId = ''; 
+             
             validationMovieTitle.textContent = 'N/A';
             validationShowtime.textContent = 'N/A';
             validationSeats.textContent = 'N/A';
@@ -2908,13 +2857,13 @@ async function handleValidScan(bookingId) { // Accepts Firestore booking ID
         const bookingData = bookingSnap.data();
         const isUsed = bookingData.qrCodeUsed || false;
 
-        // Populate validation modal
+        
         validationMovieTitle.textContent = bookingData.movieTitle || 'N/A';
         validationShowtime.textContent = bookingData.showtime || 'N/A';
         validationSeats.textContent = Array.isArray(bookingData.seats) ? bookingData.seats.sort().join(', ') : 'N/A';
         validationEmail.textContent = bookingData.userEmail || 'N/A';
-        validationBookingId.textContent = bookingId; // Show the scanned ID
-        qrValidationModal.dataset.bookingId = bookingId; // Store ID for 'Mark Used' button
+        validationBookingId.textContent = bookingId; 
+        qrValidationModal.dataset.bookingId = bookingId; 
 
         if (isUsed) {
             const usedTime = bookingData.qrUsedTimestamp ? new Date(bookingData.qrUsedTimestamp.toDate()).toLocaleString() : 'Previously';
@@ -2924,7 +2873,7 @@ async function handleValidScan(bookingId) { // Accepts Firestore booking ID
         } else {
             validationStatusElement.textContent = "QR Code is valid and not yet used.";
             validationStatusElement.className = 'status-ok';
-            markUsedBtn.disabled = false; // Enable button only if valid and unused
+            markUsedBtn.disabled = false; 
         }
         showElement(qrValidationModal);
 
@@ -2932,11 +2881,11 @@ async function handleValidScan(bookingId) { // Accepts Firestore booking ID
         console.error("Error fetching or validating booking from Firestore:", error);
         scanStatusElement.textContent = "Error validating booking status.";
         alert("An error occurred while checking the booking status.");
-        closeValidationModal(); // Close modal on fetch error
+        closeValidationModal(); 
     }
 }
 
-// Mark QR Code as Used in Firestore
+// Mark QR Code 
 async function markQrCodeAsUsed() {
     const bookingIdToMark = qrValidationModal.dataset.bookingId;
     if (!bookingIdToMark) {
@@ -2947,27 +2896,25 @@ async function markQrCodeAsUsed() {
         return;
     }
 
-    markUsedBtn.disabled = true; // Disable button during update
+    markUsedBtn.disabled = true; 
     markUsedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Marking...';
 
     try {
         const bookingRef = doc(db, "bookings", bookingIdToMark);
         await updateDoc(bookingRef, {
             qrCodeUsed: true,
-            qrUsedTimestamp: serverTimestamp() // Record the time it was marked used
+            qrUsedTimestamp: serverTimestamp() 
         });
 
         console.log("Successfully marked booking as used:", bookingIdToMark);
         validationStatusElement.textContent = "Successfully marked as used!";
         validationStatusElement.className = 'status-used';
-        markUsedBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Mark as Used'; // Reset text, keep disabled
+        markUsedBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Mark as Used';
 
-         // Update local booking cache if necessary
         const index = allBookings.findIndex(b => b.id === bookingIdToMark);
         if (index > -1) {
             allBookings[index].qrCodeUsed = true;
-             allBookings[index].qrUsedTimestamp = new Date(); // Simulate timestamp locally
-            // Refresh admin bookings list if it's the active tab
+             allBookings[index].qrUsedTimestamp = new Date(); 
             if (currentAdminTab === 'admin-bookings-section') {
                 renderAdminBookingsList();
             }
@@ -2977,7 +2924,7 @@ async function markQrCodeAsUsed() {
         console.error("Error marking booking as used:", error);
         validationStatusElement.textContent = "Error occurred while marking used.";
         validationStatusElement.className = 'status-error';
-        markUsedBtn.disabled = false; // Re-enable on error
+        markUsedBtn.disabled = false; 
         markUsedBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Mark as Used';
         alert("Failed to mark the ticket as used. Please try again.");
     }
@@ -2985,7 +2932,6 @@ async function markQrCodeAsUsed() {
 
 function closeValidationModal() {
     hideElement(qrValidationModal);
-    // Reset modal content
     validationMovieTitle.textContent = '--';
     validationShowtime.textContent = '--';
     validationSeats.textContent = '--';
@@ -2995,8 +2941,8 @@ function closeValidationModal() {
     validationStatusElement.className = '';
     markUsedBtn.disabled = true;
     markUsedBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Mark as Used';
-    qrValidationModal.dataset.bookingId = ''; // Clear stored ID
-    // Reset scan status message if needed
+    qrValidationModal.dataset.bookingId = ''; 
+    
     if (currentAdminTab === 'admin-qr-scanner-section' && scanStatusElement) {
          scanStatusElement.textContent = "Click Start Scanning.";
     }
@@ -3005,30 +2951,30 @@ function closeValidationModal() {
 function openQrZoomModal(qrElement) {
     if (!qrElement || !qrZoomModal || !qrZoomContent) return;
 
-    // ***** DETERMINE SIZE BASED ON SCREEN WIDTH *****
-    const isMobileWidth = window.innerWidth <= 640; // Example breakpoint for mobile (adjust as needed, maybe 768?)
-    const qrSize = isMobileWidth ? 200 : 300; // Smaller size for mobile, larger for desktop
+    
+    const isMobileWidth = window.innerWidth <= 640; 
+    const qrSize = isMobileWidth ? 200 : 300; 
     console.log(`Opening QR Zoom. Mobile: ${isMobileWidth}, QR Size: ${qrSize}px`);
-    // ***** END SIZE DETERMINATION *****
+    
 
-    // Clear previous content
+    
     qrZoomContent.innerHTML = '';
 
-    // Try cloning first (more efficient if source is img)
+    
     const existingImg = qrElement.querySelector('img');
     if (existingImg) {
         const zoomedImg = existingImg.cloneNode(true);
-        // Set size based on determination
+        
         zoomedImg.style.width = `${qrSize}px`;
         zoomedImg.style.height = `${qrSize}px`;
         qrZoomContent.appendChild(zoomedImg);
-        showElement(qrZoomModal); // Show the modal
-    } else { // Customer view ('my-bookings')
+        showElement(qrZoomModal); 
+    } else { 
         itemDiv.className = 'booking-list-item';
-        const bookingId = booking.id; // Store booking ID for listener
-        const movie = movies.find(m => m.id === booking.movieId); // Get movie details
+        const bookingId = booking.id; 
+        const movie = movies.find(m => m.id === booking.movieId); 
 
-        // Prepare QR Data (no change here)
+        
         const qrData = JSON.stringify({
             bookingId: bookingId,
             movieTitle: movie?.title || booking.movieTitle || 'Unknown Movie',
@@ -3059,7 +3005,7 @@ function openQrZoomModal(qrElement) {
 
         // Generate QR code after appending
         setTimeout(() => {
-            const qrElement = itemDiv.querySelector(`#qr-code-${bookingId}`); // Find element *after* innerHTML set
+            const qrElement = itemDiv.querySelector(`#qr-code-${bookingId}`); 
             if (qrElement) {
                 try {
                     new QRCode(qrElement, {
@@ -3068,12 +3014,12 @@ function openQrZoomModal(qrElement) {
                         colorDark: "#000000", colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.M
                     });
-                    // ***** CHANGE: Add Event Listener instead of inline onclick *****
+                    
                     qrElement.addEventListener('click', () => {
-                        console.log(`QR container clicked for booking ${bookingId}`); // Log click
-                        window.openQrZoomModal(qrElement); // Call the existing function
+                        console.log(`QR container clicked for booking ${bookingId}`); 
+                        window.openQrZoomModal(qrElement); 
                     });
-                    // ***** END CHANGE *****
+                    
 
                 } catch (e) {
                     console.error("QR Code generation failed:", e);
@@ -3092,25 +3038,25 @@ window.openQrZoomModal = openQrZoomModal;
 function closeQrZoomModal() {
     if (qrZoomModal) {
         hideElement(qrZoomModal);
-        qrZoomContent.innerHTML = ''; // Clear content
+        qrZoomContent.innerHTML = ''; 
     }
 }
 
 function closeSuccessModal() {
-    if (bookingSuccessModal) { // Check if element exists
+    if (bookingSuccessModal) { 
         hideElement(bookingSuccessModal);
     }
 }
 
 function formatCardNumber(event) {
     const input = event.target;
-    let value = input.value.replace(/\D/g, ''); // Remove non-digit characters
+    let value = input.value.replace(/\D/g, ''); 
     let formattedValue = '';
 
-    // Limit to 16 digits
+    
     value = value.substring(0, 16);
 
-    // Add spaces every 4 digits
+    
     for (let i = 0; i < value.length; i++) {
         if (i > 0 && i % 4 === 0) {
             formattedValue += ' ';
@@ -3123,25 +3069,25 @@ function formatCardNumber(event) {
 
 function formatExpiryDate(event) {
     const input = event.target;
-    let value = input.value.replace(/\D/g, ''); // Remove non-digit chars
+    let value = input.value.replace(/\D/g, ''); 
     let formattedValue = '';
 
-    // Handle MM
+    
     if (value.length > 0) {
         formattedValue += value.substring(0, 2);
     }
-    // Handle YY and add slash automatically
+    
     if (value.length >= 2) {
-         // Add slash only if month is complete and year started
+         
         if (formattedValue.length === 2 && value.length > 2) {
              formattedValue += '/';
         }
-         // Add YY (limit total digits to 4: MMYY)
+         
         formattedValue += value.substring(2, 4);
     }
 
-     // Special handling for backspace after slash
-     // If user deletes slash, also delete last digit of month if present
+     
+     
      if (event.inputType === 'deleteContentBackward' && input.value.length === 3 && input.value.endsWith('/')) {
          formattedValue = formattedValue.substring(0, 1);
      }
@@ -3187,7 +3133,6 @@ function initializeApp() {
 
     let resizeTimeout;
     window.addEventListener('resize', () => {
-        // Debounce resize event to avoid excessive calls
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateHeaderVisibility, 150);
     });
@@ -3195,22 +3140,21 @@ function initializeApp() {
     // --- Get Payment Form Input Elements ---
     const cardNumberInput = document.getElementById('card-number');
     const cardExpiryInput = document.getElementById('card-expiry');
-    const cardCvvInput = document.getElementById('card-cvv'); // CVV needed if you add validation later
+    const cardCvvInput = document.getElementById('card-cvv'); // CVV 
 
-    // --- *** FIX: ADD PAYMENT FORM INPUT EVENT LISTENERS HERE *** ---
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', formatCardNumber);
-        // Optional: Add blur validation if needed
-        // cardNumberInput.addEventListener('blur', validateCardNumber);
-        console.log("Card number listener attached."); // Add log
+        
+        
+        console.log("Card number listener attached."); 
     } else {
         console.warn("Card number input not found for listener attachment.");
     }
     if (cardExpiryInput) {
         cardExpiryInput.addEventListener('input', formatExpiryDate);
-        // Optional: Add blur validation if needed
-        // cardExpiryInput.addEventListener('blur', validateExpiryDate);
-        console.log("Card expiry listener attached."); // Add log
+        
+        
+        console.log("Card expiry listener attached."); 
     } else {
         console.warn("Card expiry input not found for listener attachment.");
     }
@@ -3221,24 +3165,24 @@ function initializeApp() {
     if (successModalCloseBtnSecondary) {
         successModalCloseBtnSecondary.addEventListener('click', closeSuccessModal);
     }
-    // Optional: Add blur validation for CVV if needed
-    // if (cardCvvInput) {
-    //    cardCvvInput.addEventListener('blur', validateCvv);
-    // }
-    // --- *** END OF FIX *** ---
+    
+    
+    
+    
+    
     
 
     // --- Event Delegation for Dynamic Buttons (Admin Lists) ---
-    if (adminMovieListContainer) { // Check if container exists
+    if (adminMovieListContainer) { 
         adminMovieListContainer.addEventListener('click', (event) => {
-            const targetButton = event.target.closest('button'); // Find the clicked button
-            if (!targetButton) return; // Exit if click wasn't on or inside a button
+            const targetButton = event.target.closest('button'); 
+            if (!targetButton) return; 
 
             if (targetButton.classList.contains('delete-movie-btn')) {
-                event.stopPropagation(); // Prevent card click if needed
+                event.stopPropagation(); 
                 const movieId = targetButton.dataset.movieId;
                 if (movieId) {
-                    deleteMovie(movieId); // Call your delete function
+                    deleteMovie(movieId); 
                 } else {
                     console.error("Missing data-movie-id on delete button");
                 }
@@ -3246,7 +3190,7 @@ function initializeApp() {
                  event.stopPropagation();
                  const movieId = targetButton.dataset.movieId;
                  if (movieId) {
-                    showEditForm(movieId); // Call your edit function
+                    showEditForm(movieId); 
                  } else {
                      console.error("Missing data-movie-id on edit button");
                  }
@@ -3257,22 +3201,22 @@ function initializeApp() {
     }
 
 
-    if (adminVendorListContainer) { // Check if container exists
+    if (adminVendorListContainer) { 
         adminVendorListContainer.addEventListener('click', (event) => {
-            const targetButton = event.target.closest('button'); // Find the clicked button
-            if (!targetButton) return; // Exit if click wasn't on or inside a button
+            const targetButton = event.target.closest('button'); 
+            if (!targetButton) return; 
 
             if (targetButton.classList.contains('delete-vendor-btn')) {
                 const vendorId = targetButton.dataset.vendorId;
                 if (vendorId) {
-                    deleteVendor(vendorId); // Call your delete function
+                    deleteVendor(vendorId); 
                 } else {
                      console.error("Missing data-vendor-id on delete button");
                 }
             } else if (targetButton.classList.contains('edit-vendor-btn')) {
                  const vendorId = targetButton.dataset.vendorId;
                  if (vendorId) {
-                    showEditVendorForm(vendorId); // Call your edit function
+                    showEditVendorForm(vendorId); 
                  } else {
                      console.error("Missing data-vendor-id on edit button");
                  }
@@ -3284,93 +3228,87 @@ function initializeApp() {
 
     // --- Firebase Auth State Listener ---
     onAuthStateChanged(auth, async (user) => {
-        console.log("Auth State Changed Callback Fired."); // Added log
+        console.log("Auth State Changed Callback Fired."); 
         if (user) {
-            console.log("User detected:", user.email, user.uid); // Added log
-            // User is signed in
-            let userType = 'customer'; // Default
+            console.log("User detected:", user.email, user.uid); 
+            
+            let userType = 'customer'; 
             let vendorName = null;
             let userData = null;
 
             try {
-                 // Fetch user role/data from Firestore 'users' collection using UID
+                 
                 const userDocRef = doc(db, "users", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
 
                 if (userDocSnap.exists()) {
                     userData = userDocSnap.data();
-                    userType = userData.role || 'customer'; // Expect 'admin', 'vendor', or 'customer'
+                    userType = userData.role || 'customer'; 
                     console.log(`User role from Firestore for ${user.email}: ${userType}`);
 
-                    // If vendor, fetch vendor details (like name) based on email match
+                    
                     if (userType === 'vendor') {
-                        const vendorDetailsRef = doc(db, "vendors", user.uid); // Use UID
+                        const vendorDetailsRef = doc(db, "vendors", user.uid); 
                         const vendorDetailsSnap = await getDoc(vendorDetailsRef);
                         if (vendorDetailsSnap.exists()) {
                             vendorName = vendorDetailsSnap.data().name;
                             console.log(`Vendor name found from /vendors: ${vendorName}`);
                         } else {
                              console.warn(`Vendor details document NOT found in /vendors/${user.uid} for vendor role user ${user.email}.`);
-                             vendorName = user.email; // Fallback display name
+                             vendorName = user.email; 
                         }
                     }
                 } else {
                     console.warn(`User document NOT found in Firestore for UID: ${user.uid}, Email: ${user.email}. Defaulting to customer.`);
-                     userType = 'customer'; // Assign default role
+                     userType = 'customer'; 
                 }
-                 console.log("User role fetched:", userType); // Added log
+                 console.log("User role fetched:", userType); 
 
-                 // Update authState
+                 
                  authState = {
                     isLoggedIn: true,
                     user: {
                         uid: user.uid,
                         email: user.email,
                         type: userType,
-                        name: vendorName // Contains name if vendor, null otherwise
+                        name: vendorName 
                     }
                  };
 
 
             } catch (error) {
-                console.error("Error fetching user role inside onAuthStateChanged:", error); // Added log
-                authState = { isLoggedIn: false, user: null }; // Log out on error
-                await signOut(auth); // Force sign out if role check fails critically
+                console.error("Error fetching user role inside onAuthStateChanged:", error); 
+                authState = { isLoggedIn: false, user: null }; 
+                await signOut(auth); 
             }
 
         } else {
-             console.log("No user detected (Logged out state)."); // Added log
-            // User is signed out
+             console.log("No user detected (Logged out state)."); 
+            
             authState = { isLoggedIn: false, user: null };
         }
 
         if (authState.isLoggedIn) {
             await loadDataFromFirebase();
-       } else {
-            // Clear local data on logout
+       } else { 
             movies = []; vendors = []; allBookings = []; allRatings = [];
        }
 
-        // Load data AFTER auth state is determined (or clear data on logout)
         if (authState.isLoggedIn) {
-             await loadDataFromFirebase(); // Load fresh data on login/refresh
+             await loadDataFromFirebase(); 
         } else {
-             // Clear local data on logout
              movies = [];
              vendors = [];
              allBookings = [];
              allRatings = [];
         }
 
-        // Render the UI based on the final authState and loaded data
-        console.log("Calling renderUI from onAuthStateChanged..."); // Added log
+        console.log("Calling renderUI from onAuthStateChanged..."); 
         renderUI();
-
         updateHeaderVisibility();
     });
-
     console.log("App Initialized. Waiting for Auth State...");
 }
 
 // --- Start the App ---
-window.addEventListener('DOMContentLoaded', initializeApp); // Use DOMContentLoaded instead of load
+window.addEventListener('DOMContentLoaded', initializeApp); 
